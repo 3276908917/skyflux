@@ -1,3 +1,6 @@
+* PUT XUBUNTU IN A VIRTUAL BOX ON OTTO
+
+
 * Read through the UV data python library,
     documenting thoughts and questions as you go
 * Look through the simulations,
@@ -15,8 +18,3 @@ UV mapping
 Beams available from here?
 	https://github.com/HERA-Team/HERA-Beams
 
-
-----------
-Notes:
-
-YAML is even looser than XML.
