@@ -1,0 +1,7 @@
+* Read through the UV data python library,
+    documenting thoughts and questions as you go
+* Look through the simulations,
+    documenting your thoughts as you go
+* See how to simulate the visibility thing with the equation that Ridhima gave you
+
+(how am I supposed to use the beam file)
