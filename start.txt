@@ -2,6 +2,21 @@
     documenting thoughts and questions as you go
 * Look through the simulations,
     documenting your thoughts as you go
+
+	https://github.com/HERA-Team
 * See how to simulate the visibility thing with the equation that Ridhima gave you
 
 (how am I supposed to use the beam file)
+
+UV mapping
+	https://en.wikipedia.org/wiki/UV_mapping
+
+
+Beams available from here?
+	https://github.com/HERA-Team/HERA-Beams
+
+
+----------
+Notes:
+
+YAML is even looser than XML.

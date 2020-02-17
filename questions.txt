@@ -1,0 +1,10 @@
+Did you ever hear back about the GPU simulation attempt?
+	* There seems to be one file in the repository:
+		median_filter.py
+
+Beams available from here?
+	https://github.com/HERA-Team/HERA-Beams
+	or https://github.com/HERA-Team/hera-cst
+
+Why is there a pyuvdata module from RadioAstronomySoftwareGroup
+	as well as uvtools from the HERA GitHub?
