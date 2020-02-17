@@ -8,3 +8,10 @@ Beams available from here?
 
 Why is there a pyuvdata module from RadioAstronomySoftwareGroup
 	as well as uvtools from the HERA GitHub?
+
+Not interested in externalizing
+
+    Vivaldi?
+
+Important, to myself
+    * HealPIX: we are using a pixel-based coordinate map

@@ -1,12 +1,14 @@
-----------
 Notes:
 
 YAML is even looser than XML. It is as if a CSV file had syntax requirements.
-
-Vivaldi:
 
 UV coordinates:
 
     "UV mapping is the 3D modelling process of projecting a 2D image to a 3D model's surface for texture mapping. The letters 'U' and "V' denote the axes of the 2D texture because 'X', 'Y', and 'Z'"
 
     So, I gather that this as how we get a square projectino of HERA's FoV on the celestial sphere.
+
+pyuvdata:
+
+    This page has a good example of reading in beam files (.txt)
+    https://pyuvdata.readthedocs.io/en/latest/tutorial.html
