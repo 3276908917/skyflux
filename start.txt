@@ -18,3 +18,10 @@ UV mapping
 Beams available from here?
 	https://github.com/HERA-Team/HERA-Beams
 
+---------------
+
+* So, I do not really understand what my goal is. Would be best
+    if I laid these things out.
+
+* Read Aaron Parsons delay time paper,
+    formulating questions as you go
