@@ -8,13 +8,17 @@
 
 	* A baseline has a delay spectrum
 
-* What are Fourier k modes? Parallel and perpendicular to what?
+------ For the professor:
+
+~* What are Fourier k modes? Parallel and perpendicular to what?
 	* First: what is k space? To what are we Fourier transforming?
 	(Still, however: what is a mode?)
 		https://physics.stackexchange.com/questions/212142/what-is-a-mode
 
 	"The Fourier transformation of V(\vec{\kappa}) to \tilde{V}(\vec{\tau})"
 	kappa is not k, though. Keep looking?
+
+* "The systematics of auto-correlations can be more difficult to tame than for cross-correlations."
 
 -------
 

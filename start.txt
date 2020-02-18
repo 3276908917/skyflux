@@ -29,6 +29,9 @@ Beams available from here?
 	and I believe that this is close to my goal, which is
 		find the A for a given I
 
+	* I suppose I should look at Parsons et al. 2011 if I still
+	cannot intuit the k space
+
 * I do not believe that I even finished reading the paper by Ridhima.
 	I believe that I began to skim quite badly as my 1500 deadline approached.
 
