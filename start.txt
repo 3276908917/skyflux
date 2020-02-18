@@ -60,7 +60,7 @@ i is a combination of xx and yy
 * I need to get the data for a single point source and see if it has all
     of the fields that I need in order to write the program.
 
-"The 4×4 matrix A can be seen as a mixing matrix between intrinsic and observed (primed) Stokes parameters"
+"The 4x4 matrix A can be seen as a mixing matrix between intrinsic and observed (primed) Stokes parameters"
     * How can I obtain the mixing matrix from the beam file?
 
 
