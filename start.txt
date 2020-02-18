@@ -20,8 +20,31 @@ Beams available from here?
 
 ---------------
 
-* So, I do not really understand what my goal is. Would be best
+* So, I do not really understand what my goal is. It would be best
     if I laid these things out.
+
+vague ideas and buzz words:
+
+30-250 MHz range
+    * use whatever frequency resolution you want
+    * start with a source at the center
+    * start with 52 antenna configurations
+        (that seems like a lot of work for an initial configuration...)
+
+A is a function of tau and nu, I is a function of nu
+    * UV coordinates are frequency- and time-independent
+    * 2 pi i (b * s / tau)
+        b: baseline length
+        s: source position
+        tau: delay
+    "it is a manner of representing phase"
+
+V_{ij} = AI\exp[2 \pi i (ul + vm)]
+    A is the beam model (what?)
+    I is the intensity of the point source
+    To what A does a given I correspond?
 
 * Read Aaron Parsons delay time paper,
     formulating questions as you go
+    * This objective may best be served by using Mac,
+        a platform better suited to saving PDF file highlights.
