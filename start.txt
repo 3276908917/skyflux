@@ -20,10 +20,17 @@ Beams available from here?
 
 ---------------
 
+* Read Aaron Parsons delay time paper,
+    formulating questions as you go
+    * This objective may best be served by using Mac,
+        a platform better suited to saving PDF file highlights.
+
 * So, I do not really understand what my goal is. It would be best
     if I laid these things out.
 
 vague ideas and buzz words:
+
+"start off by taking .5 MHz bandwidth"
 
 30-250 MHz range
     * use whatever frequency resolution you want
@@ -44,7 +51,16 @@ V_{ij} = AI\exp[2 \pi i (ul + vm)]
     I is the intensity of the point source
     To what A does a given I correspond?
 
-* Read Aaron Parsons delay time paper,
-    formulating questions as you go
-    * This objective may best be served by using Mac,
-        a platform better suited to saving PDF file highlights.
+i is a combination of xx and yy
+    Q = xx - yy: linear polarization
+    V: circular polarization indicates instrumental problems
+
+-----------
+
+* I need to get the data for a single point source and see if it has all
+    of the fields that I need in order to write the program.
+
+"The 4×4 matrix A can be seen as a mixing matrix between intrinsic and observed (primed) Stokes parameters"
+    * How can I obtain the mixing matrix from the beam file?
+
+
