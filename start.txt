@@ -25,6 +25,13 @@ Beams available from here?
     * This objective may best be served by using Mac,
         a platform better suited to saving PDF file highlights.
 
+	> see green highlighting on figure 5. The integral of A is obtained,
+	and I believe that this is close to my goal, which is
+		find the A for a given I
+
+* I do not believe that I even finished reading the paper by Ridhima.
+	I believe that I began to skim quite badly as my 1500 deadline approached.
+
 * So, I do not really understand what my goal is. It would be best
     if I laid these things out.
 
