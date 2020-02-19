@@ -12,3 +12,15 @@ pyuvdata:
 
     This page has a good example of reading in beam files (.txt)
     https://pyuvdata.readthedocs.io/en/latest/tutorial.html
+
+
+----
+
+My first goal is to run the visibility Jupyter notebook in the hera_sim repo:
+
+    * After installing all of the explicit dependencies, my runs fail
+    * I figure out I need to also install uvtools, available at another HERA repo
+    * I then figure out that 'pyradiosky' is not importable, so I try
+        installing that from RadioAstronomySoftwareGroup
+    * That did the trick. I now get the same warnings that the 
+        example compiled .ipynb gets.
