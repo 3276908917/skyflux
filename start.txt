@@ -25,6 +25,16 @@ Beams available from here?
     * This objective may best be served by using Mac,
         a platform better suited to saving PDF file highlights.
 
+	> see green highlighting on figure 5. The integral of A is obtained,
+	and I believe that this is close to my goal, which is
+		find the A for a given I
+
+	* I suppose I should look at Parsons et al. 2011 if I still
+	cannot intuit the k space
+
+* I do not believe that I even finished reading the paper by Ridhima.
+	I believe that I began to skim quite badly as my 1500 deadline approached.
+
 * So, I do not really understand what my goal is. It would be best
     if I laid these things out.
 
@@ -60,7 +70,7 @@ i is a combination of xx and yy
 * I need to get the data for a single point source and see if it has all
     of the fields that I need in order to write the program.
 
-"The 4×4 matrix A can be seen as a mixing matrix between intrinsic and observed (primed) Stokes parameters"
+"The 4x4 matrix A can be seen as a mixing matrix between intrinsic and observed (primed) Stokes parameters"
     * How can I obtain the mixing matrix from the beam file?
 
 

@@ -1,3 +1,27 @@
+* How do I procure baselines for the simulation?
+	(to ask this question truly well,
+	I must carefully consider both the definition of a baseline in
+	general, and the parameters that I want to use in particular)
+
+	* I am fairly certain that I want a baseline vector.
+	At the very least, b_x and b_y
+
+	* A baseline has a delay spectrum
+
+------ For the professor:
+
+~* What are Fourier k modes? Parallel and perpendicular to what?
+	* First: what is k space? To what are we Fourier transforming?
+	(Still, however: what is a mode?)
+		https://physics.stackexchange.com/questions/212142/what-is-a-mode
+
+	"The Fourier transformation of V(\vec{\kappa}) to \tilde{V}(\vec{\tau})"
+	kappa is not k, though. Keep looking?
+
+* "The systematics of auto-correlations can be more difficult to tame than for cross-correlations."
+
+-------
+
 Did you ever hear back about the GPU simulation attempt?
 	* There seems to be one file in the repository:
 		median_filter.py
