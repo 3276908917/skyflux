@@ -7,13 +7,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 beam = UVBeam()
 
-beam_filenames = [os.path.join(DATA_PATH, f) for f in ['HERA_4.9m_E-pattern_151MHz.txt']]
+beam_filenames = [os.path.join(DATA_PATH, f) for f in ['/home/lfinkbeiner/Documents/HERA/HERA_4.9m_E-pattern_151MHz.txt']]
 
-beam.read_cst_beam(beam_filenames, beam_type='efield')
+# Most importantly, the hard-code values below are entirely taken from the demo,
+    # and do not necessarily reflect your case at all
+# It seems a little ridiculous to have to specify frequencies both here and in the file names...
+# I do not understand feed polarization. And what is the point of feed version?
+beam.read_cst_beam(beam_filenames, beam_type='efield', frequency=[151e6],
+    feed_pol='x', rotate_pol=True, telescope_name='HERA',
+    feed_name='PAPER_dipole', feed_version='0.1',
+    model_name='E-field pattern - Rigging height 4.9m',
+    model_version='1.0')
 print("Beam type", beam.beam_type)
 print("Pixel coordinate system", beam.pixel_coordinate_system)
 # I do not know what this means
-print("Data normalization", data_normalization)
+print("Data normalization", beam.data_normalization)
 
 print("Number of beam polarizations", beam.Npols)
 print("Polarization type", beam.polarization_array)
@@ -29,3 +37,5 @@ plt.xlabel('Zenith Angle (radians)')
 plt.ylabel('Power')
 plt.show()
 
+print(beam.data_array[0, 0, 0, 0, :, 0])
+# hey, I didn't mean anything
