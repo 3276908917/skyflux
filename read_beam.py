@@ -31,10 +31,14 @@ print("Number of input frequencies", beam.Nfreqs)
 print("Array data shape", beam.data_array.shape)
 
 # "plot zenith angle cut through beam" I am not sure how relevant this is to my current effort
-plt.plot(beam.axis2_array, beam.data_array[0, 0, 0, 0, :, 0]) # fancy syntax, what is going on here?
+plt.plot(beam.axis2_array, np.real(beam.data_array[0, 0, 0, 0, :, 0]), label='real') # fancy syntax, what is going on here?
+plt.plot(beam.axis2_array, np.imag(beam.data_array[0, 0, 0, 0, :, 0]), label='imaginary')
 plt.xscale('log')
 plt.xlabel('Zenith Angle (radians)')
 plt.ylabel('Power')
+plt.legend(bbox_to_anchor=(1,1))
+
+# I do not understand how power can have an imaginary component.
 plt.show()
 
 print(beam.data_array[0, 0, 0, 0, :, 0])
