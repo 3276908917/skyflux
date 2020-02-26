@@ -1,0 +1,4 @@
+I have to keep using sudo every time I want to use pyuvdata and that irritates me.
+
+I have not adequately set up the conda environment.
+There are still traces of python 2.7, 3.6, and 3.8 on the system.
