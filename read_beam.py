@@ -41,5 +41,6 @@ plt.legend(bbox_to_anchor=(1,1))
 # I do not understand how power can have an imaginary component.
 plt.show()
 
+# Here is the proof; we are getting complex numbers back.
 print(beam.data_array[0, 0, 0, 0, :, 0])
 # hey, I didn't mean anything
