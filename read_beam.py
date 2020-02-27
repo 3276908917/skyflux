@@ -43,4 +43,7 @@ plt.show()
 
 # Here is the proof; we are getting complex numbers back.
 print(beam.data_array[0, 0, 0, 0, :, 0])
+
+# convert to heal_pix
+
 # hey, I didn't mean anything
