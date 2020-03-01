@@ -1,3 +1,12 @@
+'''
+We need
+    to look at the latest repo, to see if that is what we want
+    Jones matrix
+    EField to stokes helps us with this, somehow
+We need
+    to recreate that one article with all the differently colored circles
+'''
+
 # All credit to https://pyuvdata.readthedocs.io/en/latest/tutorial.html
 
 import os
