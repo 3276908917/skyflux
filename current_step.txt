@@ -10,3 +10,10 @@ def construct_spline_beam_func(
 * a spline is a piecewise polynomial. Spline interpolation/approximation tries
 	to model a set of data by splitting it into regimes, each of which is approximated
 	by a different spline.
+
+
+
+small victories: {
+    the full installation, all the way to RIMEz, works
+    if I use pip instead of conda.
+}
