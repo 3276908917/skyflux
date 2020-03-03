@@ -12,8 +12,3 @@ def construct_spline_beam_func(
 	by a different spline.
 
 
-
-small victories: {
-    the full installation, all the way to RIMEz, works
-    if I use pip instead of conda.
-}
