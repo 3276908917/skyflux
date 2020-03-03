@@ -1,0 +1,12 @@
+def model_data_to_spline_beam_func(full_file_name, nu_axis, L_synth=180, indexed=False):
+
+
+def construct_spline_beam_func(
+    nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs, imap="default"
+):
+
+
+* njit is simply a decorator to make loops run more quickly
+* a spline is a piecewise polynomial. Spline interpolation/approximation tries
+	to model a set of data by splitting it into regimes, each of which is approximated
+	by a different spline.
