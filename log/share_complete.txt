@@ -1,0 +1,7 @@
+Top-level installations. (Do we get any error messages?)
+
+hera_sim
+	no errors, but a lot of additional pip installs. Worrisome...
+
+RIMEz: pip install .
+	it worked!

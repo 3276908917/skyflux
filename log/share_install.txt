@@ -1,0 +1,46 @@
+Apparently, mixing conda and pip will really kill you, so try to avoid that for
+as long as you can.
+
+What worked and what did not? Back to basics
+
+The following lines will totally annihilate an environment:
+	conda remove --name hera --all
+	conda env remove --name hera
+
+Setting up the environment:
+
+I had to do
+	conda create --name hera python=3.7.6 --channel conda-forge
+and NOT
+	conda create --name hera
+because the second line, for some reason, created a python 2.7 environment. What!
+
+Configuring package environment:
+
+I had to also do
+	conda config --add channels conda-forge
+Because, for some reason, that second flag on the line from earlier did not
+truly add the desired source-forge channel. Anyway, bypassing that line
+would immediately fail this next part:
+
+Installation of pyuvdata (NOT tested in the long-term):
+	conda install numpy scipy astropy h5py python-casacore astropy-healpix pyyaml
+
+Installation of hera_sim (NOT tested in the long-term):
+	conda install -c conda-forge pyuvdata aipy attrs healpy
+	my guesses (NEITHER worked):
+		conda install gfortran
+		conda install fftw --enable-shared
+
+Installation of RIMEz:
+	conda install -c anaconda gfortran_osx-64 
+	conda install -c conda-forge fftw 
+	conda install numba cffi
+
+
+Pipe dream:
+	conda install matplotlib ipython jupyter codecov
+	conda install pip3
+		(pip3 does not exist)
+	conda install pip
+		already installed, apparently
