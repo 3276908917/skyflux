@@ -25,22 +25,23 @@ would immediately fail this next part:
 
 Installation of pyuvdata (NOT tested in the long-term):
 	conda install numpy scipy astropy h5py python-casacore astropy-healpix pyyaml
+		Windows failed python-casacore
 
 Installation of hera_sim (NOT tested in the long-term):
 	conda install -c conda-forge pyuvdata aipy attrs healpy
-	my guesses (NEITHER worked):
-		conda install gfortran
-		conda install fftw --enable-shared
+		Windows failed all but attrs
+			* Healpy on the conda-forge channel is intended as a pre-compiled version for Unix-like systems
 
 Installation of RIMEz:
 	conda install -c anaconda gfortran_osx-64 
+		probably not necssary on Windows machines?
 	conda install -c conda-forge fftw 
 	conda install numba cffi
 
 
 Pipe dream:
 	conda install matplotlib ipython jupyter codecov
-	conda install pip3
+	F conda install pip3
 		(pip3 does not exist)
-	conda install pip
+	F conda install pip
 		already installed, apparently
