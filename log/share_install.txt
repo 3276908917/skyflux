@@ -41,7 +41,3 @@ Installation of RIMEz:
 
 Pipe dream:
 	conda install matplotlib ipython jupyter codecov
-	F conda install pip3
-		(pip3 does not exist)
-	F conda install pip
-		already installed, apparently
