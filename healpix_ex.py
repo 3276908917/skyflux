@@ -1,8 +1,11 @@
+#nside = 16, 32, 64, 128...
 nside=128
-theta, phi = hp.pix2ang(nside,np.arange(12*nside*nside))
+
+theta, phi = hp.pix2ang(nside,np.arange(12 * nside * nside))
 J = spline_beam_func(150e6, alt, az)
 alt = np.pi/2 - theta
 alt = theta
+alt = np.pi - theta
 az = phi
 J = spline_beam_func(150e6, az, alt)
 hp.mollview(J[:,1,0], rot=[0, 90])
@@ -21,11 +24,5 @@ J[:,0,0]
 hp.orthview(np.abs(J[:,0,0]), rot=[0, 90], half_sky=True)
 hp.orthview(np.abs(J[:,1,0]), rot=[0, 90], half_sky=True)
 hp.orthview(np.abs(J[:,0,1]), rot=[0, 90], half_sky=True)
-****
-theta, phi = hp.pix2ang(nside,np.arange(12 * nside * nside))
-alt = np.pi - theta
-az = phi
-nside=16, 32, 64, 128,…
 
-https://healpix.sourceforge.io/
-
+#https://healpix.sourceforge.io/
