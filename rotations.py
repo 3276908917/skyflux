@@ -29,6 +29,23 @@ def gal_to_eq(el, be, lat=ugradio.nch.lat, radians=False):
     ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
     return new_sphere(ra_dec, radians)
 
+def eq_to_gal(ra, dec, latitude, lst, radians=False):
+    '''
+    @radians determines the format of BOTH input and output!
+    Given a pair of angles @ra and @dec,
+    return a pair of angles relating the associated
+    azimuth (first) and altitude (second).
+    '''
+    if not radians:
+        ra = np.radians(ra)
+        dec = np.radians(dec)
+        latitude = np.radians(latitude)
+        lst = np.radians(lst)
+    eq_vector = rectangle(ra, dec)
+    ha_vector = np.dot(M_eq_to_ha(lst), eq_vector)
+    topo_vector = np.dot(M_ha_to_topo(latitude), ha_vector)
+    return new_sphere(topo_vector, radians)
+
 def M_eq_to_ha(LST):
     '''
     Return the change-of-basis matrix between the equatorial and
