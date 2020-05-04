@@ -16,31 +16,31 @@ M_eq_to_gal = np.array([
     [-.867666, -.198076, .455984]
 ])
 
-def gal_to_eq(el, be, lat, radians=False):
+# accuracy not verified, see function below
+def gal_to_eq(el, be, radians=False):
     if not radians:
         l = np.radians(el)
         b = np.radians(be)
-        phi = np.radians(lat)
     else:
         l = el
         b = be
-        phi = lat
     rct = rectangle(l, b)
     ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
     return new_sphere(ra_dec, radians)
 
+# we have confirmed that this function is incorrect
 def eq_to_gal(ra, dec, radians=False):
     '''
     @radians determines the format of BOTH input and output!
     Given a pair of angles @ra and @dec,
     return a pair of angles relating the associated
-    azimuth (first) and altitude (second).
+    galactic longitude (first?) and latitude (second?).
     '''
     if not radians:
         ra = np.radians(ra)
         dec = np.radians(dec)
     eq_vector = rectangle(ra, dec)
-    gal_vector = np.dot(np.linalg.inv(M_eq_to_gal), eq_vector)
+    gal_vector = np.dot(M_eq_to_gal, eq_vector)
     return new_sphere(gal_vector, radians)
 
 def M_eq_to_ha(LST):
