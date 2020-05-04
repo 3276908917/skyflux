@@ -16,7 +16,7 @@ M_eq_to_gal = np.array([
     [-.867666, -.198076, .455984]
 ])
 
-def gal_to_eq(el, be, lat=ugradio.nch.lat, radians=False):
+def gal_to_eq(el, be, lat, radians=False):
     if not radians:
         l = np.radians(el)
         b = np.radians(be)
@@ -29,7 +29,7 @@ def gal_to_eq(el, be, lat=ugradio.nch.lat, radians=False):
     ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
     return new_sphere(ra_dec, radians)
 
-def eq_to_gal(ra, dec, latitude, lst, radians=False):
+def eq_to_gal(ra, dec, radians=False):
     '''
     @radians determines the format of BOTH input and output!
     Given a pair of angles @ra and @dec,
@@ -39,12 +39,9 @@ def eq_to_gal(ra, dec, latitude, lst, radians=False):
     if not radians:
         ra = np.radians(ra)
         dec = np.radians(dec)
-        latitude = np.radians(latitude)
-        lst = np.radians(lst)
     eq_vector = rectangle(ra, dec)
-    ha_vector = np.dot(M_eq_to_ha(lst), eq_vector)
-    topo_vector = np.dot(M_ha_to_topo(latitude), ha_vector)
-    return new_sphere(topo_vector, radians)
+    gal_vector = np.dot(np.linalg.inv(M_eq_to_gal), eq_vector)
+    return new_sphere(gal_vector, radians)
 
 def M_eq_to_ha(LST):
     '''
@@ -74,8 +71,7 @@ def rectangle(a, b):
     '''
     return np.array([np.cos(b) * np.cos(a), np.cos(b) * np.sin(a), np.sin(b)])
 
-def gal_to_topo(el, be, jd, lat=ugradio.nch.lat,
-    lon=ugradio.timing.nch.lon, radians=False):
+def gal_to_topo(el, be, jd, lat, lon, radians=False):
     '''
     @radians determines the format of BOTH input and output!
     Given a pair of angles @el and @be (in galactic coordinates),
@@ -113,7 +109,7 @@ def new_sphere(out_arr, radians=False):
         return np.degrees(gp), np.degrees(tp)   
     return gp, tp
 
-def ha_to_topo(ha, dec, lat=ugradio.nch.lat, radians=False):
+def ha_to_topo(ha, dec, lat, radians=False):
     '''
     Take a position in hour-angle right ascension / declination
         to local altitude and azimuth.
@@ -131,7 +127,7 @@ def ha_to_topo(ha, dec, lat=ugradio.nch.lat, radians=False):
     topo = np.dot(M_ha_to_topo(phi), rct)
     return new_sphere(topo, radians)
 
-def ha_to_eq(ha, dec, lat=ugradio.nch.lat, radians=False):
+def ha_to_eq(ha, dec, lat, radians=False):
     '''
     Take a position in hour-angle right-ascension / declination
         to regular right-ascension / declination.
