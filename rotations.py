@@ -16,14 +16,21 @@ M_eq_to_gal = np.array([
     [-.867666, -.198076, .455984]
 ])
 
+def ha_to_gal(ha, dec, lst, radians=False):
+    if not radians:
+        ha = np.radians(ha)
+        dec = np.radians(dec)
+        lst = np.radians(lst)
+    rct = rectangle(ha, dec)
+    ra_dec = np.dot(np.linalg.inv(M_eq_to_ha(lst)), rct)
+    gal = np.dot(M_eq_to_gal, ra_dec)
+    return new_sphere(gal, radians)
+
 def gal_to_eq(el, be, radians=False):
     if not radians:
-        l = np.radians(el)
-        b = np.radians(be)
-    else:
-        l = el
-        b = be
-    rct = rectangle(l, b)
+        el = np.radians(el)
+        be = np.radians(be)
+    rct = rectangle(el, be)
     ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
     return new_sphere(ra_dec, radians)
 
