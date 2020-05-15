@@ -1,4 +1,7 @@
 import numpy as np
+import time
+import astropy
+import astropy.time
 
 def collapse_angle(degree, minute, second):
     return degree + minute / 60 + second / 3600
@@ -6,8 +9,12 @@ def collapse_angle(degree, minute, second):
 def collapse_hour(hour, minute, second):
     return 15 * hour + minute / 4 + second / 240
 
-lat = -collapse_angle(30, 43, 17)
-lon = collapse_angle(21, 25, 42)
+hera_lat = -collapse_angle(30, 43, 17)
+hera_lon = collapse_angle(21, 25, 42)
+
+def get_lst(lon = hera_lon):
+    t = astropy.time.Time(time.time(), format='unix')
+    return t.sidereal_time('apparent', longitude=lon).radian
 
 # The change-of-basis matrix between equatorial and galactic coordinate systems
 M_eq_to_gal = np.array([
@@ -82,22 +89,19 @@ def gal_to_topo(el, be, jd, lat, lon, radians=False):
     Given a pair of angles @el and @be (in galactic coordinates),
     return a pair of angles relating the associated
     azimuth and altitude.
+
+    This does not work in the current environment
+    we are using ugradio as a crutch.
     '''
     if not radians:
-        l = np.radians(el)
-        b = np.radians(be)
-        phi = np.radians(lat)
-        # The lst function expects radians,
-        # so we do not convert this quantity.
-        theta = lon
+        el = np.radians(el)
+        be = np.radians(be)
+        lat = np.radians(lat)
     else:
-        l = el
-        b = be
-        phi = lat
-        theta = np.degrees(lon)
+        lon = np.degrees(lon)
     rct = rectangle(l, b)
     ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
-    lst = ugradio.timing.lst(jd, theta)
+    lst = get_lst(lon)
     hrd = np.dot(np.linalg.inv(M_eq_to_ha(lst)), ra_dec)
     topo = np.dot(M_ha_to_topo(phi), hrd)
     return new_sphere(topo, radians)
@@ -121,15 +125,11 @@ def ha_to_topo(ha, dec, lat, radians=False):
     This performs NO precession.
     '''
     if not radians:
-        r = np.radians(ha)
-        d = np.radians(dec)
-        phi = np.radians(lat)
-    else:
-        r = ha
-        d = dec
-        phi = lat
-    rct = rectangle(r, d)
-    topo = np.dot(M_ha_to_topo(phi), rct)
+        ha = np.radians(ha)
+        dec = np.radians(dec)
+        lat = np.radians(lat)
+    rct = rectangle(ha, dec)
+    topo = np.dot(M_ha_to_topo(lat), rct)
     return new_sphere(topo, radians)
 
 def ha_to_eq(ha, dec, lat, radians=False):
@@ -138,15 +138,11 @@ def ha_to_eq(ha, dec, lat, radians=False):
         to regular right-ascension / declination.
     '''
     if not radians:
-        r = np.radians(ha)
-        d = np.radians(dec)
-        phi = np.radians(lat)
-    else:
-        r = ha
-        d = dec
-        phi = lat
-    rct = rectangle(r, d)
-    eq = np.dot(np.linalg.inv(M_eq_to_ha(phi)), rct)
+        ha = np.radians(ha)
+        dec = np.radians(dec)
+        lat = np.radians(lat)
+    rct = rectangle(ha, dec)
+    eq = np.dot(np.linalg.inv(M_eq_to_ha(lat)), rct)
     return new_sphere(eq, radians)
 
 def eq_to_topo(ra, dec, latitude, lst, radians=False):
