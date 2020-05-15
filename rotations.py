@@ -89,18 +89,16 @@ def gal_to_topo(el, be, jd, lat, lon, radians=False):
     Given a pair of angles @el and @be (in galactic coordinates),
     return a pair of angles relating the associated
     azimuth and altitude.
+
+    This does not work in the current environment
+    we are using ugradio as a crutch.
     '''
+    raise NotImplementedError
     if not radians:
-        l = np.radians(el)
-        b = np.radians(be)
-        phi = np.radians(lat)
-        # The lst function expects radians,
-        # so we do not convert this quantity.
-        theta = lon
+        el = np.radians(el)
+        be = np.radians(be)
+        lat = np.radians(lat)
     else:
-        l = el
-        b = be
-        phi = lat
         theta = np.degrees(lon)
     rct = rectangle(l, b)
     ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
@@ -128,15 +126,11 @@ def ha_to_topo(ha, dec, lat, radians=False):
     This performs NO precession.
     '''
     if not radians:
-        r = np.radians(ha)
-        d = np.radians(dec)
-        phi = np.radians(lat)
-    else:
-        r = ha
-        d = dec
-        phi = lat
-    rct = rectangle(r, d)
-    topo = np.dot(M_ha_to_topo(phi), rct)
+        ha = np.radians(ha)
+        dec = np.radians(dec)
+        lat = np.radians(lat)
+    rct = rectangle(ha, dec)
+    topo = np.dot(M_ha_to_topo(lat), rct)
     return new_sphere(topo, radians)
 
 def ha_to_eq(ha, dec, lat, radians=False):
@@ -145,15 +139,11 @@ def ha_to_eq(ha, dec, lat, radians=False):
         to regular right-ascension / declination.
     '''
     if not radians:
-        r = np.radians(ha)
-        d = np.radians(dec)
-        phi = np.radians(lat)
-    else:
-        r = ha
-        d = dec
-        phi = lat
-    rct = rectangle(r, d)
-    eq = np.dot(np.linalg.inv(M_eq_to_ha(phi)), rct)
+        ha = np.radians(ha)
+        dec = np.radians(dec)
+        lat = np.radians(lat)
+    rct = rectangle(ha, dec)
+    eq = np.dot(np.linalg.inv(M_eq_to_ha(lat)), rct)
     return new_sphere(eq, radians)
 
 def eq_to_topo(ra, dec, latitude, lst, radians=False):
