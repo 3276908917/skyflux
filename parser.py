@@ -65,10 +65,21 @@ for line in f:
     print(GLEAM_entry(line[1:]))
 f.close()
 
-# Now we have a section on reading the antenna positions
-    # calculate baseline vectors and all that
-# is the format u, v, m?? That doesn't make any sense!
+# Antenna section
+
 antenna_positions = dict(pickle.load(open("ant_dict.pk", "rb")))
+
+def baseline(ant_ID1, ant_ID2):
+    return antenna_positions[ant_ID2] - antenna_positions[ant_ID1]
+
+def list_baselines(ant_ID):
+    print ("Baselines between antenna " + str(ant_ID) + " and antenna...")
+    for ID in antenna_positions:
+        if ant_ID != ID:
+            #print(baseline(ant_ID, ID))
+            print(str(ID) + ": " + str(baseline(ant_ID, ID)))
+
+# Now print every baseline, without duplicating
 
 # b = (u, v, w) is the
 # vector representing the coordinates in meters in the plane
@@ -76,5 +87,4 @@ antenna_positions = dict(pickle.load(open("ant_dict.pk", "rb")))
 
 # s is the Stokes I parameter?
 
-# things I am currently planning to leave open
-    # calculation of the celestial unit vector?
+# calculation of the celestial unit vector r
