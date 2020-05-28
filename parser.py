@@ -67,24 +67,49 @@ f.close()
 
 # Antenna section
 
-antenna_positions = dict(pickle.load(open("ant_dict.pk", "rb")))
+ant_pos = dict(pickle.load(open("ant_dict.pk", "rb")))
+
+"""
+b = (u, v, w) is the
+vector representing the coordinates in meters in the plane
+of the array
+"""
 
 def baseline(ant_ID1, ant_ID2):
-    return antenna_positions[ant_ID2] - antenna_positions[ant_ID1]
+    """
+    Calculate the baseline between antennae # @ant_ID1 and @ant_ID2
+    by a simple difference of their coordinates.
+    """
+    return ant_pos[ant_ID2] - ant_pos[ant_ID1]
 
 def list_baselines(ant_ID):
+    """
+    Print every baseline that features antenna # @ant_ID
+    """
     print ("Baselines between antenna " + str(ant_ID) + " and antenna...")
-    for ID in antenna_positions:
+    for ID in ant_pos:
         if ant_ID != ID:
-            #print(baseline(ant_ID, ID))
             print(str(ID) + ": " + str(baseline(ant_ID, ID)))
 
 # Now print every baseline, without duplicating
 
-# b = (u, v, w) is the
-# vector representing the coordinates in meters in the plane
-# of the array
+active_ants = list(ant_pos)
+active_ants.sort()
 
-# s is the Stokes I parameter?
+def all_baselines():
+    """
+    Print every baseline, without duplicating.
 
-# calculation of the celestial unit vector r
+    To-do: eventually I am going to want to figure out how to propagate
+        the particular order (in which I am subtracting coordinates)
+        out to the integral that I am taking.
+    """
+    for i in range(len(active_ants)):
+        ID1 = active_ants[i]
+        for j in range(i + 1, len(active_ants[i + 1:])):
+            ID2 = active_ants[j]
+            print("Baseline between antennae " + str(ID1) + \
+                  " and " + str(ID2) + " = " + str(baseline(ID1, ID2)))
+
+# s is the Stokes I parameter. I am not sure how to get that vector out of the integral.
+# I need to calculate the celestial unit vector r, but the textbook is a little over my head.
