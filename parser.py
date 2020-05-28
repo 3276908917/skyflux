@@ -13,4 +13,14 @@ We want a Python trim function, because,
     we will be ingesting a ton of white space.
 """
 
+# This is hard-coded to the GLEAMEGCAT format
 
+f = open("gleam_excerpt.txt", "r")
+for line in f:
+    line = line[1:]
+    line.index("|")
+    print(line.strip())
+f.close()
+
+# Now we have a section on reading the antenna positions
+    # calculate baseline vectors and all that
