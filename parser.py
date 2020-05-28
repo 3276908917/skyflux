@@ -20,23 +20,44 @@ class GLEAM_entry:
         # Might want to redo this line later to exclude universal "GLEAM " prefix
         self.name = line[:line.index("|")]
         line = line[line.index("|") + 1:]
+        
         self.ra = line[:line.index("|")]
+        self.format_ra()
         line = line[line.index("|") + 1:]
+
         self.dec = line[:line.index("|")]
+        self.format_dec()
         line = line[line.index("|") + 1:]
+
         self.flux = line[:line.index("|")].strip()
 
+    def format_ra(self):
+        remainder = self.ra
+        self.ra_hour = float(remainder[:remainder.index(" ")])
+
+        remainder = remainder[remainder.index(" ") + 1:]
+        self.ra_minute = float(remainder[:remainder.index(" ")])
+
+        remainder = remainder[remainder.index(" ") + 1:]
+        self.ra_second = float(remainder)
+
+        self.ra_angle = 15 * self.ra_hour + self.ra_minute / 4 + self.ra_second / 240
+
+    def format_dec(self):
+        remainder = self.dec
+        self.dec_degree = float(remainder[:remainder.index(" ")])
+
+        remainder = remainder[remainder.index(" ") + 1:]
+        self.dec_arcminute = float(remainder[:remainder.index(" ")])
+
+        remainder = remainder[remainder.index(" ") + 1:]
+        self.dec_arcsecond = float(remainder)
+
+        self.dec_angle = self.dec_degree + self.dec_arcminute / 60 + self.dec_arcsecond / 3600
+
     def __str__(self):
-        return "Name: " + self.name + "\nRight ascension: " + self.ra + \
-            "\nDeclination: " + self.dec + "\nWide-field flux: " + self.flux + "\n"
-
-    #needs formatting
-    def get_ra():
-        return self.ra
-
-    #needs formatting
-    def get_dec():
-        return self.dec
+        return "Name: " + self.name + "\nRight ascension: " + str(self.ra_angle) + \
+            "\nDeclination: " + str(self.dec_angle) + "\nWide-field flux: " + self.flux + "\n"
 
 f = open("gleam_excerpt.txt", "r")
 
