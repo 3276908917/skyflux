@@ -7,11 +7,45 @@ For each line in (argument is file path)
 Delimiter is |
 We assume that we only have to deal with 4 fields:
 | name | right ascension in hour format | declination in arc format | flux |
+"""
 
-I do not know how to open a file
-We want a Python trim function, because,
-    when we try to read from the flux field,
-    we will be ingesting a ton of white space.
+"""
+GLEAMEGCAT quick guide
+parameters to include in the output (downloaded to file)
+name
+ra
+dec -40 .. -20
+int_flux_76_mhz
+int_flux_84_mhz
+int_flux_92_mhz
+int_flux_99_mhz
+int_flux_107_mhz
+int_flux_115_mhz
+int_flux_122_mhz
+int_flux_130_mhz
+int_flux_143_mhz
+int_flux_151_mhz
+int_flux_158_mhz
+int_flux_166_mhz
+int_flux_174_mhz
+int_flux_181_mhz
+int_flux_189_mhz
+int_flux_197_mhz
+int_flux_204_mhz
+int_flux_212_mhz
+int_flux_220_mhz
+int_flux_227_mhz
+
+(I also have an alternate file which includes values for
+alpha. I am not sure if this is the same alpha about which
+Ridhima is talking. If it is, this column would be handy
+for checking my simulated results against experimental observations.)
+
+I may have gone a little overboard with the frequency coverage;
+I should definitely ask Ridhima if I should axe some of these.
+
+Alright, we are at 86633 results for dec -40 .. -20.
+I may eventually simply order by 151 MHz intensity and cut at 1000 entries.
 """
 
 # This is hard-coded to the GLEAMEGCAT format
@@ -144,4 +178,6 @@ Ergo, I think it safe just to evaluate
 A(r, nu) * s(r, nu) exp[-2 pi i nu b * r / c]
 
 A(r, nu) = S^{-1} * [J(r, nu) cross J^*(r, nu)] * S
+
+Am I evaluating this integrand for every possible base line? Would I simply sum up the integrands?
 """
