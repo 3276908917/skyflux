@@ -1,5 +1,6 @@
 import pickle
 import glob
+import numpy as np
 
 """
 For each line in (argument is file path)
@@ -111,5 +112,36 @@ def all_baselines():
             print("Baseline between antennae " + str(ID1) + \
                   " and " + str(ID2) + " = " + str(baseline(ID1, ID2)))
 
-# s is the Stokes I parameter. I am not sure how to get that vector out of the integral.
-# I need to calculate the celestial unit vector r, but the textbook is a little over my head.
+# s(r, nu) is the Stokes I parameter.
+# s = np.array([intensity goes here , 0, 0, 0])
+    # and we hope that this is a 4x1 vector
+
+"""
+The following function was written by C. D. Nunhokee,
+'genVisibility.py', polarizedSims, Feb 8 2019
+https://github.com/Chuneeta/polarizedSims/blob/master/genVisibility.py
+"""
+def raddec2lm(ra0, dec0, ra, dec):# ra and dec in radians
+    """
+    Converts ra/dec to direction cosines l/m
+    ra0  : reference/phase right ascension; type: float
+    dec0 : reference/phase declination; type:float
+    ra   : right ascension in radians; type:float
+    dec  : declination in radians; type:float
+    """
+    rad2deg = lambda val: val * 180. / np.pi
+    l = np.cos(dec) * np.sin(ra0 - ra)
+    m = -1 * (np.sin(dec) * np.cos(dec0) - \
+        np.cos(dec) * np.sin(dec0) * np.cos(ra-ra0))
+    return l, m
+
+"""
+I am not so sure anymore that I really want an integral just yet.
+Look at the infinitesimal: it is a solid angle.
+Does that not suggest we are integrating over the whole sky?
+Currently, our goal is just to pass one point source through the pipe line.
+Ergo, I think it safe just to evaluate
+A(r, nu) * s(r, nu) exp[-2 pi i nu b * r / c]
+
+A(r, nu) = S^{-1} * [J(r, nu) cross J^*(r, nu)] * S
+"""
