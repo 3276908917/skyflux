@@ -10,6 +10,9 @@ We assume that we only have to deal with 4 fields:
 """
 
 """
+I may have gone a little overboard with the frequency coverage;
+I should definitely ask Ridhima if I should axe some of these.
+
 GLEAMEGCAT quick guide
 parameters to include in the output (downloaded to file)
 name
@@ -36,19 +39,16 @@ int_flux_212_mhz
 int_flux_220_mhz
 int_flux_227_mhz
 
-(I also have an alternate file which includes values for
-alpha. I am not sure if this is the same alpha about which
-Ridhima is talking. If it is, this column would be handy
-for checking my simulated results against experimental observations.)
-
-I may have gone a little overboard with the frequency coverage;
-I should definitely ask Ridhima if I should axe some of these.
-
 Alright, we are at 86633 results for dec -40 .. -20.
 I may eventually simply order by 151 MHz intensity and cut at 1000 entries.
 """
 
 # This is hard-coded to the GLEAMEGCAT format
+
+# all numbers represent MHz quantities
+expected_frequencies = [76, 84, 92, 99, 107, 115, 122, 130,
+                    143, 151, 158, 166, 174, 181, 189,
+                    197, 204, 212, 220, 227]
 
 class GLEAM_entry:
     def __init__(self, line):
@@ -64,7 +64,17 @@ class GLEAM_entry:
         self.format_dec()
         line = line[line.index("|") + 1:]
 
-        self.flux = line[:line.index("|")].strip()
+        self.flux_by_frq = {}
+
+        """
+        We want a loop over elements from an arry. Each element describes the next frequency
+        which we are extracting.
+        """
+
+        for expected_frq in expected_frequencies:
+            self.flux_by_frq[expected_frq] = line[:line.index("|")].strip()
+            line = line[line.index("|") + 1:]
+            
 
     def format_ra(self):
         remainder = self.ra
@@ -92,12 +102,17 @@ class GLEAM_entry:
 
     def __str__(self):
         return "Name: " + self.name + "\nRight ascension: " + str(self.ra_angle) + \
-            "\nDeclination: " + str(self.dec_angle) + "\nWide-field flux: " + self.flux + "\n"
+            "\nDeclination: " + str(self.dec_angle) + \
+            "\n151 MHz flux: " + self.flux_by_frq[151] + "\n"
+    # we will probably want a __repr__ function so that we can see ALL fluxes associated
+    # with the object.
 
 f = open("gleam_excerpt.txt", "r")
 
+obj_catalog = []
+
 for line in f:
-    print(GLEAM_entry(line[1:]))
+    obj_catalog.append(GLEAM_entry(line[1:]))
 f.close()
 
 # Antenna section
