@@ -14,48 +14,11 @@ def collapse_hour(hour, minute, second):
 hera_lat = -collapse_angle(30, 43, 17)
 hera_lon = collapse_angle(21, 25, 42)
 
-"""
-For each line in (argument is file path)
-Delimiter is |
-We assume that we only have to deal with 4 fields:
-| name | right ascension in hour format | declination in arc format | flux |
-"""
+def get_lst(lon = hera_lon):
+    t = astropy.time.Time(time.time(), format='unix')
+    return t.sidereal_time('apparent', longitude=lon).radian
 
-"""
-I may have gone a little overboard with the frequency coverage;
-I should definitely ask Ridhima if I should axe some of these.
-
-GLEAMEGCAT quick guide
-parameters to include in the output (downloaded to file)
-name
-ra
-dec -40 .. -20
-int_flux_76_mhz
-int_flux_84_mhz
-int_flux_92_mhz
-int_flux_99_mhz
-int_flux_107_mhz
-int_flux_115_mhz
-int_flux_122_mhz
-int_flux_130_mhz
-int_flux_143_mhz
-int_flux_151_mhz
-int_flux_158_mhz
-int_flux_166_mhz
-int_flux_174_mhz
-int_flux_181_mhz
-int_flux_189_mhz
-int_flux_197_mhz
-int_flux_204_mhz
-int_flux_212_mhz
-int_flux_220_mhz
-int_flux_227_mhz
-
-Alright, we are at 86633 results for dec -40 .. -20.
-I may eventually simply order by 151 MHz intensity and cut at 1000 entries.
-"""
-
-# This is hard-coded to the GLEAMEGCAT format
+# The following section is hard-coded to the GLEAMEGCAT format
 
 # all numbers represent MHz quantities
 expected_frequencies = [76, 84, 92, 99, 107, 115, 122, 130,
@@ -78,11 +41,7 @@ class GLEAM_entry:
 
         self.flux_by_frq = {}
 
-        """
-        We want a loop over elements from an arry. Each element describes the next frequency
-        which we are extracting.
-        """
-
+        # we extract and record fluxes according to expected_frequencies
         for expected_frq in expected_frequencies:
             self.flux_by_frq[expected_frq] = line[:line.index("|")].strip()
             line = line[line.index("|") + 1:]
@@ -110,19 +69,20 @@ class GLEAM_entry:
         remainder = remainder[remainder.index(" ") + 1:]
         self.dec_arcsecond = float(remainder)
 
-        self.dec_angle = self.collapse_angle(self.dec_degree, self.dec_arcminute, self.dec_arcsecond)
+        self.dec_angle = collapse_angle(self.dec_degree, self.dec_arcminute, self.dec_arcsecond)
 
     def __str__(self):
         return "Name: " + self.name + "\nRight ascension: " + str(self.ra_angle) + \
             "\nDeclination: " + str(self.dec_angle) + \
             "\n151 MHz flux: " + self.flux_by_frq[151] + "\n"
-    # we will probably want a __repr__ function so that we can see ALL fluxes associated
-    # with the object.
+    # we will probably want a __repr__ function so that we can see
+    # ALL fluxes associated with the object.
 
 f = open("gleam_excerpt.txt", "r")
 
 obj_catalog = []
 
+# For each line in f, the delimiter is |
 for line in f:
     obj_catalog.append(GLEAM_entry(line[1:]))
 f.close()
@@ -153,8 +113,6 @@ def list_baselines(ant_ID):
         if ant_ID != ID:
             print(str(ID) + ": " + str(baseline(ant_ID, ID)))
 
-# Now print every baseline, without duplicating
-
 active_ants = list(ant_pos)
 active_ants.sort()
 
@@ -177,16 +135,13 @@ def all_baselines():
 # s = np.array([intensity goes here , 0, 0, 0])
     # and we hope that this is a 4x1 vector
 
-def get_lst(lon = hera_lon):
-    t = astropy.time.Time(time.time(), format='unix')
-    return t.sidereal_time('apparent', longitude=lon).radian
-
 """
 The following function was written by C. D. Nunhokee,
 'genVisibility.py', polarizedSims, Feb 8 2019
 https://github.com/Chuneeta/polarizedSims/blob/master/genVisibility.py
 """
-def raddec2lm(ra0=None, dec0 = hera_lat, ra, dec): # ra and dec in radians
+# Unfortunately, the parameter order has been switched wrt the citation.
+def raddec2lm(ra, dec, ra0=None, dec0=hera_lat): # ra and dec in radians
     """
     Converts ra/dec to direction cosines l/m
     ra0  : reference/phase right ascension; type: float
