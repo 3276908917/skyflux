@@ -156,16 +156,10 @@ def raddec2lm(ra, dec, ra0=None, dec0=hera_lat): # ra and dec in radians
     return l, m
 
 """
-I am not so sure anymore that I really want an integral just yet.
+I am not so sure that I really want an integral just yet.
 Look at the infinitesimal: it is a solid angle.
 Does that not suggest we are integrating over the whole sky?
 Currently, our goal is just to pass one point source through the pipe line.
-Ergo, I think it safe just to evaluate
-A(r, nu) * s(r, nu) exp[-2 pi i nu b * r / c]
-
-A(r, nu) = S^{-1} * [J(r, nu) cross J^*(r, nu)] * S
-
-Am I evaluating this integrand for every possible base line? Would I simply sum up the integrands?
 """
 
 S = .5 * np.array([[1, 1, 0, 0,],
@@ -176,8 +170,15 @@ S = .5 * np.array([[1, 1, 0, 0,],
 c = 299792458 # m / s
 
 def phase_factor(ant1, ant2, r, nu=151e6):
-    # we still need to adjust b for proper dotting, since b has 3 elements and r has 2
-    b = baseline(ant1, ant2)
+    """
+    Calculate the phase factor in the direction @r (l, m)
+        (we assume that n is of insignificant magnitude)
+    and at the frequency @nu
+    between two antennae whose ID #s are @ant1 and @ant2.
+    When we calculate the baseline (u, v, w), we
+        assume that w is of insignificant magnitude.
+    """
+    b = baseline(ant1, ant2)[0:2] # kill w
     br = np.dot(b, r)
     return np.exp(-2j * np.pi * nu * br / c)
 
@@ -211,9 +212,6 @@ def visibility_integrand(J, source, nu=151e6):
     # Do I want to sum for all possible baselines?
     # If not: should I make a function to evaluate the integrand for a single baseline?
     return np.dot(np.dot(A, s), phase_sum(r, nu))
-
-def raddec2lm(ra, dec, ra0=None, dec0=hera_lat):
-return l, m (radians)
 
 """
 We cannot put ra0 = get_lst() in the function header. Why?
