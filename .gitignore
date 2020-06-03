@@ -1,6 +1,12 @@
 
 *.DS_Store
+# reading the antenna generates an h5 file, but the file cannot be
+# re-used in lieu of reading
 *.h5
+# Python byte-code is by definition optimized for the LOCAL machine
 *.pyc
+# checkpoints are good for local users to undo mistakes,
+# but version control (i.e. Git) already handles mistakes for
+# the repository as a whole.
 .ipynb_checkpoints
 */.ipynb_checkpoints
