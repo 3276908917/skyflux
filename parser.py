@@ -131,10 +131,6 @@ def all_baselines():
             print("Baseline between antennae " + str(ID1) + \
                   " and " + str(ID2) + " = " + str(baseline(ID1, ID2)))
 
-# s(r, nu) is the Stokes I parameter.
-# s = np.array([intensity goes here , 0, 0, 0])
-    # and we hope that this is a 4x1 vector
-
 """
 The following function was written by C. D. Nunhokee,
 'genVisibility.py', polarizedSims, Feb 8 2019
@@ -171,6 +167,32 @@ A(r, nu) = S^{-1} * [J(r, nu) cross J^*(r, nu)] * S
 
 Am I evaluating this integrand for every possible base line? Would I simply sum up the integrands?
 """
+
+S = .5 * np.array([[1, 1, 0, 0,],
+                  [0, 0, 1, 1j],
+                  [0, 0, 1, -1j],
+                  [1, -1, 0, 0]])
+
+c = 299792458 # m / s
+
+def phase_factor(ant1, ant2, r, nu=151e6):
+    b = baseline(ant1, ant2)
+    br = np.dot(b, r)
+    return np.exp(-2j * np.pi * nu * br / c)
+
+def phase_sum():
+    # add together the phase_factors for all
+    # possible baselines without duplicates
+    return 23
+
+def visibility_integrand(J, source, nu=151e6):
+    I = raddec2lm(source.flux_by_frq[nu / 1e6])
+    s = np.array([I, 0, 0, 0])
+    # outer product of J and np.conj(J)
+    # left dot by S^{-1}, right dot by S
+
+    #return np.dot(np.dot(A, s), phase_sum(r, nu)
+    return 23
 
 """
 We cannot put ra0 = get_lst() in the function header. Why?
