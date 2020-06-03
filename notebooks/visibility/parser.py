@@ -15,6 +15,11 @@ hera_lat = -collapse_angle(30, 43, 17)
 hera_lon = collapse_angle(21, 25, 42)
 
 def get_lst(lon = hera_lon):
+    """
+    Return current local sidereal time (LST)
+    for longitude @lon (default is HERA array).
+    LST is returned in radians.
+    """
     t = astropy.time.Time(time.time(), format='unix')
     return t.sidereal_time('apparent', longitude=lon).radian
 
@@ -198,14 +203,13 @@ def phase_sum(r, nu=151e6):
     return total
 
 def visibility_integrand(J, source, nu=151e6):
-    I = raddec2lm(source.flux_by_frq[nu / 1e6])
+    I = source.flux_by_frq[nu / 1e6]
     s = np.array([I, 0, 0, 0])
 
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
-    l, m = raddec2lm(ra, dec)
-    r = (l, m) # this might be redundant. Maybe I should do r = raddec2lm(source.dec_angle)
-
+    r = raddec2lm(ra, dec)
+    
     J_outer = np.kron(J, np.conj(J))
     A = np.dot(np.dot(np.linalg.inv(S), J_outer), S)
 
