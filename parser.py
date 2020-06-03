@@ -1,6 +1,18 @@
 import pickle
 import glob
 import numpy as np
+import time
+import astropy
+import astropy.time
+
+def collapse_angle(degree, arcminute, arcsecond):
+    return degree + arcminute / 60 + arcsecond / 3600
+
+def collapse_hour(hour, minute, second):
+    return 15 * hour + minute / 4 + second / 240
+
+hera_lat = -collapse_angle(30, 43, 17)
+hera_lon = collapse_angle(21, 25, 42)
 
 """
 For each line in (argument is file path)
@@ -86,7 +98,7 @@ class GLEAM_entry:
         remainder = remainder[remainder.index(" ") + 1:]
         self.ra_second = float(remainder)
 
-        self.ra_angle = 15 * self.ra_hour + self.ra_minute / 4 + self.ra_second / 240
+        self.ra_angle = collapse_hour(self.ra_hour, self.ra_minute, self.ra_second)
 
     def format_dec(self):
         remainder = self.dec
@@ -98,7 +110,7 @@ class GLEAM_entry:
         remainder = remainder[remainder.index(" ") + 1:]
         self.dec_arcsecond = float(remainder)
 
-        self.dec_angle = self.dec_degree + self.dec_arcminute / 60 + self.dec_arcsecond / 3600
+        self.dec_angle = self.collapse_angle(self.dec_degree, self.dec_arcminute, self.dec_arcsecond)
 
     def __str__(self):
         return "Name: " + self.name + "\nRight ascension: " + str(self.ra_angle) + \
@@ -165,12 +177,16 @@ def all_baselines():
 # s = np.array([intensity goes here , 0, 0, 0])
     # and we hope that this is a 4x1 vector
 
+def get_lst(lon = hera_lon):
+    t = astropy.time.Time(time.time(), format='unix')
+    return t.sidereal_time('apparent', longitude=lon).radian
+
 """
 The following function was written by C. D. Nunhokee,
 'genVisibility.py', polarizedSims, Feb 8 2019
 https://github.com/Chuneeta/polarizedSims/blob/master/genVisibility.py
 """
-def raddec2lm(ra0, dec0, ra, dec):# ra and dec in radians
+def raddec2lm(ra0=None, dec0 = hera_lat, ra, dec): # ra and dec in radians
     """
     Converts ra/dec to direction cosines l/m
     ra0  : reference/phase right ascension; type: float
@@ -178,6 +194,10 @@ def raddec2lm(ra0, dec0, ra, dec):# ra and dec in radians
     ra   : right ascension in radians; type:float
     dec  : declination in radians; type:float
     """
+    # See note at the end about default arguments.
+    if ra0 is None:
+        ra0 = get_lst()
+    
     rad2deg = lambda val: val * 180. / np.pi
     l = np.cos(dec) * np.sin(ra0 - ra)
     m = -1 * (np.sin(dec) * np.cos(dec0) - \
@@ -195,4 +215,11 @@ A(r, nu) * s(r, nu) exp[-2 pi i nu b * r / c]
 A(r, nu) = S^{-1} * [J(r, nu) cross J^*(r, nu)] * S
 
 Am I evaluating this integrand for every possible base line? Would I simply sum up the integrands?
+"""
+
+"""
+We cannot put ra0 = get_lst() in the function header. Why?
+Because Python evaluates all function headers once upon first opening the script.
+Consequently, the default argument will be constant: subsequent calls of this
+function will use the value of get_lst() calculated when the script was opened.
 """
