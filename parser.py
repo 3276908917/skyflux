@@ -176,23 +176,44 @@ S = .5 * np.array([[1, 1, 0, 0,],
 c = 299792458 # m / s
 
 def phase_factor(ant1, ant2, r, nu=151e6):
+    # we still need to adjust b for proper dotting, since b has 3 elements and r has 2
     b = baseline(ant1, ant2)
     br = np.dot(b, r)
     return np.exp(-2j * np.pi * nu * br / c)
 
-def phase_sum():
-    # add together the phase_factors for all
-    # possible baselines without duplicates
-    return 23
+def phase_sum(r, nu=151e6):
+    """
+    add together the phase_factors for all
+    possible baselines without duplicates
+    """
+    total = complex(0)
+
+    for i in range(len(active_ants)):
+        ID1 = active_ants[i]
+        for j in range(i + 1, len(active_ants[i + 1:])):
+            ID2 = active_ants[j]
+            total += phase_factor(ID1, ID2, r, nu)
+            
+    return total
 
 def visibility_integrand(J, source, nu=151e6):
     I = raddec2lm(source.flux_by_frq[nu / 1e6])
     s = np.array([I, 0, 0, 0])
-    # outer product of J and np.conj(J)
-    # left dot by S^{-1}, right dot by S
 
-    #return np.dot(np.dot(A, s), phase_sum(r, nu)
-    return 23
+    ra = np.radians(source.ra_angle)
+    dec = np.radians(source.dec_angle)
+    l, m = raddec2lm(ra, dec)
+    r = (l, m) # this might be redundant. Maybe I should do r = raddec2lm(source.dec_angle)
+
+    J_outer = np.kron(J, np.conj(J))
+    A = np.dot(np.dot(np.linalg.inv(S), J_outer), S)
+
+    # Do I want to sum for all possible baselines?
+    # If not: should I make a function to evaluate the integrand for a single baseline?
+    return np.dot(np.dot(A, s), phase_sum(r, nu))
+
+def raddec2lm(ra, dec, ra0=None, dec0=hera_lat):
+return l, m (radians)
 
 """
 We cannot put ra0 = get_lst() in the function header. Why?
