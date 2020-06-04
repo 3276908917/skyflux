@@ -7,10 +7,6 @@ import astropy.time
 
 import rotations
 
-def get_lst(lon = hera_lon):
-    t = astropy.time.Time(time.time(), format='unix')
-    return t.sidereal_time('apparent', longitude=lon).radian
-
 # The following section is hard-coded to the GLEAMEGCAT format
 
 # all numbers represent MHz quantities
