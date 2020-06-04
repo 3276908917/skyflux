@@ -7,6 +7,18 @@ import astropy.time
 
 import rotations
 
+"""
+In principle, it should not matter which flux-by-frequency
+you order by. Like, you can choose 151e6 Hz
+
+You could also sort by int_flux (the total thing)
+
+1 Jansky threshold would be good
+
+get brightest source,
+find distribution of source brightnesses
+"""
+
 # The following section is hard-coded to the GLEAMEGCAT format
 
 # all numbers represent MHz quantities
@@ -166,7 +178,7 @@ def phase_sum(r, nu=151e6):
 
 def visibility_integrand(J, source, nu=151e6):
     I = source.flux_by_frq[nu / 1e6]
-    s = np.array([I, 0, 0, 0])
+    s = np.array([complex(I), 0, 0, 0])
 
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
