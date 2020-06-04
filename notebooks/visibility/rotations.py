@@ -166,3 +166,26 @@ def eq_to_topo(ra, dec, latitude, lst, radians=False):
     ha_vector = np.dot(M_eq_to_ha(lst), eq_vector)
     topo_vector = np.dot(M_ha_to_topo(latitude), ha_vector)
     return new_sphere(topo_vector, radians)
+
+"""
+The following function was written by C. D. Nunhokee,
+'genVisibility.py', polarizedSims, Feb 8 2019
+https://github.com/Chuneeta/polarizedSims/blob/master/genVisibility.py
+"""
+# Unfortunately, the parameter order has been switched wrt the citation.
+def raddec2lm(ra, dec, ra0=None, dec0=hera_lat): # ra and dec in radians
+    """
+    Converts ra/dec to direction cosines l/m
+    ra0  : reference/phase right ascension; type: float
+    dec0 : reference/phase declination; type:float
+    ra   : right ascension in radians; type:float
+    dec  : declination in radians; type:float
+    """
+    # See note at the end about default arguments.
+    if ra0 is None:
+        ra0 = get_lst()
+
+    l = np.cos(dec) * np.sin(ra0 - ra)
+    m = -1 * (np.sin(dec) * np.cos(dec0) - \
+        np.cos(dec) * np.sin(dec0) * np.cos(ra-ra0))
+    return l, m
