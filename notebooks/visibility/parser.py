@@ -170,14 +170,15 @@ def visibility_integrand(J, source, nu=151e6):
 
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
-    r = raddec2lm(ra, dec)
+    r = rotations.raddec2lm(ra, dec)
     
     J_outer = np.kron(J, np.conj(J))
     A = np.dot(np.dot(np.linalg.inv(S), J_outer), S)
 
     # Do I want to sum for all possible baselines?
     # If not: should I make a function to evaluate the integrand for a single baseline?
-    return np.dot(np.dot(A, s), phase_sum(r, nu))
+    phi = phase_sum(r, nu)
+    return np.dot(np.dot(A, s), phi)
 
 """
 We cannot put ra0 = get_lst() in the function header. Why?
