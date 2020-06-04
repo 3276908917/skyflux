@@ -17,6 +17,10 @@ You could also sort by int_flux (the total thing)
 
 get brightest source,
 find distribution of source brightnesses
+
+PARSE SPECTRAL INDICES FOR EACH OBJECT
+raise a warning if an object could not find a valid spectral index!
+Because, if it lacks one, we need to fit a power law.
 """
 
 # The following section is hard-coded to the GLEAMEGCAT format
@@ -99,6 +103,8 @@ b = (u, v, w) is the
 vector representing the coordinates in meters in the plane
 of the array
 """
+
+# Get this printing crap out of here.
 
 def baseline(ant_ID1, ant_ID2):
     """
@@ -191,6 +197,39 @@ def visibility_integrand(J, source, nu=151e6):
     # If not: should I make a function to evaluate the integrand for a single baseline?
     phi = phase_sum(r, nu)
     return np.dot(np.dot(A, s), phi)
+
+"""
+Sum your sources, not your baselines.
+Summation over different values r-hat
+
+Integration is a summation over sources.
+
+(I think the output should be a scalar, not a 4x1)
+
+The graph of times and positions
+
+A will change according to time. Equation 3 assumes that we have
+just one integration time.
+
+The change in A over time represents a drift scan,
+like the Gaussians that you recently visualized.
+
+Time you can do, you have all the information
+
+use constant flux independent of frequency
+(this is the same as saying that alpha is equal to one)
+then varying frequency from 100-200 MHz
+'assume it is the same beam between 100 and 200 MHz'
+    beam variation is what we will eventually be handling anyway
+
+15 m or 30 m baseline East-West
+
+I need to plot the A matrix, to see the leakage terms.
+Plot it in healpix.
+
+(Ask for her power spectrum notebook plot for a single baseline,
+if you complete all of your work.)
+"""
 
 """
 We cannot put ra0 = get_lst() in the function header. Why?
