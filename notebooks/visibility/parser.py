@@ -1,10 +1,5 @@
 import pickle
-import glob
 import numpy as np
-import time
-import astropy
-import astropy.time
-
 import rotations
 
 """
@@ -50,7 +45,8 @@ class GLEAM_entry:
         for expected_frq in expected_frequencies:
             self.flux_by_frq[expected_frq] = line[:line.index("|")].strip()
             line = line[line.index("|") + 1:]
-            
+
+        self.alpha = line[:line.index("|")]
 
     def format_ra(self):
         remainder = self.ra
@@ -82,6 +78,7 @@ class GLEAM_entry:
         return "Name: " + self.name + "\nRight ascension: " + str(self.ra_angle) + \
             "\nDeclination: " + str(self.dec_angle) + \
             "\n151 MHz flux: " + self.flux_by_frq[151] + "\n"
+    
     # we will probably want a __repr__ function so that we can see
     # ALL fluxes associated with the object.
 

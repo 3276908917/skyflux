@@ -1,6 +1,3 @@
-I may have gone a little overboard with the frequency coverage;
-I should definitely ask Ridhima if I should axe some of these.
-
 GLEAMEGCAT quick guide
 parameters to include in the output (downloaded to file)
 name
@@ -27,5 +24,4 @@ int_flux_212_mhz
 int_flux_220_mhz
 int_flux_227_mhz
 
-Alright, we are at 86633 results for dec -40 .. -20.
-I may eventually simply order by 151 MHz intensity and cut at 1000 entries.
+We are at 3872 results for these constraints.
