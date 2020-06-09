@@ -3,6 +3,11 @@ import time
 import astropy
 import astropy.time
 
+"""
+S ~/prop\nu^alpha
+S_{200} = S_{150} * (200/150)^\alpha
+"""
+
 def collapse_angle(degree, arcminute, arcsecond):
     return degree + arcminute / 60 + arcsecond / 3600
 
