@@ -13,7 +13,7 @@ you order by. Like, you can choose 151e6 Hz
 
 You could also sort by int_flux (the total thing)
 
-1 Jansky threshold would be good
+1 Jansky = 1000 mJy threshold would be good
 
 get brightest source,
 find distribution of source brightnesses
@@ -98,14 +98,6 @@ f.close()
 
 ant_pos = dict(pickle.load(open("ant_dict.pk", "rb")))
 
-"""
-b = (u, v, w) is the
-vector representing the coordinates in meters in the plane
-of the array
-"""
-
-# Get this printing crap out of here.
-
 def baseline(ant_ID1, ant_ID2):
     """
     Calculate the baseline between antennae # @ant_ID1 and @ant_ID2
@@ -113,39 +105,8 @@ def baseline(ant_ID1, ant_ID2):
     """
     return ant_pos[ant_ID2] - ant_pos[ant_ID1]
 
-def list_baselines(ant_ID):
-    """
-    Print every baseline that features antenna # @ant_ID
-    """
-    print ("Baselines between antenna " + str(ant_ID) + " and antenna...")
-    for ID in ant_pos:
-        if ant_ID != ID:
-            print(str(ID) + ": " + str(baseline(ant_ID, ID)))
-
 active_ants = list(ant_pos)
 active_ants.sort()
-
-def all_baselines():
-    """
-    Print every baseline, without duplicating.
-
-    To-do: eventually I am going to want to figure out how to propagate
-        the particular order (in which I am subtracting coordinates)
-        out to the integral that I am taking.
-    """
-    for i in range(len(active_ants)):
-        ID1 = active_ants[i]
-        for j in range(i + 1, len(active_ants[i + 1:])):
-            ID2 = active_ants[j]
-            print("Baseline between antennae " + str(ID1) + \
-                  " and " + str(ID2) + " = " + str(baseline(ID1, ID2)))
-
-"""
-I am not so sure that I really want an integral just yet.
-Look at the infinitesimal: it is a solid angle.
-Does that not suggest we are integrating over the whole sky?
-Currently, our goal is just to pass one point source through the pipe line.
-"""
 
 S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, 1j],
@@ -167,21 +128,6 @@ def phase_factor(ant1, ant2, r, nu=151e6):
     br = np.dot(b, r)
     return np.exp(-2j * np.pi * nu * br / c)
 
-def phase_sum(r, nu=151e6):
-    """
-    add together the phase_factors for all
-    possible baselines without duplicates
-    """
-    total = complex(0)
-
-    for i in range(len(active_ants)):
-        ID1 = active_ants[i]
-        for j in range(i + 1, len(active_ants[i + 1:])):
-            ID2 = active_ants[j]
-            total += phase_factor(ID1, ID2, r, nu)
-            
-    return total
-
 def visibility_integrand(J, source, nu=151e6):
     I = source.flux_by_frq[nu / 1e6]
     s = np.array([complex(I), 0, 0, 0])
@@ -194,7 +140,8 @@ def visibility_integrand(J, source, nu=151e6):
     A = np.dot(np.dot(np.linalg.inv(S), J_outer), S)
 
     # Do I want to sum for all possible baselines?
-    # If not: should I make a function to evaluate the integrand for a single baseline?
+    # No. I should make a function to evaluate the integrand
+        # for a single baseline.
     phi = phase_sum(r, nu)
     return np.dot(np.dot(A, s), phi)
 

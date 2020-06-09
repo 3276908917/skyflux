@@ -5,7 +5,7 @@ GLEAMEGCAT quick guide
 parameters to include in the output (downloaded to file)
 name
 ra
-dec -40 .. -20
+dec -40.72 .. -20.72
 int_flux_76_mhz
 int_flux_84_mhz
 int_flux_92_mhz
@@ -15,7 +15,7 @@ int_flux_115_mhz
 int_flux_122_mhz
 int_flux_130_mhz
 int_flux_143_mhz
-int_flux_151_mhz
+int_flux_151_mhz > 1000
 int_flux_158_mhz
 int_flux_166_mhz
 int_flux_174_mhz
