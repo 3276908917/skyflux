@@ -42,11 +42,18 @@ class GLEAM_entry:
         self.flux_by_frq = {}
 
         # we extract and record fluxes according to expected_frequencies
+        # at the same time, we convert mJy -> Jy
         for expected_frq in expected_frequencies:
-            self.flux_by_frq[expected_frq] = line[:line.index("|")].strip()
+            self.flux_by_frq[expected_frq] = \
+                float(line[:line.index("|")].strip()) / 1000
             line = line[line.index("|") + 1:]
 
-        self.alpha = line[:line.index("|")]
+        # this requires careful handling even by the user:
+        # blind numerical comparisons of alphas could generate ValueErrors
+        try:
+            self.alpha = float(line[:line.index("|")])
+        except ValueError:
+            self.alpha = None
 
     def format_ra(self):
         remainder = self.ra
@@ -145,6 +152,7 @@ def visibility_integrand(J, source, nu=151e6):
 """
 Sum your sources, not your baselines.
 Summation over different values r-hat
+    Are my r-hat calculations automatically normalized?
 
 Integration is a summation over sources.
 

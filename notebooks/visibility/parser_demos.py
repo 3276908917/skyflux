@@ -2,6 +2,25 @@ import numpy as np
 
 import parser
 
+# GLEAMEGCAT section
+
+# Might be interesting to see whether this changes with different frequencies
+def brightest_source(frq=151):
+    """
+    Return the source with the highest value for integrated flux
+    at frequency @frq (in MHz). The source must also satisfy the
+    query constaints described in resources/GLEAM_guide.txt.
+
+    There is no error checking to make sure @frq is a valid frequency.
+    """
+    max_obj = parser.obj_catalog[0]
+    for gleam_obj in parser.obj_catalog:
+        if gleam_obj.flux_by_frq[frq] > max_obj.flux_by_frq[frq]:
+            max_obj = gleam_obj
+    print("Largest flux value encountered:", max_obj.flux_by_frq[frq])
+    print("Name of associated object:", max_obj.name)
+    return max_obj
+
 # Antenna section
 
 """
