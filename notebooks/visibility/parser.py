@@ -4,18 +4,15 @@ import rotations
 
 """
 In principle, it should not matter which flux-by-frequency
-you order by. Like, you can choose 151e6 Hz
+you order by. However, in practice (as we can see in
+parser_demos.py), some sources are brighter than others
+at certain frequencies.
 
-You could also sort by int_flux (the total thing)
-
-1 Jansky = 1000 mJy threshold would be good
-
-get brightest source,
 find distribution of source brightnesses
 
-PARSE SPECTRAL INDICES FOR EACH OBJECT
-raise a warning if an object could not find a valid spectral index!
-Because, if it lacks one, we need to fit a power law.
+We have several sources that lack spectral indices,
+    so it looks like we are moving ahead with plan A
+    (use a power-law regression to get a spectral index function)
 """
 
 # The following section is hard-coded to the GLEAMEGCAT format

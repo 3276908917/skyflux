@@ -1,6 +1,22 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
 import parser
+
+def frame():
+    """
+    Set up generic infrastructure for an improved-looking plot.
+    We return the figure and the axis on which we want to plot.
+    """
+    fig = plt.figure(figsize = (6, 3))
+
+    plt.subplots_adjust(left=.15, bottom=.2, right=.95, top=.9)
+    ax = fig.add_subplot(111)
+    
+    ax.tick_params(axis="x", labelsize=12)
+    ax.tick_params(axis="y", labelsize=12)
+
+    return fig, ax
 
 # GLEAMEGCAT section
 
@@ -20,6 +36,35 @@ def brightest_source(frq=151):
     print("Largest flux value encountered:", max_obj.flux_by_frq[frq])
     print("Name of associated object:", max_obj.name)
     return max_obj
+
+def brightness_distr(frq=151):
+    """
+    Generate a histogram for the brigtnesses of all sources
+    (satisfying the resources/GLEAM_guide.txt constraints)
+    for a given frequency.
+    """
+    fluxes = np.array([
+        np.log(gleam_obj.flux_by_frq[frq]) for gleam_obj in parser.obj_catalog
+    ])
+
+    fig, ax = frame()
+    ax.hist(fluxes, bins=29)
+    plt.xlabel("ln([Jy]) at " + str(frq) + " MHz", fontsize=12)
+    plt.ylabel("Frequency", fontsize=12)
+
+"""
+76 MHz
+Largest flux value encountered: 37.735298
+Name of associated object: GLEAM J084125-754033
+
+(This object holds all records on the range [76, 130])
+
+151 MHz
+Largest flux value encountered: 25.322440999999998
+Name of associated object: GLEAM J164417-771532
+
+(This object holds all records on the range [143, 227])
+"""
 
 # Antenna section
 
