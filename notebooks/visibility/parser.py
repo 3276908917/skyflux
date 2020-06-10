@@ -39,16 +39,20 @@ class GLEAM_entry:
         # we extract and record fluxes according to expected_frequencies
         # at the same time, we convert mJy -> Jy
         for expected_frq in expected_frequencies:
-            self.flux_by_frq[expected_frq] = \
-                float(line[:line.index("|")].strip()) / 1000
+            try:
+                self.flux_by_frq[expected_frq] = \
+                    float(line[:line.index("|")].strip()) / 1000
+            except ValueError:
+                print("Missing flux value for:", self.name,
+                      "at frequency:", expected_frq, "MHz.")
+                self.flux_by_frq[expected_frq] = np.NaN
             line = line[line.index("|") + 1:]
 
-        # this requires careful handling even by the user:
-        # blind numerical comparisons of alphas could generate ValueErrors
         try:
             self.alpha = float(line[:line.index("|")])
         except ValueError:
-            self.alpha = None
+            print("Missing spectral index for:", self.name)
+            self.alpha = np.NaN
 
     def format_ra(self):
         remainder = self.ra
@@ -84,7 +88,7 @@ class GLEAM_entry:
     # we will probably want a __repr__ function so that we can see
     # ALL fluxes associated with the object.
 
-f = open("gleam_excerpt.txt", "r")
+f = open("gleam_with_alpha.txt", "r")
 
 obj_catalog = []
 
