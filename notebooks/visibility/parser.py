@@ -112,6 +112,17 @@ S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, -1j],
                   [1, -1, 0, 0]])
 
+def test():
+    """
+    Play around with the return value if you doubt that
+    this module is being reloaded properly.
+    """
+    return 2
+
+def A(J):
+    J_outer = np.kron(J, np.conj(J))
+    return np.dot(np.dot(np.linalg.inv(S), J_outer), S)
+
 c = 299792458 # m / s
 
 def phase_factor(ant1, ant2, r, nu=151e6):
@@ -137,18 +148,18 @@ def visibility(J, ant1, ant2, source, nu=151e6):
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
     r = rotations.raddec2lm(ra, dec)
-    
-    J_outer = np.kron(J, np.conj(J))
-    A = np.dot(np.dot(np.linalg.inv(S), J_outer), S)
 
     phi = phase_factor(ant1, ant2, r, nu)
-    return np.dot(np.dot(A, s), phi)
+    return np.dot(np.dot(A(J), s), phi)[0]
+        # I do not like this indexing. I only did it to get the scalar,
+            # but how can I be sure it is not a sum of elements, for example?
 
 def visibility_integrand(J, ant1, ant2, nu=151e6):
     total = complex(0)
     for source in obj_catalog:
         total += visibility(J, ant1, ant2, source, nu)
     return total
+    # shouldn't visibility be a real quantity??
 
 """
 Sum your sources, not your baselines.
