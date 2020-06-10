@@ -2,6 +2,8 @@ import pickle
 import numpy as np
 import rotations
 
+J = np.load("../J.npy", fix_imports=False) # Python 2 deserves to die
+
 """
 In principle, it should not matter which flux-by-frequency
 you order by. However, in practice (as we can see in
@@ -123,7 +125,8 @@ def test():
     """
     return 2
 
-def A(J):
+def A(source_idx):
+    this_J = J[source_idx]
     J_outer = np.kron(J, np.conj(J))
     return np.dot(np.dot(np.linalg.inv(S), J_outer), S)
 
@@ -142,10 +145,12 @@ def phase_factor(ant1, ant2, r, nu=151e6):
     br = np.dot(b, r)
     return np.exp(-2j * np.pi * nu * br / c)
 
-def visibility(J, ant1, ant2, source, nu=151e6):
+def visibility(ant1, ant2, source_index, nu=151e6):
     """
     Visibility integrand evaluated for a single source.
     """
+    source = obj_catalog[source_index]
+    
     I = source.flux_by_frq[nu / 1e6]
     s = np.array([complex(I), 0, 0, 0])
 
@@ -154,7 +159,7 @@ def visibility(J, ant1, ant2, source, nu=151e6):
     r = rotations.raddec2lm(ra, dec)
 
     phi = phase_factor(ant1, ant2, r, nu)
-    return np.dot(np.dot(A(J), s), phi)[0]
+    return np.dot(np.dot(A(source_index), s), phi)[0]
         # I do not like this indexing. I only did it to get the scalar,
             # but how can I be sure it is not a sum of elements, for example?
 
