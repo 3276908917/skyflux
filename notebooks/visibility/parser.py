@@ -8,8 +8,6 @@ you order by. However, in practice (as we can see in
 parser_demos.py), some sources are brighter than others
 at certain frequencies.
 
-find distribution of source brightnesses
-
 We have several sources that lack spectral indices,
     so it looks like we are moving ahead with plan A
     (use a power-law regression to get a spectral index function)
@@ -81,7 +79,7 @@ class GLEAM_entry:
     def __str__(self):
         return "Name: " + self.name + "\nRight ascension: " + str(self.ra_angle) + \
             "\nDeclination: " + str(self.dec_angle) + \
-            "\n151 MHz flux: " + self.flux_by_frq[151] + "\n"
+            "\n151 MHz flux: " + str(self.flux_by_frq[151]) + "\n"
     
     # we will probably want a __repr__ function so that we can see
     # ALL fluxes associated with the object.
@@ -129,7 +127,10 @@ def phase_factor(ant1, ant2, r, nu=151e6):
     br = np.dot(b, r)
     return np.exp(-2j * np.pi * nu * br / c)
 
-def visibility_integrand(J, source, nu=151e6):
+def visibility(J, ant1, ant2, source, nu=151e6):
+    """
+    Visibility integrand evaluated for a single source.
+    """
     I = source.flux_by_frq[nu / 1e6]
     s = np.array([complex(I), 0, 0, 0])
 
@@ -140,19 +141,22 @@ def visibility_integrand(J, source, nu=151e6):
     J_outer = np.kron(J, np.conj(J))
     A = np.dot(np.dot(np.linalg.inv(S), J_outer), S)
 
-    # Do I want to sum for all possible baselines?
-    # No. I should make a function to evaluate the integrand
-        # for a single baseline.
-    phi = phase_sum(r, nu)
+    phi = phase_factor(ant1, ant2, r, nu)
     return np.dot(np.dot(A, s), phi)
+
+def visibility_integrand(J, ant1, ant2, nu=151e6):
+    total = complex(0)
+    for source in obj_catalog:
+        total += visibility(J, ant1, ant2, source, nu)
+    return total
 
 """
 Sum your sources, not your baselines.
 Summation over different values r-hat
     Are my r-hat calculations automatically normalized?
+"""
 
-Integration is a summation over sources.
-
+"""
 (I think the output should be a scalar, not a 4x1)
 
 The graph of times and positions
