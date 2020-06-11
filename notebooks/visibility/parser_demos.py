@@ -70,14 +70,14 @@ def brightness_distr(frq=151):
 
 """
 76 MHz
-Largest flux value encountered: 37.735298
-Name of associated object: GLEAM J084125-754033
+Largest flux value encountered: 85.960663
+Name of associated object: GLEAM J052257-362727
 
 (This object holds all records on the range [76, 130])
 
 151 MHz
 Largest flux value encountered: 55.942432000000004
-Name of associated object: GLEAM J164417-771532
+Name of associated object: GLEAM J052257-362727
 
 (This object holds all records on the range [143, 227])
 """
