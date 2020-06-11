@@ -44,7 +44,8 @@ def old_brightness_distr(frq=151):
     for a given frequency.
     """
     fluxes = np.array([
-        gleam_obj.flux_by_frq[frq] for gleam_obj in parser.obj_catalog
+        gleam_obj.flux_by_frq[frq] for gleam_obj in parser.obj_catalog \
+        if gleam_obj.flux_by_frq[frq] > 2
     ])
 
     fig, ax = frame()
@@ -75,7 +76,7 @@ Name of associated object: GLEAM J084125-754033
 (This object holds all records on the range [76, 130])
 
 151 MHz
-Largest flux value encountered: 25.322440999999998
+Largest flux value encountered: 55.942432000000004
 Name of associated object: GLEAM J164417-771532
 
 (This object holds all records on the range [143, 227])
