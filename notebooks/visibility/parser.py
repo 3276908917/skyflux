@@ -155,27 +155,22 @@ def visibility(ant1, ant2, source_index, nu=151e6):
     r = rotations.raddec2lm(ra, dec)
 
     phi = phase_factor(ant1, ant2, r, nu)
-    return np.dot(np.dot(A(source_index), s), phi)[0]
+    return np.dot(np.dot(A(source_index), s), phi)
         # I do not like this indexing. I only did it to get the scalar,
             # but how can I be sure it is not a sum of elements, for example?
 
 def visibility_integrand(ant1, ant2, nu=151e6):
-    total = complex(0)
+    total = complex(0) # 4 x 1. Visibility has a phase,
+                        # i.e. a phase
     for i in range(len(obj_catalog)):
         total += visibility(ant1, ant2, i, nu)
     return total
     # shouldn't visibility be a real quantity??
 
 """
-Sum your sources, not your baselines.
-Summation over different values r-hat
-    Are my r-hat calculations automatically normalized?
-"""
-
-"""
 (I think the output should be a scalar, not a 4x1)
 
-The graph of times and positions
+Want graph of times and positions.
 
 A will change according to time. Equation 3 assumes that we have
 just one integration time.

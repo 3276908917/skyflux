@@ -37,6 +37,21 @@ def brightest_source(frq=151):
     print("Name of associated object:", max_obj.name)
     return max_obj
 
+def old_brightness_distr(frq=151):
+    """
+    Generate a histogram for the brigtnesses of all sources
+    (satisfying the resources/GLEAM_guide.txt constraints)
+    for a given frequency.
+    """
+    fluxes = np.array([
+        gleam_obj.flux_by_frq[frq] for gleam_obj in parser.obj_catalog
+    ])
+
+    fig, ax = frame()
+    ax.hist(fluxes, bins=29)
+    plt.xlabel("Flux [Jy] at " + str(frq) + " MHz", fontsize=12)
+    plt.ylabel("Frequency", fontsize=12)
+
 def brightness_distr(frq=151):
     """
     Generate a histogram for the brigtnesses of all sources
@@ -120,3 +135,9 @@ def phase_factor(ant1, ant2, r, nu=151e6):
     b = parser.baseline(ant1, ant2)[0:2] # kill w
     br = np.dot(b, r)
     return np.exp(-2j * np.pi * nu * br / parser.c)
+
+"""
+Are my r calculations automatically normalized?
+    (I am using the direction cosines conversion
+    function raddec2lm.)
+"""

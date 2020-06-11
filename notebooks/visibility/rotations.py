@@ -8,10 +8,10 @@ S ~/prop\nu^alpha
 S_{200} = S_{150} * (200/150)^\alpha
 """
 
-def collapse_angle(degree, arcminute, arcsecond):
+def collapse_angle(degree, arcminute=0, arcsecond=0):
     return degree + arcminute / 60 + arcsecond / 3600
 
-def collapse_hour(hour, minute, second):
+def collapse_hour(hour, minute=0, second=0):
     return 15 * hour + minute / 4 + second / 240
 
 hera_lat = -collapse_angle(30, 43, 17)
