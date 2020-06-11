@@ -45,13 +45,14 @@ def old_brightness_distr(frq=151):
     """
     fluxes = np.array([
         gleam_obj.flux_by_frq[frq] for gleam_obj in parser.obj_catalog \
-        if gleam_obj.flux_by_frq[frq] > 2
+        if gleam_obj.flux_by_frq[frq]
     ])
 
     fig, ax = frame()
     ax.hist(fluxes, bins=29)
     plt.xlabel("Flux [Jy] at " + str(frq) + " MHz", fontsize=12)
     plt.ylabel("Frequency", fontsize=12)
+    plt.ylim(0, 1000)
 
 def brightness_distr(frq=151):
     """
