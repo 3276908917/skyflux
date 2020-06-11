@@ -2,6 +2,13 @@ import pickle
 import numpy as np
 import rotations
 
+def test():
+    """
+    Play around with the return value if you doubt that
+    this module is being reloaded properly.
+    """
+    return 2
+
 J = np.load("../J.npy", fix_imports=False) # Python 2 deserves to die
 
 """
@@ -91,9 +98,7 @@ class GLEAM_entry:
     # ALL fluxes associated with the object.
 
 f = open("gleam_with_alpha.txt", "r")
-
 obj_catalog = []
-
 # For each line in f, the delimiter is |
 for line in f:
     obj_catalog.append(GLEAM_entry(line[1:]))
@@ -110,20 +115,11 @@ def baseline(ant_ID1, ant_ID2):
     """
     return ant_pos[ant_ID2] - ant_pos[ant_ID1]
 
-active_ants = list(ant_pos)
-active_ants.sort()
 
 S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, 1j],
                   [0, 0, 1, -1j],
                   [1, -1, 0, 0]])
-
-def test():
-    """
-    Play around with the return value if you doubt that
-    this module is being reloaded properly.
-    """
-    return 2
 
 def A(source_idx):
     this_J = J[source_idx]
@@ -163,10 +159,10 @@ def visibility(ant1, ant2, source_index, nu=151e6):
         # I do not like this indexing. I only did it to get the scalar,
             # but how can I be sure it is not a sum of elements, for example?
 
-def visibility_integrand(J, ant1, ant2, nu=151e6):
+def visibility_integrand(ant1, ant2, nu=151e6):
     total = complex(0)
-    for source in obj_catalog:
-        total += visibility(J, ant1, ant2, source, nu)
+    for i in range(len(obj_catalog)):
+        total += visibility(ant1, ant2, i, nu)
     return total
     # shouldn't visibility be a real quantity??
 
@@ -186,8 +182,10 @@ just one integration time.
 
 The change in A over time represents a drift scan,
 like the Gaussians that you recently visualized.
-
-Time you can do, you have all the information
+    Time you can do, you have all the information. I am guessing
+    I probably only need to call raddec2lm with different values
+    of ra0, i.e. moving what would otherwise be the current LST
+    over the entire range [0, 2 np.pi)
 
 use constant flux independent of frequency
 (this is the same as saying that alpha is equal to one)
@@ -196,12 +194,13 @@ then varying frequency from 100-200 MHz
     beam variation is what we will eventually be handling anyway
 
 15 m or 30 m baseline East-West
+    I do not remember what this means.
 
 I need to plot the A matrix, to see the leakage terms.
 Plot it in healpix.
 
-(Ask for her power spectrum notebook plot for a single baseline,
-if you complete all of your work.)
+(Ask for Ridhima's power spectrum notebook plot for a
+single baseline, once the above work has been completed and tested.)
 """
 
 """

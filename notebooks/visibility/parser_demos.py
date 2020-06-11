@@ -83,6 +83,9 @@ def list_baselines(ant_ID):
         if ant_ID != ID:
             print(str(ID) + ": " + str(parser.baseline(ant_ID, ID)))
 
+active_ants = list(parser.ant_pos)
+active_ants.sort()
+
 def all_baselines():
     """
     Print every baseline, without duplicating.
@@ -91,10 +94,10 @@ def all_baselines():
         the particular order (in which I am subtracting coordinates)
         out to the integral that I am taking.
     """
-    for i in range(len(parser.active_ants)):
-        ID1 = parser.active_ants[i]
-        for j in range(i + 1, len(parser.active_ants[i + 1:])):
-            ID2 = parser.active_ants[j]
+    for i in range(len(active_ants)):
+        ID1 = active_ants[i]
+        for j in range(i + 1, len(active_ants[i + 1:])):
+            ID2 = active_ants[j]
             print("Baseline between antennae " + str(ID1) + \
                   " and " + str(ID2) + " = " + str(parser.baseline(ID1, ID2)))
 
