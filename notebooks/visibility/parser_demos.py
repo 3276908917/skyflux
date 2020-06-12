@@ -20,6 +20,14 @@ def frame():
 
 # GLEAMEGCAT section
 
+"""
+Maybe do a Jupyter notebook with the different histograms
+"""
+
+def num_sources_range(start=3, end=5, frq=151):
+    for gleam_obj in parser.obj_catalog:
+        if 
+
 # Might be interesting to see whether this changes with different frequencies
 def brightest_source(frq=151):
     """
@@ -52,7 +60,7 @@ def old_brightness_distr(frq=151):
     ax.hist(fluxes, bins=29)
     plt.xlabel("Flux [Jy] at " + str(frq) + " MHz", fontsize=12)
     plt.ylabel("Frequency", fontsize=12)
-    plt.ylim(0, 1000)
+    plt.ylim(0, 10)
 
 def brightness_distr(frq=151):
     """

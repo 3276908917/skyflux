@@ -167,6 +167,48 @@ def visibility_integrand(ant1, ant2, nu=151e6):
     return total
     # shouldn't visibility be a real quantity??
 
+    """
+        PING RIDHIMA TO GET FREQUENCY BEAM
+
+        for now, assume that 100-200 MHz is the same frequency
+            use spectral index to scale the result
+            split it at 1 MHz for now.
+            (i.e. same Jones matrix 100-200 MHz for now).
+        "I will leave the chunking of frequency and time up to you."
+        
+        We discussed to do ten-minute intervals:
+        each ten minutes, we have one data point
+        5 hours, 6 data per hour.
+        0-8 hours (colder patch)
+        create 1D plot.
+            great Slack question: what is the best way
+            to visually represent the results?
+
+        DO NOT average it yet, return an array of all
+        data points.
+
+        time axis (2D), frequency axis (3D)
+
+        write a power law equation which takes a
+        spectral index and then scales the result appropriately
+            > amplitude of visibility should be decreasing with frequency
+            > (since all of these sources are synchrotrons)
+        plt.imshow()
+
+        simple test for the computation:
+        at zenith (ra = LST), a source should be real
+        (phase is zero)
+
+        feel free to use orthview to get the
+        Mueller matrix plots. Figure 1 in (Nunhokee et al)
+        did not actually use healpy, so feel free to
+        tinker.
+            "Return projected map -> store in variable
+            variable -> imshow"
+
+        read up on healpy.cartview
+    """
+
 """
 (I think the output should be a scalar, not a 4x1)
 
