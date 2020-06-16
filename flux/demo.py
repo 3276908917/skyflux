@@ -3,6 +3,10 @@ import numpy as np
 
 from . import parse
 
+"""
+Maybe do a Jupyter notebook with the different histograms
+"""
+
 def frame():
     """
     Set up generic infrastructure for an improved-looking plot.
@@ -20,13 +24,15 @@ def frame():
 
 # GLEAMEGCAT section
 
-"""
-Maybe do a Jupyter notebook with the different histograms
-"""
-
-#def num_sources_range(start=3, end=5, frq=151):
-#    for gleam_obj in parse.obj_catalog:
-#        if 
+def sources_range(start=3, end=5, frq=151):
+    assert start < end, "Requested range must be of positive width"
+    valid_sources = []
+    for gleam_obj in parse.obj_catalog:
+        if gleam_obj.flux_by_frq[frq] <= end and \
+           gleam_obj.flux_by_frq[frq] >= start:
+            valid_sources.append(gleam_obj)
+    print("Number of valid sources encountered:", len(valid_sources))
+    return valid_sources
 
 # Might be interesting to see whether this changes with different frequencies
 def brightest_source(frq=151):
@@ -45,37 +51,39 @@ def brightest_source(frq=151):
     print("Name of associated object:", max_obj.name)
     return max_obj
 
-def old_brightness_distr(frq=151):
+def brightness_distr(frq=151, ln=False, data_lim=None, ylim=None):
     """
     Generate a histogram for the brigtnesses of all sources
-    (satisfying the resources/GLEAM_guide.txt constraints)
-    for a given frequency.
+    for a given frequency @frq.
+    Where we restrict ourselves to sources between
+        @data_lim = (minFlux, maxFlux)
+    and we restrict the view according to
+        @ylim = (minY, maxY)
+    If @ln is True, we take the natural logarithm of each flux before
+        plotting it. I found that this helped bring out the appearance
+        of the distribution, which was intensely clustered.
     """
-    fluxes = np.array([
-        gleam_obj.flux_by_frq[frq] for gleam_obj in parse.obj_catalog \
-        if gleam_obj.flux_by_frq[frq]
-    ])
+    if ln:
+        fluxes = np.array([
+            np.log(gleam_obj.flux_by_frq[frq]) for gleam_obj in parse.obj_catalog
+        ])
+    else:
+        fluxes = np.array([
+            gleam_obj.flux_by_frq[frq] for gleam_obj in parse.obj_catalog
+        ])
 
     fig, ax = frame()
     ax.hist(fluxes, bins=29)
-    plt.xlabel("Flux [Jy] at " + str(frq) + " MHz", fontsize=12)
-    plt.ylabel("Frequency", fontsize=12)
-    plt.ylim(0, 10)
 
-def brightness_distr(frq=151):
-    """
-    Generate a histogram for the brigtnesses of all sources
-    (satisfying the resources/GLEAM_guide.txt constraints)
-    for a given frequency.
-    """
-    fluxes = np.array([
-        np.log(gleam_obj.flux_by_frq[frq]) for gleam_obj in parse.obj_catalog
-    ])
+    if ln:
+        plt.xlabel("ln([Jy]) at " + str(frq) + " MHz", fontsize=12)
+    else:
+        plt.xlabel("Flux [Jy] at " + str(frq) + " MHz", fontsize=12)
 
-    fig, ax = frame()
-    ax.hist(fluxes, bins=29)
-    plt.xlabel("ln([Jy]) at " + str(frq) + " MHz", fontsize=12)
     plt.ylabel("Frequency", fontsize=12)
+
+    if ylim is not None:
+        plt.ylim(ylim[0], ylim[1])
 
 """
 76 MHz
