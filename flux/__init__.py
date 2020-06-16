@@ -3,6 +3,10 @@ import flux.parser
 import flux.demos
 
 """
+I wanted to use this block of code to automatically import any new
+scripts that I add, but for some reason it breaks relative imports
+in sub-modules.
+
 import pkgutil
 
 __all__ = []
