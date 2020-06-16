@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='flux',
-    version='-8.9.9',
+    version='1!1.1a1',
     author='Lukas Finkbeiner, C. D. Nunhokee, Aaron Parsons',
     author_email='lfinkbeiner@berkeley.edu',
     url='https://github.com/3276908917/HERA',
