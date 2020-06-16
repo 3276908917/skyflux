@@ -1,6 +1,12 @@
 import pickle
+import os
+
 import numpy as np
+
 from . import rotations
+
+data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
+print("Accessing: " + data_prefix)
 
 def test():
     """
@@ -9,15 +15,16 @@ def test():
     """
     return 2
 
+# If any of the three data files (J matrix, source catalog, antannae positions)
+# fails to load, we give a more specific error message for last two functions.
+full_load = True
+
 S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, 1j],
                   [0, 0, 1, -1j],
                   [1, -1, 0, 0]])
 
-try:
-    J = np.load("../J.npy", fix_imports=False) # Python 2 deserves to die
-except FileNotFoundError:
-    print("Failure to load pre-generated J matrix.")
+c = 299792458 # m / s
 
 """
 In principle, it should not matter which flux-by-frequency
@@ -106,7 +113,7 @@ class GLEAM_entry:
     # ALL fluxes associated with the object.
 
 try:
-    f = open("gleam_with_alpha.txt", "r")
+    f = open(data_prefix + "gleam_with_alpha.txt", "r")
     obj_catalog = []
     # For each line in f, the delimiter is |
     for line in f:
@@ -114,66 +121,83 @@ try:
     f.close()
 except FileNotFoundError:
     print("Failure to load gleam catalog.")
+    full_load = False
+
+    #import os
+    #print("Current working directory: " + os.path.abspath(os.getcwd()))
 
 # Antenna section
 
 try:
-    ant_pos = dict(pickle.load(open("ant_dict.pk", "rb")))
+    ant_pos = dict(pickle.load(open(data_prefix + "ant_dict.pk", "rb")))
+
+    def baseline(ant_ID1, ant_ID2):
+        """
+        Calculate the baseline between antennae # @ant_ID1 and @ant_ID2
+        by a simple difference of their coordinates.
+        """
+        return ant_pos[ant_ID2] - ant_pos[ant_ID1]
+
+    def phase_factor(ant1, ant2, r, nu=151e6):
+        """
+        Calculate the phase factor in the direction @r (l, m)
+            (we assume that n is of insignificant magnitude)
+        and at the frequency @nu
+        between two antennae whose ID #s are @ant1 and @ant2.
+        When we calculate the baseline (u, v, w), we
+            assume that w is of insignificant magnitude.
+        """
+        b = baseline(ant1, ant2)[0:2] # kill w
+        br = np.dot(b, r)
+        return np.exp(-2j * np.pi * nu * br / c)
+    
 except FileNotFoundError:
     print("Failure to load antennae data.")
+    full_load = False
 
-def baseline(ant_ID1, ant_ID2):
-    """
-    Calculate the baseline between antennae # @ant_ID1 and @ant_ID2
-    by a simple difference of their coordinates.
-    """
-    return ant_pos[ant_ID2] - ant_pos[ant_ID1]
+try:
+    # Python 2 deserves to die
+    J = np.load(data_prefix + "J.npy", fix_imports=False)
+    print("Do not forget that our current approach to J" + \
+          " pre-generation is imprecise and mostly wrong.")
 
-def A(source_idx):
-    this_J = J[source_idx]
-    J_outer = np.kron(J, np.conj(J))
-    return np.dot(np.dot(np.linalg.inv(S), J_outer), S)
+    def A(source_idx):
+        """ Return the Müller matrix for an associated Jones matrix"""
+        this_J = J[source_idx]
+        J_outer = np.kron(J, np.conj(J))
+        return np.dot(np.dot(np.linalg.inv(S), J_outer), S)
+except FileNotFoundError:
+    print("Failure to load pre-generated J matrix.")
+    full_load = False
 
-c = 299792458 # m / s
+if full_load:
+    def visibility(ant1, ant2, source_index, nu=151e6):
+        """
+        Visibility integrand evaluated for a single source.
+        """
+        source = obj_catalog[source_index]
+        
+        I = source.flux_by_frq[nu / 1e6]
+        s = np.array([complex(I), 0, 0, 0])
 
-def phase_factor(ant1, ant2, r, nu=151e6):
-    """
-    Calculate the phase factor in the direction @r (l, m)
-        (we assume that n is of insignificant magnitude)
-    and at the frequency @nu
-    between two antennae whose ID #s are @ant1 and @ant2.
-    When we calculate the baseline (u, v, w), we
-        assume that w is of insignificant magnitude.
-    """
-    b = baseline(ant1, ant2)[0:2] # kill w
-    br = np.dot(b, r)
-    return np.exp(-2j * np.pi * nu * br / c)
+        ra = np.radians(source.ra_angle)
+        dec = np.radians(source.dec_angle)
+        r = rotations.raddec2lm(ra, dec)
 
-def visibility(ant1, ant2, source_index, nu=151e6):
-    """
-    Visibility integrand evaluated for a single source.
-    """
-    source = obj_catalog[source_index]
-    
-    I = source.flux_by_frq[nu / 1e6]
-    s = np.array([complex(I), 0, 0, 0])
+        phi = phase_factor(ant1, ant2, r, nu)
+        return np.dot(np.dot(A(source_index), s), phi)
+            # I do not like this indexing. I only did it to get the scalar,
+                # but how can I be sure it is not a sum of elements, for example?
 
-    ra = np.radians(source.ra_angle)
-    dec = np.radians(source.dec_angle)
-    r = rotations.raddec2lm(ra, dec)
-
-    phi = phase_factor(ant1, ant2, r, nu)
-    return np.dot(np.dot(A(source_index), s), phi)
-        # I do not like this indexing. I only did it to get the scalar,
-            # but how can I be sure it is not a sum of elements, for example?
-
-def visibility_integrand(ant1, ant2, nu=151e6):
-    total = complex(0) # 4 x 1. Visibility has a phase,
-                        # i.e. a phase
-    for i in range(len(obj_catalog)):
-        total += visibility(ant1, ant2, i, nu)
-    return total
-    # shouldn't visibility be a real quantity??
+    def visibility_integrand(ant1, ant2, nu=151e6):
+        total = complex(0) # 4 x 1. Visibility has a phase,
+                            # i.e. a phase
+        for i in range(len(obj_catalog)):
+            total += visibility(ant1, ant2, i, nu)
+        return total
+else:
+    print("Functions 'visibility' and 'visibility_integrand' will" + \
+          " not be avalailable due to at least one missing file.")
 
     """
         PING RIDHIMA TO GET FREQUENCY BEAM
