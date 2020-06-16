@@ -3,7 +3,7 @@ import os
 
 import numpy as np
 
-from . import rotations
+from flux import rotations
 
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 print("Accessing: " + data_prefix)

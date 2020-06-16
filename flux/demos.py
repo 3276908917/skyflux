@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from . import parser
+#from flux import parser
 
 def frame():
     """
