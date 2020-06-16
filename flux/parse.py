@@ -6,14 +6,7 @@ import numpy as np
 from flux import rot
 
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
-print("Accessing: " + data_prefix)
-
-def test():
-    """
-    Play around with the return value if you doubt that
-    this module is being reloaded properly.
-    """
-    return 2
+print("Searching for data files at: " + data_prefix)
 
 # If any of the three data files (J matrix, source catalog, antannae positions)
 # fails to load, we give a more specific error message for last two functions.
