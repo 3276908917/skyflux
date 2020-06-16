@@ -1,6 +1,6 @@
-import flux.rotations
-import flux.parser
-import flux.demos
+import flux.rot
+import flux.parse
+import flux.demo
 
 """
 I wanted to use this block of code to automatically import any new

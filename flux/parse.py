@@ -3,7 +3,7 @@ import os
 
 import numpy as np
 
-from flux import rotations
+from flux import rot
 
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 print("Accessing: " + data_prefix)
@@ -88,7 +88,7 @@ class GLEAM_entry:
         remainder = remainder[remainder.index(" ") + 1:]
         self.ra_second = float(remainder)
 
-        self.ra_angle = rotations.collapse_hour(
+        self.ra_angle = rot.collapse_hour(
             self.ra_hour, self.ra_minute, self.ra_second)
 
     def format_dec(self):
@@ -101,7 +101,7 @@ class GLEAM_entry:
         remainder = remainder[remainder.index(" ") + 1:]
         self.dec_arcsecond = float(remainder)
 
-        self.dec_angle = rotations.collapse_angle(
+        self.dec_angle = rot.collapse_angle(
             self.dec_degree, self.dec_arcminute, self.dec_arcsecond)
 
     def __str__(self):
@@ -182,7 +182,7 @@ if full_load:
 
         ra = np.radians(source.ra_angle)
         dec = np.radians(source.dec_angle)
-        r = rotations.raddec2lm(ra, dec)
+        r = rot.raddec2lm(ra, dec)
 
         phi = phase_factor(ant1, ant2, r, nu)
         return np.dot(np.dot(A(source_index), s), phi)
