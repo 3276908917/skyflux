@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
-from . import parse
+from flux import parse
 
 """
 Maybe do a Jupyter notebook with the different histograms
@@ -51,6 +52,35 @@ def brightest_source(frq=151):
     print("Name of associated object:", max_obj.name)
     return max_obj
 
+def is_constrained(value, min_acceptable=None, max_acceptable=None):
+    if min_acceptable is not None and value > min_acceptable:
+        return False
+    if max_acceptable is not None and value > max_acceptable:
+        return False
+    return True
+
+def hist_data(list_source, frq=151, ln=False, data_lim=None):
+    fluxes = []
+
+    if data_lim is not None:
+        min_acceptable = data_lim[0]
+    else:
+        min_acceptable = None
+    if data_lim is not None:
+        max_acceptable = data_lim[1]
+    else:
+        max_acceptable = None
+        
+    for gleam_obj in list_source:
+        I = gleam_obj.flux_by_frq[frq]
+        if is_constrained(I, min_acceptable, max_acceptable):
+            if ln:
+                fluxes.append(np.log(I))
+            else:
+                fluxes.append(I)
+                
+    return np.array(fluxes)
+
 def brightness_distr(frq=151, ln=False, data_lim=None, ylim=None):
     """
     Generate a histogram for the brigtnesses of all sources
@@ -62,15 +92,16 @@ def brightness_distr(frq=151, ln=False, data_lim=None, ylim=None):
     If @ln is True, we take the natural logarithm of each flux before
         plotting it. I found that this helped bring out the appearance
         of the distribution, which was intensely clustered.
+
+    Note: if you want to specify only one boundary (this works
+        for both data_lim and ylim), you can simply set the
+        irrelevant boundary to None. For example,
+            data_lim = (2, None)
+        will give all sources brighter than 2 Jy.
     """
-    if ln:
-        fluxes = np.array([
-            np.log(gleam_obj.flux_by_frq[frq]) for gleam_obj in parse.obj_catalog
-        ])
-    else:
-        fluxes = np.array([
-            gleam_obj.flux_by_frq[frq] for gleam_obj in parse.obj_catalog
-        ])
+    fluxes = hist_data(parse.obj_catalog, frq, ln, data_lim)
+    # Naive application of Sturge's Rule to get number of bins
+    K = math.ceil(1 + 3.322 * np.log(len(fluxes)))
 
     fig, ax = frame()
     ax.hist(fluxes, bins=29)
@@ -83,7 +114,12 @@ def brightness_distr(frq=151, ln=False, data_lim=None, ylim=None):
     plt.ylabel("Frequency", fontsize=12)
 
     if ylim is not None:
-        plt.ylim(ylim[0], ylim[1])
+        if ylim[1] is None:
+            plt.ylim(bottom=ylim[0])
+        elif ylim[0] is None:
+            plt.ylim(top=ylim[1])
+        else:
+            plt.ylim(ylim[0], ylim[1])
 
 """
 76 MHz
@@ -134,13 +170,6 @@ def all_baselines():
             print("Baseline between antennae " + str(ID1) + \
                   " and " + str(ID2) + " = " + str(parse.baseline(ID1, ID2)))
 
-"""
-I am not so sure that I really want an integral just yet.
-Look at the infinitesimal: it is a solid angle.
-Does that not suggest we are integrating over the whole sky?
-Currently, our goal is just to pass one point source through the pipe line.
-"""
-
 def phase_factor(ant1, ant2, r, nu=151e6):
     """
     Calculate the phase factor in the direction @r (l, m)
@@ -153,9 +182,3 @@ def phase_factor(ant1, ant2, r, nu=151e6):
     b = parse.baseline(ant1, ant2)[0:2] # kill w
     br = np.dot(b, r)
     return np.exp(-2j * np.pi * nu * br / parse.c)
-
-"""
-Are my r calculations automatically normalized?
-    (I am using the direction cosines conversion
-    function raddec2lm.)
-"""

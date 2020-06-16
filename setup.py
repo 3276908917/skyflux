@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='flux',
-    version='1!1.1a2',
+    version='1!1.1a3',
     author='Lukas Finkbeiner, C. D. Nunhokee, Aaron Parsons',
     author_email='lfinkbeiner@berkeley.edu',
     description='Primitive source handling functions',
