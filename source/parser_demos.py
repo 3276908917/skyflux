@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import parser
+from . import parser
 
 def frame():
     """
