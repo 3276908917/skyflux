@@ -53,7 +53,7 @@ def brightest_source(frq=151):
     return max_obj
 
 def is_constrained(value, min_acceptable=None, max_acceptable=None):
-    if min_acceptable is not None and value > min_acceptable:
+    if min_acceptable is not None and value < min_acceptable:
         return False
     if max_acceptable is not None and value > max_acceptable:
         return False
