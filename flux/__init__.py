@@ -1,6 +1,9 @@
 import flux.rot
 import flux.parse
 import flux.demo
+import flux.generate_model
+# I do not like this name, it should be more inclusive
+import flux.J
 
 """
 I wanted to use this block of code to automatically import any new

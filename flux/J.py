@@ -1,32 +1,50 @@
-import pickle
 import os
-
 import numpy as np
 from RIMEz import beam_models
-from spin1_beam_model import cst_processing, jones_matrix_field
 
-data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
-beam_origin = data_prefix + "HERA_4.9m_E-pattern_151MHz.txt"
-beam_destination = data_prefix + "ant1_s2.h5"
+from flux import rot
 
-processor = cst_processing.CSTDataProcessor(
-    [beam_origin, beam_origin, beam_origin],
-    # hard coding to demonstrate functionality elsewhere.
-    # We will fix it eventually.
-    np.array([150e6, 151e6, 152e6]),
-    1, 1e-4
+beam_origin = os.path.dirname(os.path.abspath(__file__)) + \
+              "/HERA_4.9m_E-pattern_151MHz.txt"
+
+spline_beam_func = beam_models.model_data_to_spline_beam_func(
+    beam_origin,
+    # Like in generate_model.py, we have some hard-coded frequencies
+    # which we want to re-evaluate in the future.
+    np.array([150e6, 151e6, 152e6])
 )
-
-# If any of the three data files (J matrix, source catalog, antannae positions)
-# fails to load, we give a more specific error message for last two functions.
-full_load = True
 
 S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, 1j],
                   [0, 0, 1, -1j],
                   [1, -1, 0, 0]])
 
-c = 299792458 # m / s
+def J_matrix(freq=150e6, source):
+    """
+    @source : we expect an object of the type
+                GLEAM_entry (see parse.py)
+
+    The default argument comes from the beam that I
+    had access to when this was written.
+    """
+    ra = np.radians(source.ra_angle)
+    dec = np.radians(source.dec_angle)
+    latitude = np.radians(rot.hera_lat)
+    # We want to transform the following into a function parameter
+    lst = rot.get_lst()
+    az, alt = rot.eq_to_topo(ra, dec, latitude, lst, radians=True)
+
+    az = np.array([az])
+    alt = np.array([alt])
+
+    #! bad hard-coding
+    return spline_beam_func(freq, alt, az)
+    
+
+def A_matrix(freq=150e6, source):
+    J = J_matrix(freq, source)
+    J_outer = np.kron(J, np.conj(J))
+    return np.dot(S, np.dot(J_outer, np.linalg.inv(S)))
 
 try:
     # Python 2 deserves to die

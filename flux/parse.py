@@ -1,9 +1,10 @@
 import pickle
 import os
-
 import numpy as np
 
 from flux import rot
+
+c = 299792458 # m / s
 
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 print("Searching for data files at: " + data_prefix)
@@ -11,13 +12,6 @@ print("Searching for data files at: " + data_prefix)
 # If any of the three data files (J matrix, source catalog, antannae positions)
 # fails to load, we give a more specific error message for last two functions.
 full_load = True
-
-S = .5 * np.array([[1, 1, 0, 0,],
-                  [0, 0, 1, 1j],
-                  [0, 0, 1, -1j],
-                  [1, -1, 0, 0]])
-
-c = 299792458 # m / s
 
 """
 In principle, it should not matter which flux-by-frequency
