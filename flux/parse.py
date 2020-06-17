@@ -3,14 +3,15 @@ import os
 import numpy as np
 
 from flux import rot
+from flux import stokes
 
 c = 299792458 # m / s
 
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 print("Searching for data files at: " + data_prefix)
 
-# If any of the three data files (J matrix, source catalog, antannae positions)
-# fails to load, we give a more specific error message for last two functions.
+# If the source catalog or antannae positions fail to load,
+# we warn that we will not define the last two functions.
 full_load = True
 
 """
@@ -24,7 +25,9 @@ We have several sources that lack spectral indices,
     (use a power-law regression to get a spectral index function)
 """
 
-# The following section is hard-coded to the GLEAMEGCAT format
+# The following section is hard-coded to the GLEAMEGCAT format,
+# as downloaded by myself.
+# See resources/GLEAM_guide.txt for more details.
 
 # all numbers represent MHz quantities
 expected_frequencies = [76, 84, 92, 99, 107, 115, 122, 130,
@@ -142,28 +145,15 @@ except FileNotFoundError:
     print("Failure to load antennae data.")
     full_load = False
 
-try:
-    # Python 2 deserves to die
-    J = np.load(data_prefix + "J.npy", fix_imports=False)
-    print("Do not forget that our current approach to J" + \
-          " pre-generation is imprecise and mostly wrong.")
-
-    def A(source_idx):
-        """ Return the Müller matrix for an associated Jones matrix"""
-        this_J = J[source_idx]
-        J_outer = np.kron(J, np.conj(J))
-        return np.dot(np.dot(np.linalg.inv(S), J_outer), S)
-except FileNotFoundError:
-    print("Failure to load pre-generated J matrix.")
-    full_load = False
-
 if full_load:
-    def visibility(ant1, ant2, source_index, nu=151e6):
+    def visibility(ant1, ant2, source, nu=151e6):
         """
         Visibility integrand evaluated for a single source.
+
+        The most glaring waste of compute is separately calculating
+        the values for RA and DEC, although it is not clear to me
+        how many clock cycles are actually spent thereon.
         """
-        source = obj_catalog[source_index]
-        
         I = source.flux_by_frq[nu / 1e6]
         s = np.array([complex(I), 0, 0, 0])
 
@@ -173,14 +163,11 @@ if full_load:
 
         phi = phase_factor(ant1, ant2, r, nu)
         return np.dot(np.dot(A(source_index), s), phi)
-            # I do not like this indexing. I only did it to get the scalar,
-                # but how can I be sure it is not a sum of elements, for example?
 
     def visibility_integrand(ant1, ant2, nu=151e6):
-        total = complex(0) # 4 x 1. Visibility has a phase,
-                            # i.e. a phase
-        for i in range(len(obj_catalog)):
-            total += visibility(ant1, ant2, i, nu)
+        total = np.array([0j, 0j, 0j, 0j]) # 4 x 1. Visibility has a phase,
+        for source in obj_catalog:
+            total += visibility(ant1, ant2, source, nu)
         return total
 else:
     print("Functions 'visibility' and 'visibility_integrand' will" + \
