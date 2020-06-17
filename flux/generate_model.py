@@ -1,4 +1,4 @@
-def generate_model:
+def generate_model():
     import os
     from RIMEz import beam_models
     from spin1_beam_model import cst_processing

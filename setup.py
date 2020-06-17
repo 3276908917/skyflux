@@ -5,7 +5,10 @@ with open("README.md", "r") as fh:
 
 setup(
     name='flux',
-    version='1!1.1a3',
+    # the very first version was 1!1.1a1
+    # I will always start with ones and end with nines because I think
+        # that is cleaner
+    version='1!1.1a4',
     author='Lukas Finkbeiner, C. D. Nunhokee, Aaron Parsons',
     author_email='lfinkbeiner@berkeley.edu',
     description='Primitive source handling functions',

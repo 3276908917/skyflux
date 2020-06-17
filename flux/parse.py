@@ -162,7 +162,7 @@ if full_load:
         r = rot.raddec2lm(ra, dec)
 
         phi = phase_factor(ant1, ant2, r, nu)
-        return np.dot(np.dot(A(source_index), s), phi)
+        return np.dot(np.dot(stokes.A_matrix(ra, dec, nu), s), phi)
 
     def visibility_integrand(ant1, ant2, nu=151e6):
         total = np.array([0j, 0j, 0j, 0j]) # 4 x 1. Visibility has a phase,
