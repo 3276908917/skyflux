@@ -1,8 +1,5 @@
 
 *.DS_Store
-# reading the antenna generates an h5 file, but the file cannot be
-# re-used in lieu of reading
-*.h5
 # Python byte-code is by definition optimized for the LOCAL machine
 *.pyc
 # checkpoints are good for local users to undo mistakes,

@@ -7,7 +7,7 @@ from spin1_beam_model import cst_processing, jones_matrix_field
 
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 beam_origin = data_prefix + "HERA_4.9m_E-pattern_151MHz.txt"
-beam_destination = 'ant1_s2'
+beam_destination = data_prefix + "ant1_s2.h5"
 
 processor = cst_processing.CSTDataProcessor(
     [beam_origin, beam_origin, beam_origin],
