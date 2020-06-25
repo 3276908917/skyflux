@@ -29,5 +29,6 @@ setup(
         'HERA_4.9m_E-pattern_151MHz.txt'
     ]},
     include_package_data=True,
-    install_requires=[], #I definitely need to come back and fix this
+    # until RIMEz updates its rumba references:
+    install_requires=['numba < 0.49.0'], #I definitely need to come back and fix this
 )

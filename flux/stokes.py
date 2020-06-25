@@ -43,7 +43,7 @@ def J_matrix(ra, dec, nu=150e6):
     az = np.array([az])
     alt = np.array([alt])
 
-    return spline_beam_func(freq, alt, az)
+    return spline_beam_func(nu, alt, az)
 
 def A_matrix(ra, dec, nu=150e6):
     """
