@@ -1,3 +1,14 @@
+"""
+Utilities for evaluating the visibility sky integral.
+"""
+
+import numpy as np
+
+from flux import rot
+from flux import ant
+from flux import stokes
+from flux import catalog
+
 def visibility(ant1, ant2, source, nu=151e6):
     """
     Visibility integrand evaluated for a single source.
@@ -13,15 +24,15 @@ def visibility(ant1, ant2, source, nu=151e6):
     dec = np.radians(source.dec_angle)
     r = rot.raddec2lm(ra, dec)
 
-    phi = phase_factor(ant1, ant2, r, nu)
+    phi = ant.phase_factor(ant1, ant2, r, nu)
     return np.dot(np.dot(stokes.A_matrix(ra, dec, nu), s), phi)
 
 def visibility_integrand(ant1, ant2, nu=151e6):
     """
     Return visibility integrand evaluated for all sources
-    in obj_catalog.
+    in catalog's parsed GLEAM array, obj_catalog.
     """
     total = np.array([0j, 0j, 0j, 0j]) # 4 x 1. Visibility has a phase,
-    for source in obj_catalog:
+    for source in catalog.obj_catalog:
         total += visibility(ant1, ant2, source, nu)
     return total

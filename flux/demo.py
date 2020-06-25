@@ -1,8 +1,14 @@
+"""
+Utilities for displaying various plots concerning the distributions
+of the GLEAM objects in the parser buffer (catalog.obj_catalog).
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-from flux import parse
+from flux import catalog
+from flux import ant
 
 def frame():
     """
@@ -24,7 +30,7 @@ def frame():
 def sources_range(start=3, end=5, frq=151):
     """
     Return all sources in the current parse buffer
-        (see obj_catalog in parse.py)
+        (see obj_catalog in catalog.py)
     for which the flux at the frequency @frq (in MHz) is
         at least @start [Jy] and
         at most @end [Jy]
@@ -32,7 +38,7 @@ def sources_range(start=3, end=5, frq=151):
     """
     assert start < end, "Requested range must be of positive width"
     valid_sources = []
-    for gleam_obj in parse.obj_catalog:
+    for gleam_obj in catalog.obj_catalog:
         if gleam_obj.flux_by_frq[frq] <= end and \
            gleam_obj.flux_by_frq[frq] >= start:
             valid_sources.append(gleam_obj)
@@ -48,8 +54,8 @@ def brightest_source(frq=151):
 
     There is no error checking to make sure @frq is a valid frequency.
     """
-    max_obj = parse.obj_catalog[0]
-    for gleam_obj in parse.obj_catalog:
+    max_obj = catalog.obj_catalog[0]
+    for gleam_obj in catalog.obj_catalog:
         if gleam_obj.flux_by_frq[frq] > max_obj.flux_by_frq[frq]:
             max_obj = gleam_obj
     print("Largest flux value encountered:", max_obj.flux_by_frq[frq])
@@ -72,7 +78,7 @@ def is_constrained(value, min_acceptable=None, max_acceptable=None):
 def hist_data(list_source, frq=151, ln=False, data_lim=None):
     """
     For every GLEAM_entry object
-        as defined in parse.py
+        as defined in catalog.py
     in @list_source,
     extract its flux at frequency @frq (in MHz)
 
@@ -125,7 +131,7 @@ def brightness_distr(frq=151, ln=False, data_lim=None, ylim=None):
             data_lim = (2, None)
         will give all sources brighter than 2 Jy.
     """
-    fluxes = hist_data(parse.obj_catalog, frq, ln, data_lim)
+    fluxes = hist_data(catalog.obj_catalog, frq, ln, data_lim)
     # Naive application of Sturge's Rule to get number of bins
     K = math.ceil(1 + 3.322 * np.log(len(fluxes)))
 
@@ -174,11 +180,11 @@ def list_baselines(ant_ID):
     Print every baseline that features antenna # @ant_ID
     """
     print ("Baselines between antenna " + str(ant_ID) + " and antenna...")
-    for ID in parse.ant_pos:
+    for ID in ant.ant_pos:
         if ant_ID != ID:
-            print(str(ID) + ": " + str(parse.baseline(ant_ID, ID)))
+            print(str(ID) + ": " + str(ant.baseline(ant_ID, ID)))
 
-active_ants = list(parse.ant_pos)
+active_ants = list(ant.ant_pos)
 active_ants.sort()
 
 def all_baselines():
@@ -194,4 +200,4 @@ def all_baselines():
         for j in range(i + 1, len(active_ants[i + 1:])):
             ID2 = active_ants[j]
             print("Baseline between antennae " + str(ID1) + \
-                  " and " + str(ID2) + " = " + str(parse.baseline(ID1, ID2)))
+                  " and " + str(ID2) + " = " + str(ant.baseline(ID1, ID2)))

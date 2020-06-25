@@ -1,12 +1,9 @@
-import pickle
 import os
 import numpy as np
 
 from flux import rot
-from flux import stokes
 
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
-print("Searching for data files at: " + data_prefix)
 
 # The following section is hard-coded to the GLEAMEGCAT format,
 # as downloaded by myself.

@@ -3,7 +3,12 @@ Utilities for calculations based on antenna positions,
 such as baseline and phase factor.
 """
 
+import os
+import numpy as np
+import pickle
+
 c = 299792458 # m / s
+data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 try:
     ant_pos = dict(pickle.load(open(data_prefix + "ant_dict.pk", "rb")))

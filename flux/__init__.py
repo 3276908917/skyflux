@@ -1,8 +1,10 @@
-import flux.rot
-import flux.parse
-import flux.demo
 import flux.generate_model
+import flux.rot
+import flux.catalog
+import flux.ant
+import flux.vis
 import flux.stokes
+import flux.demo
 
 """
 I wanted to use this block of code to automatically import any new

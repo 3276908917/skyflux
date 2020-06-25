@@ -14,7 +14,7 @@ setup(
     # the very first version was 1!1.1a1
     # I will always start with ones and end with nines because I think
         # that is cleaner
-    version='1!1.1a5',
+    version='1!1.1a6',
     author='Lukas Finkbeiner, C. D. Nunhokee, Aaron Parsons',
     author_email='lfinkbeiner@berkeley.edu',
     description='Primitive source handling functions',
@@ -22,7 +22,12 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/3276908917/HERA',
     packages=find_packages(),
-    package_data={'': ['gleam_with_alpha.txt', 'ant_dict.pk', 'J.npy']},
+    package_data={'': [
+        'gleam_with_alpha.txt',
+        'ant_dict.pk',
+        'ant.h5',
+        'HERA_4.9m_E-pattern_151MHz.txt'
+    ]},
     include_package_data=True,
     install_requires=[], #I definitely need to come back and fix this
 )
