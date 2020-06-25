@@ -5,25 +5,12 @@ import numpy as np
 from flux import rot
 from flux import stokes
 
-c = 299792458 # m / s
-
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 print("Searching for data files at: " + data_prefix)
 
 # If the source catalog or antannae positions fail to load,
 # we warn that we will not define the last two functions.
 full_load = True
-
-"""
-In principle, it should not matter which flux-by-frequency
-you order by. However, in practice (as we can see in
-parser_demos.py), some sources are brighter than others
-at certain frequencies.
-
-We have several sources that lack spectral indices,
-    so it looks like we are moving ahead with plan A
-    (use a power-law regression to get a spectral index function)
-"""
 
 # The following section is hard-coded to the GLEAMEGCAT format,
 # as downloaded by myself.
@@ -112,86 +99,6 @@ try:
 except FileNotFoundError:
     print("Failure to load gleam catalog.")
     full_load = False
-
-    """
-        PING RIDHIMA TO GET FREQUENCY BEAM
-            once you have your current pipeline working for this
-                frequency
-
-        for now, assume that 100-200 MHz is the same frequency
-            use spectral index to scale the result
-            split it at 1 MHz for now.
-            (i.e. same Jones matrix 100-200 MHz for now).
-        "I will leave the chunking of frequency and time up to you."
-        
-        We discussed to do ten-minute intervals:
-        each ten minutes, we have one data point
-        5 hours, 6 data per hour.
-        0-8 hours (colder patch)
-        create 1D plot.
-            great Slack question: what is the best way
-            to visually represent the results?
-
-        DO NOT average it yet, return an array of all
-        data points.
-
-        time axis (2D), frequency axis (3D)
-
-        write a power law equation which takes a
-        spectral index and then scales the result appropriately
-            > amplitude of visibility should be decreasing with frequency
-            > (since all of these sources are synchrotrons)
-        plt.imshow()
-
-        simple test for the computation:
-        at zenith (ra = LST), a source should be real
-        (phase is zero)
-
-        feel free to use orthview to get the
-        Mueller matrix plots. Figure 1 in (Nunhokee et al)
-        did not actually use healpy, so feel free to
-        tinker.
-            "Return projected map -> store in variable
-            variable -> imshow"
-
-        read up on healpy.cartview,
-            that is a third option besides Mollview and orthview
-
-        do not worry if the axes are not in RA and Dec,
-            just get the healpy grid on the A matrices
-            like in the Stack Overflow
-    """
-
-"""
-(I think the output should be a scalar, not a 4x1)
-
-Want graph of times and positions.
-
-A will change according to time. Equation 3 assumes that we have
-just one integration time.
-
-The change in A over time represents a drift scan,
-like the Gaussians that you recently visualized.
-    Time you can do, you have all the information. I am guessing
-    I probably only need to call raddec2lm with different values
-    of ra0, i.e. moving what would otherwise be the current LST
-    over the entire range [0, 2 np.pi)
-
-use constant flux independent of frequency
-(this is the same as saying that alpha is equal to one)
-then varying frequency from 100-200 MHz
-'assume it is the same beam between 100 and 200 MHz'
-    beam variation is what we will eventually be handling anyway
-
-15 m or 30 m baseline East-West
-    I do not remember what this means.
-
-I need to plot the A matrix, to see the leakage terms.
-Plot it in healpix.
-
-(Ask for Ridhima's power spectrum notebook plot for a
-single baseline, once the above work has been completed and tested.)
-"""
 
 """
 We cannot put ra0 = get_lst() in the function header. Why?

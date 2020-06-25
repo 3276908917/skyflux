@@ -3,6 +3,8 @@ Utilities for calculations based on antenna positions,
 such as baseline and phase factor.
 """
 
+c = 299792458 # m / s
+
 try:
     ant_pos = dict(pickle.load(open(data_prefix + "ant_dict.pk", "rb")))
 
