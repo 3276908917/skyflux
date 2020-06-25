@@ -1,17 +1,21 @@
 import numpy as np
 import time
+# Are BOTH of these imports really necessary?
 import astropy
 import astropy.time
 
-"""
-S ~/prop\nu^alpha
-S_{200} = S_{150} * (200/150)^\alpha
-"""
-
 def collapse_angle(degree, arcminute=0, arcsecond=0):
+    """
+    Return a single angle in degrees, based on an
+    angle in the form of degrees, arcminutes, and arcseconds.
+    """
     return degree + arcminute / 60 + arcsecond / 3600
 
 def collapse_hour(hour, minute=0, second=0):
+    """
+    Return a single angle in degrees, based on an
+    angle in the form of hours, minutes, and seconds of a day.
+    """
     return 15 * hour + minute / 4 + second / 240
 
 hera_lat = -collapse_angle(30, 43, 17)
@@ -173,7 +177,8 @@ def eq_to_topo(ra, dec, latitude, lst, radians=False):
     return new_sphere(topo_vector, radians)
 
 """
-The following function was written by C. D. Nunhokee,
+The following is an adaptation of a function originally
+written by C. D. Nunhokee,
 'genVisibility.py', polarizedSims, Feb 8 2019
 https://github.com/Chuneeta/polarizedSims/blob/master/genVisibility.py
 """
@@ -182,9 +187,9 @@ def raddec2lm(ra, dec, ra0=None, dec0=hera_lat): # ra and dec in radians
     """
     Converts ra/dec to direction cosines l/m
     ra0  : reference/phase right ascension; type: float
-    dec0 : reference/phase declination; type:float
-    ra   : right ascension in radians; type:float
-    dec  : declination in radians; type:float
+    dec0 : reference/phase declination; type: float
+    ra   : right ascension in radians; type: float
+    dec  : declination in radians; type: float
     """
     # See note at the end about default arguments.
     if ra0 is None:
@@ -194,3 +199,10 @@ def raddec2lm(ra, dec, ra0=None, dec0=hera_lat): # ra and dec in radians
     m = -1 * (np.sin(dec) * np.cos(dec0) - \
         np.cos(dec) * np.sin(dec0) * np.cos(ra-ra0))
     return l, m
+
+"""
+We cannot put ra0 = get_lst() in the function header. Why?
+Because Python evaluates all function headers once upon first opening the script.
+Consequently, the default argument will be constant: subsequent calls of this
+function will use the value of get_lst() calculated when the script was opened.
+"""

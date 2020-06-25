@@ -28,11 +28,11 @@ class GLEAM_entry:
         line = line[line.index("|") + 1:]
         
         self.ra = line[:line.index("|")]
-        self.format_ra()
+        self._format_ra()
         line = line[line.index("|") + 1:]
 
         self.dec = line[:line.index("|")]
-        self.format_dec()
+        self._format_dec()
         line = line[line.index("|") + 1:]
 
         self.flux_by_frq = {}
@@ -55,7 +55,18 @@ class GLEAM_entry:
             print("Missing spectral index for:", self.name)
             self.alpha = np.NaN
 
-    def format_ra(self):
+    def _format_ra(self):
+        """
+        self.ra is a string which describes the right-ascension
+            of the source in the format 'HH-mm-ss'.
+        This internal function breaks that string up into
+            three explicitly floating-point instance variables:
+                ra_hour, ra_minute, and ra_second
+        Finally, it allocates the instance variable ra_angle
+            to represent a full conversion of the original
+            right-ascension into a single, centralized, floating-point
+            angle in degrees.
+        """
         remainder = self.ra
         self.ra_hour = float(remainder[:remainder.index(" ")])
 
@@ -68,7 +79,18 @@ class GLEAM_entry:
         self.ra_angle = rot.collapse_hour(
             self.ra_hour, self.ra_minute, self.ra_second)
 
-    def format_dec(self):
+    def _format_dec(self):
+        """
+        self.dec is a string which describes the declination
+            of the source in the format '(arc)degree-arcminute-arcsecond'.
+        This internal function breaks that string up into
+            three explicitly floating-point instance variables:
+                dec_degree, dec_arcminute, and dec_arcsecond
+        Finally, it allocates the instance variable dec_angle
+            to represent a full conversion of the original
+            declination into a single, centralized, floating-point
+            angle in degrees.
+        """
         remainder = self.dec
         self.dec_degree = float(remainder[:remainder.index(" ")])
 
@@ -99,10 +121,3 @@ try:
 except FileNotFoundError:
     print("Failure to load gleam catalog.")
     full_load = False
-
-"""
-We cannot put ra0 = get_lst() in the function header. Why?
-Because Python evaluates all function headers once upon first opening the script.
-Consequently, the default argument will be constant: subsequent calls of this
-function will use the value of get_lst() calculated when the script was opened.
-"""
