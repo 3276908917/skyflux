@@ -1,0 +1,18 @@
+1. finish rotations docstrings
+
+2. finish parser docstrings and rename the file
+
+3. repair the flux package so that we return to the level of functionality
+	which we had before we started along the J_script branch
+
+4. update at least three notebooks so that they correctly interact with this
+	newer edition of the package.
+	4a. the histogram notebook
+	4b. ?
+	4c. ?
+
+5. Actually work on 2 things that Ridhima suggested in one of the previous calls.
+
+6. Test gal_to_topo to make sure it still works
+Test ha_to_topo to verify the docstring has the correct ordering of
+	returned altitude and azimuth.

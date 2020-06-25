@@ -40,8 +40,8 @@ M_eq_to_gal = np.array([
 def ha_to_gal(ha, dec, lst, radians=False):
     """
     Convert a position in the format
-        (hour-angle = @ha, declination = @dec)
-    and considered at the local sidereal time @lst
+        (hour-angle = @ha, declination = @dec),
+    and considered at the local sidereal time @lst,
     to the galactic-coordinates position
         (el : galactic longitude, be = galactic latitude)
 
@@ -127,16 +127,20 @@ def rectangle(a, b):
     """
     return np.array([np.cos(b) * np.cos(a), np.cos(b) * np.sin(a), np.sin(b)])
 
-def gal_to_topo(el, be, jd, lat, lon, radians=False):
-    '''
-    @radians determines the format of BOTH input and output!
-    Given a pair of angles @el and @be (in galactic coordinates),
-    return a pair of angles relating the associated
-    azimuth and altitude.
+def gal_to_topo(el, be, lat, lon, radians=False):
+    """
+    Convert a position in the galactic format
+        (galactic longitude = @el, galactic latitude = @be),
+    and for an observer at latitude @lat and longitude @lon,
+    to the topocentric-coordinates position
+        (az : local azimuth, alt : local altitude)
 
-    This does not work in the current environment
-    we are using ugradio as a crutch.
-    '''
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+
+    WARNING: this function has undergone some dependency changes
+    without additional accuracy tests. It may not work correctly, currently.
+    """
     if not radians:
         el = np.radians(el)
         be = np.radians(be)
@@ -163,12 +167,23 @@ def new_sphere(out_arr, radians=False):
     return gp, tp
 
 def ha_to_topo(ha, dec, lat, radians=False):
-    '''
-    Take a position in hour-angle right ascension / declination
-        to local altitude and azimuth.
-        
-    This performs NO precession.
-    '''
+    """
+    Convert a position in the hour-angle format
+        (hour-angle = @ha, declination = @dec),
+    and for an observer at latitude @lat,
+    to the topocentric-coordinates position
+        (az: local azimuth, alt: local altitude)
+
+    Be careful not to confuse the hour-angle coordinate system
+    (which this function endeavors to convert)
+    with the conventional EQUATORIAL-coordinates representation of
+    the right ascension ANGLE in the format (HOUR, minute, second).
+
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+
+    WARNING: the altitude and azimuth may be listed in the wrong order.
+    """
     if not radians:
         ha = np.radians(ha)
         dec = np.radians(dec)
@@ -178,10 +193,15 @@ def ha_to_topo(ha, dec, lat, radians=False):
     return new_sphere(topo, radians)
 
 def ha_to_eq(ha, dec, lat, radians=False):
-    '''
-    Take a position in hour-angle right-ascension / declination
-        to regular right-ascension / declination.
-    '''
+    """
+    Convert a position in the hour-angle format
+        (hour-angle = @ha, declination = @dec)
+    to the equatorial-coordinates position
+        (ra : right ascension, dec : declination)
+
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+    """
     if not radians:
         ha = np.radians(ha)
         dec = np.radians(dec)
