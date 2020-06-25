@@ -195,18 +195,3 @@ def all_baselines():
             ID2 = active_ants[j]
             print("Baseline between antennae " + str(ID1) + \
                   " and " + str(ID2) + " = " + str(parse.baseline(ID1, ID2)))
-
-#! Does this really belong in a demo script??
-
-def phase_factor(ant1, ant2, r, nu=151e6):
-    """
-    Calculate the phase factor in the direction @r (l, m)
-        (we assume that n is of insignificant magnitude)
-    and at the frequency @nu
-    between two antennae whose ID #s are @ant1 and @ant2.
-    When we calculate the baseline (u, v, w), we
-        assume that w is of insignificant magnitude.
-    """
-    b = parse.baseline(ant1, ant2)[0:2] # kill w
-    br = np.dot(b, r)
-    return np.exp(-2j * np.pi * nu * br / parse.c)
