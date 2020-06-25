@@ -145,6 +145,7 @@ except FileNotFoundError:
     print("Failure to load antennae data.")
     full_load = False
 
+# It is very poor form to put the visibility functions here
 if full_load:
     def visibility(ant1, ant2, source, nu=151e6):
         """
@@ -175,6 +176,8 @@ else:
 
     """
         PING RIDHIMA TO GET FREQUENCY BEAM
+            once you have your current pipeline working for this
+                frequency
 
         for now, assume that 100-200 MHz is the same frequency
             use spectral index to scale the result
@@ -212,7 +215,12 @@ else:
             "Return projected map -> store in variable
             variable -> imshow"
 
-        read up on healpy.cartview
+        read up on healpy.cartview,
+            that is a third option besides Mollview and orthview
+
+        do not worry if the axes are not in RA and Dec,
+            just get the healpy grid on the A matrices
+            like in the Stack Overflow
     """
 
 """

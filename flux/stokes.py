@@ -4,8 +4,7 @@ from RIMEz import beam_models
 
 from flux import rot
 
-beam_origin = os.path.dirname(os.path.abspath(__file__)) + \
-              "/ant.h5"
+beam_origin = os.path.dirname(os.path.abspath(__file__)) + "/ant.h5"
 
 spline_beam_func = beam_models.model_data_to_spline_beam_func(
     beam_origin,
@@ -14,6 +13,8 @@ spline_beam_func = beam_models.model_data_to_spline_beam_func(
     np.array([150e6, 151e6, 152e6])
 )
 
+# This is a constant change of basis matrix
+# for getting stokes parameters with a Jones matrix.
 S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, 1j],
                   [0, 0, 1, -1j],
@@ -21,8 +22,10 @@ S = .5 * np.array([[1, 1, 0, 0,],
 
 def J_matrix(ra, dec, nu=150e6):
     """
-    @source : we expect an object of the type
-                GLEAM_entry (see parse.py)
+    Return the Jones matrix J.
+    @ra: right ascension of the source, in degrees.
+    @dec: right ascension of the source, in degrees.
+    @nu: frequency of interest, in Hz.
 
     The default argument comes from the beam that I
     had access to when this was written.
@@ -35,10 +38,18 @@ def J_matrix(ra, dec, nu=150e6):
     az = np.array([az])
     alt = np.array([alt])
 
-    #! bad hard-coding
     return spline_beam_func(freq, alt, az)
 
 def A_matrix(ra, dec, nu=150e6):
+    """
+    Return the Mueller matrix A.
+    @ra: right ascension of the source, in degrees.
+    @dec: declination of the source, in degrees.
+    @nu: frequency of interest, in Hz.
+
+    The default argument comes from the beam that I
+    had access to when this was written.
+    """
     J = J_matrix(ra, dec, nu)
     J_outer = np.kron(J, np.conj(J))
     return np.dot(S, np.dot(J_outer, np.linalg.inv(S)))

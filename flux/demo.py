@@ -4,10 +4,6 @@ import math
 
 from flux import parse
 
-"""
-Maybe do a Jupyter notebook with the different histograms
-"""
-
 def frame():
     """
     Set up generic infrastructure for an improved-looking plot.
