@@ -37,65 +37,6 @@ M_eq_to_gal = np.array([
     [-.867666, -.198076, .455984]
 ])
 
-def ha_to_gal(ha, dec, lst, radians=False):
-    """
-    Convert a position in the format
-        (hour-angle = @ha, declination = @dec),
-    and considered at the local sidereal time @lst,
-    to the galactic-coordinates position
-        (el : galactic longitude, be = galactic latitude)
-
-    Be careful not to confuse the hour-angle coordinate system
-        (which this function endeavors to convert)
-    with the conventional EQUATORIAL-coordinates representation of
-    the right ascension ANGLE in the format (HOUR, minute, second).
-
-    @radians determines the interpretation of BOTH the input
-    and output. By default everything is in degrees.
-    """
-    if not radians:
-        ha = np.radians(ha)
-        dec = np.radians(dec)
-        lst = np.radians(lst)
-    rct = rectangle(ha, dec)
-    ra_dec = np.dot(np.linalg.inv(M_eq_to_ha(lst)), rct)
-    gal = np.dot(M_eq_to_gal, ra_dec)
-    return new_sphere(gal, radians)
-
-def gal_to_eq(el, be, radians=False):
-    """
-    Convert a position in the galactic format
-        (galactic longitude = @el, galactic latitude = @be)
-    to the equatorial-coordinates position
-        (ra : right ascension, dec = declination)
-
-    @radians determines the interpretation of BOTH the input
-    and output. By default everything is in degrees.
-    """
-    if not radians:
-        el = np.radians(el)
-        be = np.radians(be)
-    rct = rectangle(el, be)
-    ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
-    return new_sphere(ra_dec, radians)
-
-def eq_to_gal(ra, dec, radians=False):
-    """
-    Convert a position in the equatorial format
-        (right ascension = @ra, declination = @dec)
-    to the galactic-coordinates position
-        (el : galactic longitude, be = galactic latitude)
-
-    @radians determines the interpretation of BOTH the input
-    and output. By default everything is in degrees.
-    """
-    if not radians:
-        ra = np.radians(ra)
-        dec = np.radians(dec)
-    eq_vector = rectangle(ra, dec)
-    gal_vector = np.dot(M_eq_to_gal, eq_vector)
-    return new_sphere(gal_vector, radians)
-
 def M_eq_to_ha(lst):
     """
     Return the change-of-basis matrix between the equatorial and
@@ -127,33 +68,6 @@ def rectangle(a, b):
     """
     return np.array([np.cos(b) * np.cos(a), np.cos(b) * np.sin(a), np.sin(b)])
 
-def gal_to_topo(el, be, lat, lon, radians=False):
-    """
-    Convert a position in the galactic format
-        (galactic longitude = @el, galactic latitude = @be),
-    and for an observer at latitude @lat and longitude @lon,
-    to the topocentric-coordinates position
-        (az : local azimuth, alt : local altitude)
-
-    @radians determines the interpretation of BOTH the input
-    and output. By default everything is in degrees.
-
-    WARNING: this function has undergone some dependency changes
-    without additional accuracy tests. It may not work correctly, currently.
-    """
-    if not radians:
-        el = np.radians(el)
-        be = np.radians(be)
-        lat = np.radians(lat)
-    else:
-        lon = np.degrees(lon)
-    rct = rectangle(l, b)
-    ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
-    lst = get_lst(lon)
-    hrd = np.dot(np.linalg.inv(M_eq_to_ha(lst)), ra_dec)
-    topo = np.dot(M_ha_to_topo(phi), hrd)
-    return new_sphere(topo, radians)
-
 def new_sphere(out_arr, radians=False):
     """
     Given a 3x1 rectangular / Cartesian vector @out_arr,
@@ -165,6 +79,88 @@ def new_sphere(out_arr, radians=False):
     if not radians:
         return np.degrees(gp), np.degrees(tp)   
     return gp, tp
+
+def eq_to_gal(ra, dec, radians=False):
+    """
+    Convert a position in the equatorial format
+        (right ascension = @ra, declination = @dec)
+    to the galactic-coordinates position
+        (el : galactic longitude, be = galactic latitude)
+
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+    """
+    if not radians:
+        ra = np.radians(ra)
+        dec = np.radians(dec)
+    eq_vector = rectangle(ra, dec)
+    gal_vector = np.dot(M_eq_to_gal, eq_vector)
+    return new_sphere(gal_vector, radians)
+
+def eq_to_topo(ra, dec, latitude, lst, radians=False):
+    """
+    Convert a position in the equatorial format
+        (right ascension = @ra, declination = @dec)
+    to the topocentric-coordinates position
+        (az : local azimuth, alt = local altitude)
+
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+
+    WARNING: the altitude and azimuth may be listed in the wrong order.
+    """
+    if not radians:
+        ra = np.radians(ra)
+        dec = np.radians(dec)
+        latitude = np.radians(latitude)
+        lst = np.radians(lst)
+    eq_vector = rectangle(ra, dec)
+    ha_vector = np.dot(M_eq_to_ha(lst), eq_vector)
+    topo_vector = np.dot(M_ha_to_topo(latitude), ha_vector)
+    return new_sphere(topo_vector, radians)
+
+def ha_to_eq(ha, dec, lat, radians=False):
+    """
+    Convert a position in the hour-angle format
+        (hour-angle = @ha, declination = @dec)
+    to the equatorial-coordinates position
+        (ra : right ascension, dec : declination)
+
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+    """
+    if not radians:
+        ha = np.radians(ha)
+        dec = np.radians(dec)
+        lat = np.radians(lat)
+    rct = rectangle(ha, dec)
+    eq = np.dot(np.linalg.inv(M_eq_to_ha(lat)), rct)
+    return new_sphere(eq, radians)
+
+def ha_to_gal(ha, dec, lst, radians=False):
+    """
+    Convert a position in the format
+        (hour-angle = @ha, declination = @dec),
+    and considered at the local sidereal time @lst,
+    to the galactic-coordinates position
+        (el : galactic longitude, be = galactic latitude)
+
+    Be careful not to confuse the hour-angle coordinate system
+        (which this function endeavors to convert)
+    with the conventional EQUATORIAL-coordinates representation of
+    the right ascension ANGLE in the format (HOUR, minute, second).
+
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+    """
+    if not radians:
+        ha = np.radians(ha)
+        dec = np.radians(dec)
+        lst = np.radians(lst)
+    rct = rectangle(ha, dec)
+    ra_dec = np.dot(np.linalg.inv(M_eq_to_ha(lst)), rct)
+    gal = np.dot(M_eq_to_gal, ra_dec)
+    return new_sphere(gal, radians)
 
 def ha_to_topo(ha, dec, lat, radians=False):
     """
@@ -192,40 +188,49 @@ def ha_to_topo(ha, dec, lat, radians=False):
     topo = np.dot(M_ha_to_topo(lat), rct)
     return new_sphere(topo, radians)
 
-def ha_to_eq(ha, dec, lat, radians=False):
+def gal_to_eq(el, be, radians=False):
     """
-    Convert a position in the hour-angle format
-        (hour-angle = @ha, declination = @dec)
+    Convert a position in the galactic format
+        (galactic longitude = @el, galactic latitude = @be)
     to the equatorial-coordinates position
-        (ra : right ascension, dec : declination)
+        (ra : right ascension, dec = declination)
 
     @radians determines the interpretation of BOTH the input
     and output. By default everything is in degrees.
     """
     if not radians:
-        ha = np.radians(ha)
-        dec = np.radians(dec)
-        lat = np.radians(lat)
-    rct = rectangle(ha, dec)
-    eq = np.dot(np.linalg.inv(M_eq_to_ha(lat)), rct)
-    return new_sphere(eq, radians)
+        el = np.radians(el)
+        be = np.radians(be)
+    rct = rectangle(el, be)
+    ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
+    return new_sphere(ra_dec, radians)
 
-def eq_to_topo(ra, dec, latitude, lst, radians=False):
-    '''
-    @radians determines the format of BOTH input and output!
-    Given a pair of angles @ra and @dec,
-    return a pair of angles relating the associated
-    azimuth (first) and altitude (second).
-    '''
+def gal_to_topo(el, be, lat, lon, radians=False):
+    """
+    Convert a position in the galactic format
+        (galactic longitude = @el, galactic latitude = @be),
+    and for an observer at latitude @lat and longitude @lon,
+    to the topocentric-coordinates position
+        (az : local azimuth, alt : local altitude)
+
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+
+    WARNING: this function has undergone some dependency changes
+    without additional accuracy tests. It may not work correctly, currently.
+    """
     if not radians:
-        ra = np.radians(ra)
-        dec = np.radians(dec)
-        latitude = np.radians(latitude)
-        lst = np.radians(lst)
-    eq_vector = rectangle(ra, dec)
-    ha_vector = np.dot(M_eq_to_ha(lst), eq_vector)
-    topo_vector = np.dot(M_ha_to_topo(latitude), ha_vector)
-    return new_sphere(topo_vector, radians)
+        el = np.radians(el)
+        be = np.radians(be)
+        lat = np.radians(lat)
+    else:
+        lon = np.degrees(lon)
+    rct = rectangle(l, b)
+    ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
+    lst = get_lst(lon)
+    hrd = np.dot(np.linalg.inv(M_eq_to_ha(lst)), ra_dec)
+    topo = np.dot(M_ha_to_topo(phi), hrd)
+    return new_sphere(topo, radians)
 
 """
 The following is an adaptation of a function originally
