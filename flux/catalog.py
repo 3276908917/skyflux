@@ -8,10 +8,6 @@ from flux import stokes
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 print("Searching for data files at: " + data_prefix)
 
-# If the source catalog or antannae positions fail to load,
-# we warn that we will not define the last two functions.
-full_load = True
-
 # The following section is hard-coded to the GLEAMEGCAT format,
 # as downloaded by myself.
 # See resources/GLEAM_guide.txt for more details.
@@ -23,6 +19,17 @@ expected_frequencies = [76, 84, 92, 99, 107, 115, 122, 130,
 
 class GLEAM_entry:
     def __init__(self, line):
+        """
+        Initialize GLEAM object with a line from the catalog excerpt
+        downloaded as a text file. We expect all of the following, in
+        this order, on a separate line associated with a single GLEAM object:
+            name
+            right ascension (hour, minute, second)
+            declination (degree, arcminute, arcsecond)
+            integrated flux value for each of the frequencies in
+                expected_frequencies
+            spectral index, alpha
+        """
         # Might want to redo this line later to exclude universal "GLEAM " prefix
         self.name = line[:line.index("|")]
         line = line[line.index("|") + 1:]
@@ -120,4 +127,3 @@ try:
     f.close()
 except FileNotFoundError:
     print("Failure to load gleam catalog.")
-    full_load = False

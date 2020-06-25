@@ -1,6 +1,6 @@
-1. finish rotations docstrings
+$1. finish rotations docstrings
 
-2. finish parser docstrings and rename the file
+$2. finish parser docstrings and rename the file
 
 3. repair the flux package so that we return to the level of functionality
 	which we had before we started along the J_script branch
@@ -17,3 +17,5 @@
 Test ha_to_topo to verify the docstring has the correct ordering of
 	returned altitude and azimuth.
 Test eq_to_topo similarly
+
+7. add a __repr__ function for the GLEAM object.
