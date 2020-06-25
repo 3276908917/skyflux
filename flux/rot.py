@@ -83,19 +83,12 @@ def eq_to_gal(ra, dec, radians=False):
     """
     Convert a position in the equatorial format
         (right ascension = @ra, declination = @dec)
-    to the equatorial-coordinates position
-        (ra : right ascension, dec = declination)
+    to the galactic-coordinates position
+        (el : galactic longitude, be = galactic latitude)
 
     @radians determines the interpretation of BOTH the input
     and output. By default everything is in degrees.
     """
-    
-    '''
-    @radians determines the format of BOTH input and output!
-    Given a pair of angles @ra and @dec,
-    return a pair of angles relating the associated
-    galactic longitude (first?) and latitude (second?).
-    '''
     if not radians:
         ra = np.radians(ra)
         dec = np.radians(dec)
@@ -103,32 +96,35 @@ def eq_to_gal(ra, dec, radians=False):
     gal_vector = np.dot(M_eq_to_gal, eq_vector)
     return new_sphere(gal_vector, radians)
 
-def M_eq_to_ha(LST):
-    '''
+def M_eq_to_ha(lst):
+    """
     Return the change-of-basis matrix between the equatorial and
-    hour angle declination coordinate systems.
-    The conversion depends on the @LST, Local Siderial Time
-    '''
-    s = np.sin(LST)
-    c = np.cos(LST)
+    hour-angle coordinate systems.
+    The conversion depends on the
+        local sidereal time @lst : float, radians
+    """
+    s = np.sin(lst)
+    c = np.cos(lst)
     return np.array([[c, s, 0], [s, -c, 0], [0, 0, 1]])
 
 def M_ha_to_topo(phi):
-    '''
-    Return the change-of-basis matrix between the hour angle declination
+    """
+    Return the change-of-basis matrix between the hour-angle
     and topocentric coordinate systems.
-    The conversion depends on the user's current latitude @phi,
-        which must be given in radians.
-    '''
+    The conversion depends on the
+        latitude of the observer @phi : float, radians
+    """
     s = np.sin(phi)
     c = np.cos(phi)
     return np.array([[-s, 0, c], [0, -1, 0], [c, 0, s]])
 
 def rectangle(a, b):
-    '''
-    Given a pair of angles (both angles must be in radians),
-    return the corresponding 3x1 rectangular vector.
-    '''
+    """
+    Given a pair of angles
+        @a : float, radians
+        @b : float, radians
+    return the corresponding 3x1 rectangular / Cartesian vector.
+    """
     return np.array([np.cos(b) * np.cos(a), np.cos(b) * np.sin(a), np.sin(b)])
 
 def gal_to_topo(el, be, jd, lat, lon, radians=False):
@@ -155,11 +151,11 @@ def gal_to_topo(el, be, jd, lat, lon, radians=False):
     return new_sphere(topo, radians)
 
 def new_sphere(out_arr, radians=False):
-    '''
-    Given a 3x1 vector,
-    return the corresponding pair of angles
+    """
+    Given a 3x1 rectangular / Cartesian vector @out_arr,
+    return the corresponding pair of angles as a tuple.
     @radians determines whether the angles are given in radians.
-    '''
+    """
     gp = np.arctan2(out_arr[1], out_arr[0])
     tp = np.arcsin(out_arr[2])
     if not radians:
@@ -170,6 +166,7 @@ def ha_to_topo(ha, dec, lat, radians=False):
     '''
     Take a position in hour-angle right ascension / declination
         to local altitude and azimuth.
+        
     This performs NO precession.
     '''
     if not radians:
