@@ -21,7 +21,7 @@ def collapse_hour(hour, minute=0, second=0):
 hera_lat = -collapse_angle(30, 43, 17)
 hera_lon = collapse_angle(21, 25, 42)
 
-def get_lst(lon = hera_lon):
+def get_lst(lon=hera_lon):
     """
     Return current local sidereal time (LST)
     for longitude @lon (default is HERA array).
@@ -38,6 +38,21 @@ M_eq_to_gal = np.array([
 ])
 
 def ha_to_gal(ha, dec, lst, radians=False):
+    """
+    Convert a position in the format
+        (hour-angle = @ha, declination = @dec)
+    and considered at the local sidereal time @lst
+    to the galactic-coordinates position
+        (el : galactic longitude, be = galactic latitude)
+
+    Be careful not to confuse the hour-angle coordinate system
+        (which this function endeavors to convert)
+    with the conventional EQUATORIAL-coordinates representation of
+    the right ascension ANGLE in the format (HOUR, minute, second).
+
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+    """
     if not radians:
         ha = np.radians(ha)
         dec = np.radians(dec)
@@ -48,6 +63,15 @@ def ha_to_gal(ha, dec, lst, radians=False):
     return new_sphere(gal, radians)
 
 def gal_to_eq(el, be, radians=False):
+    """
+    Convert a position in the galactic format
+        (galactic longitude = @el, galactic latitude = @be)
+    to the equatorial-coordinates position
+        (ra : right ascension, dec = declination)
+
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+    """
     if not radians:
         el = np.radians(el)
         be = np.radians(be)
@@ -56,6 +80,16 @@ def gal_to_eq(el, be, radians=False):
     return new_sphere(ra_dec, radians)
 
 def eq_to_gal(ra, dec, radians=False):
+    """
+    Convert a position in the equatorial format
+        (right ascension = @ra, declination = @dec)
+    to the equatorial-coordinates position
+        (ra : right ascension, dec = declination)
+
+    @radians determines the interpretation of BOTH the input
+    and output. By default everything is in degrees.
+    """
+    
     '''
     @radians determines the format of BOTH input and output!
     Given a pair of angles @ra and @dec,
