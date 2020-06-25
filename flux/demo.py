@@ -22,6 +22,14 @@ def frame():
 # GLEAMEGCAT section
 
 def sources_range(start=3, end=5, frq=151):
+    """
+    Return all sources in the current parse buffer
+        (see obj_catalog in parse.py)
+    for which the flux at the frequency @frq (in MHz) is
+        at least @start [Jy] and
+        at most @end [Jy]
+    This function also prints the number of such sources encountered.
+    """
     assert start < end, "Requested range must be of positive width"
     valid_sources = []
     for gleam_obj in parse.obj_catalog:
@@ -31,11 +39,11 @@ def sources_range(start=3, end=5, frq=151):
     print("Number of valid sources encountered:", len(valid_sources))
     return valid_sources
 
-# Might be interesting to see whether this changes with different frequencies
 def brightest_source(frq=151):
     """
     Return the source with the highest value for integrated flux
-    at frequency @frq (in MHz). The source must also satisfy the
+        at frequency @frq (in MHz).
+    The source must also satisfy the
     query constaints described in resources/GLEAM_guide.txt.
 
     There is no error checking to make sure @frq is a valid frequency.
@@ -49,6 +57,12 @@ def brightest_source(frq=151):
     return max_obj
 
 def is_constrained(value, min_acceptable=None, max_acceptable=None):
+    """
+    Return True if @max_acceptable >= @value >= @min_acceptable,
+        False otherwise.
+    Although this is written as a general helper function,
+        it is chiefly used in filtering the data for the histogram.
+    """
     if min_acceptable is not None and value < min_acceptable:
         return False
     if max_acceptable is not None and value > max_acceptable:
@@ -56,6 +70,22 @@ def is_constrained(value, min_acceptable=None, max_acceptable=None):
     return True
 
 def hist_data(list_source, frq=151, ln=False, data_lim=None):
+    """
+    For every GLEAM_entry object
+        as defined in parse.py
+    in @list_source,
+    extract its flux at frequency @frq (in MHz)
+
+    Return an array containing those fluxes which
+    satisfy the boundaries established by
+        @data_lim = (@min_acceptable_value, @max_acceptable_value).
+    To leave an extreme unbounded, enter None as that value.
+    
+    If @ln = True, we also take the natural logarithm of all the
+    fluxes that we return. This is helpful, although not rigorous,
+    for observing some of the more exponential spread patterns,
+    such as the radio flux distribution as 151 MHz.
+    """
     fluxes = []
 
     if data_lim is not None:
@@ -80,7 +110,7 @@ def hist_data(list_source, frq=151, ln=False, data_lim=None):
 def brightness_distr(frq=151, ln=False, data_lim=None, ylim=None):
     """
     Generate a histogram for the brigtnesses of all sources
-    for a given frequency @frq.
+    for a given frequency @frq (in MHz).
     Where we restrict ourselves to sources between
         @data_lim = (minFlux, maxFlux)
     and we restrict the view according to
@@ -165,6 +195,8 @@ def all_baselines():
             ID2 = active_ants[j]
             print("Baseline between antennae " + str(ID1) + \
                   " and " + str(ID2) + " = " + str(parse.baseline(ID1, ID2)))
+
+#! Does this really belong in a demo script??
 
 def phase_factor(ant1, ant2, r, nu=151e6):
     """
