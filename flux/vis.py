@@ -12,10 +12,11 @@ from flux import catalog
 def visibility(ant1, ant2, source, nu=151e6):
     """
     Visibility integrand evaluated for a single source.
-
-    The most glaring waste of compute is separately calculating
-    the values for RA and DEC, although it is not clear to me
-    how many clock cycles are actually spent thereon.
+    @ant1 and @ant2 are indices of antannae,
+        to specify a baseline
+    @source is a GLEAM catalog object
+        (see catalog.py for specifications)
+    @nu frequency in Hertz    
     """
     I = source.flux_by_frq[nu / 1e6]
     s = np.array([complex(I), 0, 0, 0])
@@ -31,6 +32,9 @@ def visibility_integrand(ant1, ant2, nu=151e6):
     """
     Return visibility integrand evaluated for all sources
     in catalog's parsed GLEAM array, obj_catalog.
+    @ant1 and @ant2 are indices of antannae,
+        to specify a baseline
+    @nu frequency in Hertz
     """
     total = np.array([0j, 0j, 0j, 0j]) # 4 x 1. Visibility has a phase,
     for source in catalog.obj_catalog:

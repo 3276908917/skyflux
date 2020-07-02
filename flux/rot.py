@@ -1,8 +1,7 @@
 import numpy as np
 import time
-# Are BOTH of these imports really necessary?
-import astropy
 import astropy.time
+from astropy import units as u
 
 def collapse_angle(degree, arcminute=0, arcsecond=0):
     """
@@ -24,11 +23,14 @@ hera_lon = collapse_angle(21, 25, 42)
 def get_lst(lon=hera_lon):
     """
     Return current local sidereal time (LST)
-    for longitude @lon (default is HERA array).
+    for longitude
+        @lon : degrees, float
+        (default is HERA array).
     LST is returned in radians.
     """
+    lon_deg = hera_lon * u.degree
     t = astropy.time.Time(time.time(), format='unix')
-    return t.sidereal_time('apparent', longitude=lon).radian
+    return t.sidereal_time('apparent', longitude=lon_deg).radian
 
 # The change-of-basis matrix between equatorial and galactic coordinate systems
 M_eq_to_gal = np.array([
@@ -239,13 +241,15 @@ written by C. D. Nunhokee,
 https://github.com/Chuneeta/polarizedSims/blob/master/genVisibility.py
 """
 # Unfortunately, the parameter order has been switched wrt the citation.
-def raddec2lm(ra, dec, ra0=None, dec0=hera_lat): # ra and dec in radians
+def raddec2lm(ra, dec, ra0=None, dec0=np.radians(hera_lat)):
     """
-    Converts ra/dec to direction cosines l/m
-    ra0  : reference/phase right ascension; type: float
-    dec0 : reference/phase declination; type: float
+    Converts equatorial coordinates to direction cosines l & m
     ra   : right ascension in radians; type: float
     dec  : declination in radians; type: float
+    ra0  : reference/phase right ascension, in radians; type: float
+         (default: current LST)
+    dec0 : reference/phase declination; type: float
+         (default: latitude of the HERA array)
     """
     # See note at the end about default arguments.
     if ra0 is None:
@@ -253,7 +257,7 @@ def raddec2lm(ra, dec, ra0=None, dec0=hera_lat): # ra and dec in radians
 
     l = np.cos(dec) * np.sin(ra0 - ra)
     m = -1 * (np.sin(dec) * np.cos(dec0) - \
-        np.cos(dec) * np.sin(dec0) * np.cos(ra-ra0))
+        np.cos(dec) * np.sin(dec0) * np.cos(ra - ra0))
     return l, m
 
 """
