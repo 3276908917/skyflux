@@ -10,21 +10,23 @@ from flux import stokes
 from flux import catalog
 
 #! the default arguments for 'nu' are inconsistent across functions...
-def visibility(ant1, ant2, source, nu=151e6):
+def visibility(ant1, ant2, source, nu=151e6, time=None):
     """
     Visibility integrand evaluated for a single source.
     @ant1 and @ant2 are indices of antannae,
         to specify a baseline
     @source is a GLEAM catalog object
         (see catalog.py for specifications)
-    @nu frequency in Hertz    
+    @nu : signal frequency [Hz]
+    @time : custom local sidereal time [float, radians]
+        default: None corresponds to run-time LST.
     """
     I = source.flux_by_frq[nu / 1e6]
     s = np.array([complex(I), 0, 0, 0])
 
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
-    r = rot.raddec2lm(ra, dec)
+    r = rot.raddec2lm(ra, dec, ra0=time)
 
     phi = ant.phase_factor(ant1, ant2, r, nu)
 
@@ -33,21 +35,19 @@ def visibility(ant1, ant2, source, nu=151e6):
     # Its necessity bespeaks ill omen
     return malformed_result[:, 0]
 
-def visibility_integrand(ant1, ant2, nu=151e6):
+def visibility_integrand(ant1, ant2, nu=151e6, time=None):
     """
     Return visibility integrand evaluated for all sources
     in catalog's parsed GLEAM array, obj_catalog.
     @ant1 and @ant2 are indices of antannae,
         to specify a baseline
     @nu frequency in Hertz
-
-    Note: use break_array on the output. In the interests of
-    compute, this function sticks with the garbage
-    format that the numpy dot product automatically introduced.
+    @time : custom local sidereal time [float, radians]
+        default: None corresponds to run-time LST.
     """
     total = np.array([0j, 0j, 0j, 0j]) # 4 x 1. Visibility has a phase,
     for source in catalog.obj_catalog:
-        total += visibility(ant1, ant2, source, nu)
+        total += visibility(ant1, ant2, source, nu, time)
     return total
 
 def visibility_over_time(ant1, ant2, start, end, interval, nu=151e6):
@@ -63,5 +63,12 @@ def visibility_over_time(ant1, ant2, start, end, interval, nu=151e6):
     The cold patch has start = 0 hours, end = 8 hours,
         and we set out to measure at ten minute intervals.
     (ant1, ant2, 0, 2 / 3 * np.pi, np.pi / 72, nu)
+    to-do: error-checking on inputs
     """
-
+    list_visibilities = []
+    lst = start
+    while lst <= end:
+        list_visibilities.append(visibility_integrand(ant1, ant2, nu, lst))
+        lst += interval
+    # perhaps not necessary. Better safe than sorry:
+    return np.array(list_visibilities)
