@@ -1,0 +1,9 @@
+> updates:
+	* time tracking seems to work, but that was the easy part
+	* Still have the zeroing-out bug, though I feel I have run out of ideas for debugging.
+		The gaussian notebook still works, and the pure_J notebook still does not.
+	* cold patch I have implemented though I am having difficulty testing?
+		How? It is just a set of vectors
+	* and I am having difficulty testing the A matrix anyway
+		I recall you saying some things about imshow after getting the values from a healpy routine,
+		rather than directly displaying the output of the routine?
