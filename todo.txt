@@ -1,3 +1,11 @@
+1. plot an A matrix (which one?)
+2. plot the cold patch data
+3. investigate the J matrix zero debacle
+4. verify that ALL of the functions in rot return (az, alt) and not (alt, az)
+5. investigate the J matrix zero debacle
+6. update every notebook in the repository
+7. investigate the J matrix zero debacle
+
 simple test for the computation:
 at zenith (ra = LST), a source should be real
 (phase is zero)
@@ -36,8 +44,6 @@ read up on healpy.cartview,
 do not worry if the axes are not in RA and Dec,
     just get the healpy grid on the A matrices
     like in the Stack Overflow
-
-> Want graph of times and positions for sources.
 
 15 m or 30 m baseline East-West
     I do not remember what this means.

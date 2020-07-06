@@ -23,7 +23,7 @@ each ten minutes, we have one data point
 DO NOT average it yet, return an array of all
 data points.
 
-> Want graph of times and positions for sources.
+Want graph of times and positions for sources.
 
 A will change according to time. Equation 3 assumes that we have
 just one integration time.

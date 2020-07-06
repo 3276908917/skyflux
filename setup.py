@@ -14,7 +14,11 @@ setup(
     # the very first version was 1!1.1a1
     # I will always start with ones and end with nines because I think
         # that is cleaner
-    version='1!1.1a7',
+    version='1!1.1a8',
+    # additionally, remember that we change versions in the following order
+        # increase the last digit to nine, reset to 1
+        # cycle between a, b, and finally rc
+        # increase the remaining digits to nine, reset to 1
     author='Lukas Finkbeiner, C. D. Nunhokee, Aaron Parsons',
     author_email='lfinkbeiner@berkeley.edu',
     description='Primitive source handling functions',
