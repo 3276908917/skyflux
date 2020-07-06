@@ -7,3 +7,13 @@
 	* and I am having difficulty testing the A matrix anyway
 		I recall you saying some things about imshow after getting the values from a healpy routine,
 		rather than directly displaying the output of the routine?
+
+Try passing arbitrary right ascension (declination fixed) into the interopolation routine, not azimuth and altitude
+	Try using a source between 0 and 8 hours at -30.72 declination,
+	such that 4 hours represents the maximum intensity.
+Similarly, arbitrary declination (ra fixed)
+
+* These tests should verify the correctness of the coordinate conversion
+
+Test inserting a unity J matrix directly into the visibility routine
+* This should test the correctness of your implementation of the equation
