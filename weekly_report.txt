@@ -25,4 +25,8 @@ Well, first I can use my existing infrastructure to find the correct dimensions.
 Okay, I did that, but I realized I did not know what to use for the other parameters, so I used:
 	baseline: antennae 87 and 141
 	source: obj_catalog[30] (this serves to provide an ra and dec to the phase factor calculator)
-	LST: "now" (23:58 yesterday night)	
+	LST: "now" (23:58 yesterday night)
+
+array([ 0.60351302+1.91898613j, -0.65773655+1.26124957j,
+        1.26124957+0.65773655j,  0.        +0.j        ])
+Yeah, that seems wrong.	

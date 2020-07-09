@@ -34,7 +34,7 @@ def collapse_hour(hour, minute=0, second=0, radians=False):
 hera_lat = -collapse_angle(30, 43, 17)
 hera_lon = collapse_angle(21, 25, 42)
 
-def get_lst(lon=np.radians(hera_lon), radians=False):
+def get_lst(hera_lon, radians=False):
     """
     Return current local sidereal time (LST)
     for longitude
@@ -120,7 +120,8 @@ def eq_to_gal(ra, dec, radians=False):
     gal_vector = np.dot(M_eq_to_gal, eq_vector)
     return new_sphere(gal_vector, radians)
 
-def eq_to_topo(ra, dec, latitude, lst, radians=False):
+def eq_to_topo(ra, dec,
+    latitude=hera_lat, lon=hera_lon, lst=None, radians=False):
     """
     Convert a position in the equatorial format
         (right ascension = @ra, declination = @dec)
@@ -130,6 +131,8 @@ def eq_to_topo(ra, dec, latitude, lst, radians=False):
     @radians determines the interpretation of BOTH the input
     and output. By default everything is in degrees.
     """
+    if lst is None:
+        lst = get_lst(lon, radians)
     if not radians:
         ra = np.radians(ra)
         dec = np.radians(dec)
