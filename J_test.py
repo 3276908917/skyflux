@@ -24,6 +24,7 @@ def visibility(J, ant1, ant2, source, ra, dec, nu=151e6, time=None):
     @time : local sidereal time [float, radians]
         default: None corresponds to run-time LST.
     """
+    print("time:", time)
     I = source.flux_by_frq[nu / 1e6]
     s = np.array([complex(I), 0, 0, 0])
 

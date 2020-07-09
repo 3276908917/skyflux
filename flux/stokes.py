@@ -13,7 +13,7 @@ spline_beam_func = beam_models.model_data_to_spline_beam_func(
     # Like in generate_model.py, we have some hard-coded frequencies
     # which we want to re-evaluate in the future.
     np.array([150e6, 151e6, 152e6])
-)
+) #xx = J[0][0][1]
 
 # This is a constant change of basis matrix
 # for getting stokes parameters with a Jones matrix.
