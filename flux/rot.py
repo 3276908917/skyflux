@@ -3,32 +3,46 @@ import time
 import astropy.time
 from astropy import units as u
 
-def collapse_angle(degree, arcminute=0, arcsecond=0):
+def collapse_angle(degree, arcminute=0, arcsecond=0, radians=False):
     """
-    Return a single angle in degrees, based on an
+    Return a single angle, based on an
     angle in the form of degrees, arcminutes, and arcseconds.
-    """
-    return degree + arcminute / 60 + arcsecond / 3600
 
-def collapse_hour(hour, minute=0, second=0):
+    @radians
+        True: return the angle in radians
+        False: in degrees
     """
-    Return a single angle in degrees, based on an
+    deg = degree + arcminute / 60 + arcsecond / 3600
+    if radians:
+        return np.radians(deg)
+    return deg
+
+def collapse_hour(hour, minute=0, second=0, radians=False):
+    """
+    Return a single angle, based on an
     angle in the form of hours, minutes, and seconds of a day.
+
+    @radians
+        True: return the angle in radians
+        False: in degrees
     """
-    return 15 * hour + minute / 4 + second / 240
+    deg = 15 * hour + minute / 4 + second / 240
+    if radians:
+        return np.radians(deg)
+    return deg
 
 hera_lat = -collapse_angle(30, 43, 17)
 hera_lon = collapse_angle(21, 25, 42)
 
-def get_lst(lon=np.radians(hera_lon), radians=True):
+def get_lst(lon=np.radians(hera_lon), radians=False):
     """
     Return current local sidereal time (LST)
     for longitude
-        @lon : degrees
+        @lon : float, degrees BY DEFAULT
         (default is HERA array).
     @radians:
-        True: LST is returned in radians.
-        False: in degrees
+        True: LST is returned in radians, @lon is expected in radians.
+        False: LST is returned in degrees, @lon is expected in degrees.
     """
     lon_deg = lon * u.degree
     if radians:
@@ -115,8 +129,6 @@ def eq_to_topo(ra, dec, latitude, lst, radians=False):
 
     @radians determines the interpretation of BOTH the input
     and output. By default everything is in degrees.
-
-    WARNING: the altitude and azimuth may be listed in the wrong order.
     """
     if not radians:
         ra = np.radians(ra)
@@ -232,11 +244,9 @@ def gal_to_topo(el, be, lat, lon, radians=False):
         el = np.radians(el)
         be = np.radians(be)
         lat = np.radians(lat)
-    else:
-        lon = np.degrees(lon)
     rct = rectangle(l, b)
     ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
-    lst = get_lst(lon)
+    lst = get_lst(lon, radians)
     hrd = np.dot(np.linalg.inv(M_eq_to_ha(lst)), ra_dec)
     topo = np.dot(M_ha_to_topo(phi), hrd)
     return new_sphere(topo, radians)
@@ -260,7 +270,7 @@ def raddec2lm(ra, dec, ra0=None, dec0=np.radians(hera_lat)):
     """
     # See note at the end about default arguments.
     if ra0 is None:
-        ra0 = get_lst()
+        ra0 = get_lst(radians=True)
 
     l = np.cos(dec) * np.sin(ra0 - ra)
     m = -1 * (np.sin(dec) * np.cos(dec0) - \
