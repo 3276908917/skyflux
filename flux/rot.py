@@ -20,17 +20,24 @@ def collapse_hour(hour, minute=0, second=0):
 hera_lat = -collapse_angle(30, 43, 17)
 hera_lon = collapse_angle(21, 25, 42)
 
-def get_lst(lon=hera_lon):
+def get_lst(lon=np.radians(hera_lon), radians=True):
     """
     Return current local sidereal time (LST)
     for longitude
-        @lon : degrees, float
+        @lon : degrees
         (default is HERA array).
-    LST is returned in radians.
+    @radians:
+        True: LST is returned in radians.
+        False: in degrees
     """
-    lon_deg = hera_lon * u.degree
+    lon_deg = lon * u.degree
+    if radians:
+        lon_deg = np.radians(lon) * u.degree
+        
     t = astropy.time.Time(time.time(), format='unix')
-    return t.sidereal_time('apparent', longitude=lon_deg).radian
+    if radians:
+        return t.sidereal_time('apparent', longitude=lon_deg).radian
+    return t.sidereal_time('apparent', longitude=lon_deg).deg
 
 # The change-of-basis matrix between equatorial and galactic coordinate systems
 M_eq_to_gal = np.array([

@@ -6,6 +6,8 @@ from flux import rot
 
 beam_origin = os.path.dirname(os.path.abspath(__file__)) + "/ant.h5"
 
+# My understanding of the documentation is that
+# alt, az are both in radians
 spline_beam_func = beam_models.model_data_to_spline_beam_func(
     beam_origin,
     # Like in generate_model.py, we have some hard-coded frequencies
@@ -28,8 +30,8 @@ S_{200} = S_{150} * (200/150)^\alpha
 def J_matrix(ra, dec, lst=None, nu=150e6):
     """
     Return the Jones matrix J.
-    @ra: right ascension of the source, in degrees.
-    @dec: right ascension of the source, in degrees.
+    @ra: right ascension of the source, in radians.
+    @dec: right ascension of the source, in radians.
     @nu: frequency of interest, in Hz.
 
     The default argument comes from the beam that I
@@ -38,8 +40,6 @@ def J_matrix(ra, dec, lst=None, nu=150e6):
     if lst is None:
         lst = rot.get_lst()
     latitude = np.radians(rot.hera_lat)
-    # We want to transform the following into a function parameter
-    lst = rot.get_lst()
     az, alt = rot.eq_to_topo(ra, dec, latitude, lst, radians=True)
 
     az = np.array([az])
@@ -50,8 +50,8 @@ def J_matrix(ra, dec, lst=None, nu=150e6):
 def A_matrix(ra, dec, nu=150e6):
     """
     Return the Mueller matrix A.
-    @ra: right ascension of the source, in degrees.
-    @dec: declination of the source, in degrees.
+    @ra: right ascension of the source, in radians.
+    @dec: declination of the source, in radians.
     @nu: frequency of interest, in Hz.
 
     The default argument comes from the beam that I
