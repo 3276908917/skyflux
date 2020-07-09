@@ -11,9 +11,18 @@
 Try passing arbitrary right ascension (declination fixed) into the interopolation routine, not azimuth and altitude
 	Try using a source between 0 and 8 hours at -30.72 declination,
 	such that 4 hours represents the maximum intensity.
+		ra = 4 * (2 * np.pi) / 24 = np.pi / 3
 Similarly, arbitrary declination (ra fixed)
 
 * These tests should verify the correctness of the coordinate conversion
 
 Test inserting a unity J matrix directly into the visibility routine
 * This should test the correctness of your implementation of the equation
+How do I get a unity J matrix?
+Well, first I can use my existing infrastructure to find the correct dimensions.
+	Then, I build an array of ones according to that specification.
+
+Okay, I did that, but I realized I did not know what to use for the other parameters, so I used:
+	baseline: antennae 87 and 141
+	source: obj_catalog[30] (this serves to provide an ra and dec to the phase factor calculator)
+	LST: "now" (23:58 yesterday night)	
