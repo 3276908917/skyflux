@@ -121,7 +121,7 @@ def eq_to_gal(ra, dec, radians=False):
     return new_sphere(gal_vector, radians)
 
 def eq_to_topo(ra, dec,
-    latitude=hera_lat, lon=hera_lon, lst=None, radians=False):
+    lat=hera_lat, lon=hera_lon, lst=None, radians=False):
     """
     Convert a position in the equatorial format
         (right ascension = @ra, declination = @dec)

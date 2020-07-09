@@ -13,7 +13,7 @@ def A_matrix(J):
     J_outer = np.kron(J, np.conj(J))
     return np.dot(S, np.dot(J_outer, np.linalg.inv(S)))
 
-def visibility(J, ant1, ant2, source, nu=151e6, time=None):
+def visibility(J, ant1, ant2, source, ra, dec, nu=151e6, time=None):
     """
     Visibility integrand evaluated for a single source.
     @ant1 and @ant2 are indices of antannae,
@@ -27,8 +27,6 @@ def visibility(J, ant1, ant2, source, nu=151e6, time=None):
     I = source.flux_by_frq[nu / 1e6]
     s = np.array([complex(I), 0, 0, 0])
 
-    ra = np.radians(source.ra_angle)
-    dec = np.radians(source.dec_angle)
     r = rot.raddec2lm(ra, dec, ra0=time)
 
     phi = ant.phase_factor(ant1, ant2, r, nu)
