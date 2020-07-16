@@ -34,7 +34,7 @@ def collapse_hour(hour, minute=0, second=0, radians=False):
 hera_lat = -collapse_angle(30, 43, 17)
 hera_lon = collapse_angle(21, 25, 42)
 
-def get_lst(lon, radians=False):
+def get_lst(lon=None, radians=False):
     """
     Return current local sidereal time (LST)
     for longitude
@@ -44,6 +44,8 @@ def get_lst(lon, radians=False):
         True: LST is returned in radians, @lon is expected in radians.
         False: LST is returned in degrees, @lon is expected in degrees.
     """
+    if lon is None and not radians:
+        lon = radians
     t = astropy.time.Time(time.time(), format='unix')
     if radians:
         return t.sidereal_time('apparent', longitude=lon * u.radian).radian
