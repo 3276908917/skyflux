@@ -11,7 +11,7 @@ S = .5 * np.array([[1, 1, 0, 0,],
 
 def A_matrix(J):
     J_outer = np.kron(J, np.conj(J))
-    return np.dot(S, np.dot(J_outer, np.linalg.inv(S)))
+    return np.dot(np.linalg.inv(S), np.dot(J_outer, S))
 
 def visibility(J, ant1, ant2, source, ra, dec, nu=151e6, time=None):
     """

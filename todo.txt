@@ -1,4 +1,7 @@
--1. Map the RIMEz indices to the standard J format
+Implement J_matrix
+
+same frequency, intensity increasing and decreasing for a single source over time
+
 0. J matrix all-ones test
 1. plot an A matrix (which one?)
 2. plot the cold patch data

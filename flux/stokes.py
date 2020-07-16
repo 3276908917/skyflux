@@ -20,6 +20,8 @@ def format_J(J_RIMEz):
     I cannot find the notes that corroborate this theory!
     The default shape of a single RIMEz J matrix is:
         [[xy, yy], [xx, yx]]
+    My current guess for the true convention
+        [[xx, xy], [yx, yy]]
     """
     new_J = np.copy(J_RIMEz)
     for J in new_J:
