@@ -28,7 +28,7 @@ def visibility(J, ant1, ant2, source, ra, dec, nu=151e6, time=None):
     I = source.flux_by_frq[nu / 1e6]
     s = np.array([complex(I), 0, 0, 0])
 
-    r = rot.raddec2lm(ra, dec, ra0=time)
+    r = rot.radec2lm(ra, dec, ra0=time)
 
     phi = ant.phase_factor(ant1, ant2, r, nu)
 

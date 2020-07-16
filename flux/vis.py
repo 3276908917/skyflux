@@ -26,7 +26,7 @@ def visibility(ant1, ant2, source, nu=151e6, time=None):
 
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
-    r = rot.raddec2lm(ra, dec, ra0=time)
+    r = rot.radec2lm(ra, dec, ra0=time)
 
     phi = ant.phase_factor(ant1, ant2, r, nu)
 

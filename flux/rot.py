@@ -34,7 +34,7 @@ def collapse_hour(hour, minute=0, second=0, radians=False):
 hera_lat = -collapse_angle(30, 43, 17)
 hera_lon = collapse_angle(21, 25, 42)
 
-def get_lst(hera_lon, radians=False):
+def get_lst(lon, radians=False):
     """
     Return current local sidereal time (LST)
     for longitude
@@ -261,7 +261,7 @@ written by C. D. Nunhokee,
 https://github.com/Chuneeta/polarizedSims/blob/master/genVisibility.py
 """
 # Unfortunately, the parameter order has been switched wrt the citation.
-def raddec2lm(ra, dec, ra0=None, dec0=np.radians(hera_lat)):
+def radec2lm(ra, dec, ra0=None, dec0=np.radians(hera_lat)):
     """
     Converts equatorial coordinates to direction cosines l & m
     ra   : right ascension in radians; type: float
@@ -273,7 +273,7 @@ def raddec2lm(ra, dec, ra0=None, dec0=np.radians(hera_lat)):
     """
     # See note at the end about default arguments.
     if ra0 is None:
-        ra0 = get_lst(radians=True)
+        ra0 = get_lst(np.radians(hera_lon), radians=True)
 
     l = np.cos(dec) * np.sin(ra0 - ra)
     m = -1 * (np.sin(dec) * np.cos(dec0) - \

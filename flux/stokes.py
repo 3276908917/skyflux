@@ -15,6 +15,8 @@ spline_beam_func = beam_models.model_data_to_spline_beam_func(
     np.array([150e6, 151e6, 152e6])
 ) #xx = J[0][0][1]
 
+def format_J(
+
 # This is a constant change of basis matrix
 # for getting stokes parameters with a Jones matrix.
 S = .5 * np.array([[1, 1, 0, 0,],
