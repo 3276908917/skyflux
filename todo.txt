@@ -1,10 +1,10 @@
+-1. Map the RIMEz indices to the standard J format
+0. J matrix all-ones test
 1. plot an A matrix (which one?)
 2. plot the cold patch data
-3. investigate the J matrix zero debacle
+3. investigate the J matrix zero debacle?
 4. verify that ALL of the functions in rot return (az, alt) and not (alt, az)
-5. investigate the J matrix zero debacle
-6. update every notebook in the repository
-7. investigate the J matrix zero debacle
+5. update every notebook in the repository
 
 simple test for the computation:
 at zenith (ra = LST), a source should be real
