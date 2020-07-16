@@ -22,11 +22,6 @@ S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, -1j],
                   [1, -1, 0, 0]])
 
-"""
-S ~/prop\nu^alpha
-S_{200} = S_{150} * (200/150)^\alpha
-"""
-
 def J_matrix(ra, dec, lst=None, nu=150e6):
     """
     Return the Jones matrix J.

@@ -6,6 +6,9 @@
 4. verify that ALL of the functions in rot return (az, alt) and not (alt, az)
 5. update every notebook in the repository
 
+S ~/prop\nu^alpha
+S_{200} = S_{150} * (200/150)^\alpha
+
 simple test for the computation:
 at zenith (ra = LST), a source should be real
 (phase is zero)
