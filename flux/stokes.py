@@ -13,9 +13,19 @@ spline_beam_func = beam_models.model_data_to_spline_beam_func(
     # Like in generate_model.py, we have some hard-coded frequencies
     # which we want to re-evaluate in the future.
     np.array([150e6, 151e6, 152e6])
-) #xx = J[0][0][1]
+)
 
-def format_J(
+def format_J(J_RIMEz):
+    """
+    I cannot find the notes that corroborate this theory!
+    The default shape of a single RIMEz J matrix is:
+        [[xy, yy], [xx, yx]]
+    """
+    new_J = np.copy(J_RIMEz)
+    for J in new_J:
+        J[0, 0], J[1, 0], J[0, 1], J[1, 1] = \
+        J[1, 0], J[0, 0], J[1, 1], J[0, 1]
+    return new_J
 
 # This is a constant change of basis matrix
 # for getting stokes parameters with a Jones matrix.

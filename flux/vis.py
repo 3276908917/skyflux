@@ -45,7 +45,7 @@ def visibility_integrand(ant1, ant2, nu=151e6, time=None):
     @time : local sidereal time [float, radians]
         default: None corresponds to run-time LST.
     """
-    total = np.array([0j, 0j, 0j, 0j]) # 4 x 1. Visibility has a phase,
+    total = np.array([0j, 0j, 0j, 0j]) # 4 x 1, complex encodes phase.
     for source in catalog.obj_catalog:
         total += visibility(ant1, ant2, source, nu, time)
     return total

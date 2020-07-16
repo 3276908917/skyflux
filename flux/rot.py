@@ -44,14 +44,10 @@ def get_lst(lon, radians=False):
         True: LST is returned in radians, @lon is expected in radians.
         False: LST is returned in degrees, @lon is expected in degrees.
     """
-    lon_deg = lon * u.degree
-    if radians:
-        lon_deg = np.radians(lon) * u.degree
-        
     t = astropy.time.Time(time.time(), format='unix')
     if radians:
-        return t.sidereal_time('apparent', longitude=lon_deg).radian
-    return t.sidereal_time('apparent', longitude=lon_deg).deg
+        return t.sidereal_time('apparent', longitude=lon * u.radian).radian
+    return t.sidereal_time('apparent', longitude=lon * u.deg).deg
 
 # The change-of-basis matrix between equatorial and galactic coordinate systems
 M_eq_to_gal = np.array([
