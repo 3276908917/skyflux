@@ -122,7 +122,7 @@ def eq_to_gal(ra, dec, radians=False):
     return new_sphere(gal_vector, radians)
 
 def eq_to_topo(ra, dec,
-    lat=hera_lat, lon=hera_lon, lst=None, radians=False):
+    lat=None, lon=None, lst=None, radians=False):
     """
     Convert a position in the equatorial format
         (right ascension = @ra, declination = @dec)
@@ -132,13 +132,20 @@ def eq_to_topo(ra, dec,
     @radians determines the interpretation of BOTH the input
     and output. By default everything is in degrees.
     """
-    if lst is None:
-        lst = get_lst(lon, radians)
+    if lat is None:
+        lat = np.radians(hera_lat)
+    elif not radians:
+        lat = np.radians(lat)
     if not radians:
         ra = np.radians(ra)
         dec = np.radians(dec)
-        lat = np.radians(latitude)
         lst = np.radians(lst)
+    if lst is None:
+        if lon is None:
+            lon = np.radians(hera_lon)
+        elif not radians:
+            lon = np.radians(lon)
+        lst = get_lst(lon, radians=True)
     eq_vector = rectangle(ra, dec)
     ha_vector = np.dot(M_eq_to_ha(lst), eq_vector)
     topo_vector = np.dot(M_ha_to_topo(lat), ha_vector)

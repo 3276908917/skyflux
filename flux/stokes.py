@@ -49,16 +49,16 @@ def J_matrix(ra, dec, lst=None, nu=150e6):
     had access to when this was written.
     """
     if lst is None:
-        lst = rot.get_lst()
-    latitude = np.radians(rot.hera_lat)
-    az, alt = rot.eq_to_topo(ra, dec, latitude, lst, radians=True)
+        lst = rot.get_lst(radians=True)
+    lat = np.radians(rot.hera_lat)
+    az, alt = rot.eq_to_topo(ra, dec, lat, lst=lst, radians=True)
 
     az = np.array([az])
     alt = np.array([alt])
 
-    return spline_beam_func(nu, alt, az)
+    return format_J(spline_beam_func(nu, alt, az))
 
-def A_matrix(ra, dec, nu=150e6):
+def A_matrix(ra, dec, lst=None, nu=150e6):
     """
     Return the Mueller matrix A.
     @ra: right ascension of the source, in radians.
@@ -68,6 +68,8 @@ def A_matrix(ra, dec, nu=150e6):
     The default argument comes from the beam that I
     had access to when this was written.
     """
-    J = J_matrix(ra, dec, nu)
+    J = J_matrix(ra, dec, lst, nu)
+    print(J)
     J_outer = np.kron(J, np.conj(J))
+    print(J_outer)
     return np.dot(S, np.dot(J_outer, np.linalg.inv(S)))
