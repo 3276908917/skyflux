@@ -17,11 +17,13 @@ spline_beam_func = beam_models.model_data_to_spline_beam_func(
 
 def format_J(J_RIMEz):
     """
-    I cannot find the notes that corroborate this theory!
     The default shape of a single RIMEz J matrix is:
         [[xy, yy], [xx, yx]]
-    My current guess for the true convention
+    The true convention is:
         [[xx, xy], [yx, yy]]
+    As with np.radians, one must verify that the input is of
+    the incorrect format. For example, if one called this on
+    a hard-coded J matrix, one would merely confuse the order.
     """
     new_J = np.copy(J_RIMEz)
     for J in new_J:

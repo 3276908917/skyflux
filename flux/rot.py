@@ -44,8 +44,11 @@ def get_lst(lon=None, radians=False):
         True: LST is returned in radians, @lon is expected in radians.
         False: LST is returned in degrees, @lon is expected in degrees.
     """
-    if lon is None and not radians:
-        lon = radians
+    if lon is None:
+        if radians:
+            lon = np.radians(hera_lon)
+        else:
+            lon = hera_lon
     t = astropy.time.Time(time.time(), format='unix')
     if radians:
         return t.sidereal_time('apparent', longitude=lon * u.radian).radian
@@ -134,11 +137,11 @@ def eq_to_topo(ra, dec,
     if not radians:
         ra = np.radians(ra)
         dec = np.radians(dec)
-        latitude = np.radians(latitude)
+        lat = np.radians(latitude)
         lst = np.radians(lst)
     eq_vector = rectangle(ra, dec)
     ha_vector = np.dot(M_eq_to_ha(lst), eq_vector)
-    topo_vector = np.dot(M_ha_to_topo(latitude), ha_vector)
+    topo_vector = np.dot(M_ha_to_topo(lat), ha_vector)
     return new_sphere(topo_vector, radians)
 
 def ha_to_eq(ha, dec, lat, radians=False):
