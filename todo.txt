@@ -1,3 +1,15 @@
+Monday or so: script with code, from paper
+
+https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.rotate_map_pixel.html
+
+https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.html
+
+
+IMPORTANT GOALS
+* We want to generate the J matrix enough and rotate the sky, not the beam!
+	i.e. do not use time as a parameter in J matrix calculation
+* Healpy has rotate-by-time functionality
+
 Implement J_matrix
 
 same frequency, intensity increasing and decreasing for a single source over time
