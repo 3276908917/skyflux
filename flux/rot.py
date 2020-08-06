@@ -61,24 +61,33 @@ M_eq_to_gal = np.array([
     [-.867666, -.198076, .455984]
 ])
 
-def M_eq_to_ha(lst):
+def M_eq_to_ha(lst=None, radians=False):
     """
     Return the change-of-basis matrix between the equatorial and
     hour-angle coordinate systems.
     The conversion depends on the
         local sidereal time @lst : float, radians
     """
+    if lst is None:
+        lst = get_lst(radians=True)
+    if not radians:
+        lst = np.radians(lst)
+    
     s = np.sin(lst)
     c = np.cos(lst)
     return np.array([[c, s, 0], [s, -c, 0], [0, 0, 1]])
 
-def M_ha_to_topo(phi):
+def M_ha_to_topo(phi=None, radians=False):
     """
     Return the change-of-basis matrix between the hour-angle
     and topocentric coordinate systems.
     The conversion depends on the
         latitude of the observer @phi : float, radians
     """
+    if phi is None:
+        phi = np.radians(hera_lat)
+    elif not radians:
+        phi = np.radians(phi)
     s = np.sin(phi)
     c = np.cos(phi)
     return np.array([[-s, 0, c], [0, -1, 0], [c, 0, s]])
@@ -136,19 +145,19 @@ def eq_to_topo(ra, dec,
         lat = np.radians(hera_lat)
     elif not radians:
         lat = np.radians(lat)
-    if not radians:
-        ra = np.radians(ra)
-        dec = np.radians(dec)
-        lst = np.radians(lst)
     if lst is None:
         if lon is None:
             lon = np.radians(hera_lon)
         elif not radians:
             lon = np.radians(lon)
         lst = get_lst(lon, radians=True)
+    if not radians:
+        ra = np.radians(ra)
+        dec = np.radians(dec)
+        lst = np.radians(lst)
     eq_vector = rectangle(ra, dec)
-    ha_vector = np.dot(M_eq_to_ha(lst), eq_vector)
-    topo_vector = np.dot(M_ha_to_topo(lat), ha_vector)
+    ha_vector = np.dot(M_eq_to_ha(lst, radians=True), eq_vector)
+    topo_vector = np.dot(M_ha_to_topo(lat, radians=True), ha_vector)
     return new_sphere(topo_vector, radians)
 
 def ha_to_eq(ha, dec, lat, radians=False):
@@ -166,7 +175,7 @@ def ha_to_eq(ha, dec, lat, radians=False):
         dec = np.radians(dec)
         lat = np.radians(lat)
     rct = rectangle(ha, dec)
-    eq = np.dot(np.linalg.inv(M_eq_to_ha(lat)), rct)
+    eq = np.dot(np.linalg.inv(M_eq_to_ha(lat, radians=True)), rct)
     return new_sphere(eq, radians)
 
 def ha_to_gal(ha, dec, lst, radians=False):
@@ -190,7 +199,7 @@ def ha_to_gal(ha, dec, lst, radians=False):
         dec = np.radians(dec)
         lst = np.radians(lst)
     rct = rectangle(ha, dec)
-    ra_dec = np.dot(np.linalg.inv(M_eq_to_ha(lst)), rct)
+    ra_dec = np.dot(np.linalg.inv(M_eq_to_ha(lst, radians=True)), rct)
     gal = np.dot(M_eq_to_gal, ra_dec)
     return new_sphere(gal, radians)
 
@@ -217,7 +226,7 @@ def ha_to_topo(ha, dec, lat, radians=False):
         dec = np.radians(dec)
         lat = np.radians(lat)
     rct = rectangle(ha, dec)
-    topo = np.dot(M_ha_to_topo(lat), rct)
+    topo = np.dot(M_ha_to_topo(lat, radians=True), rct)
     return new_sphere(topo, radians)
 
 def gal_to_eq(el, be, radians=False):
@@ -258,8 +267,8 @@ def gal_to_topo(el, be, lat, lon, radians=False):
     rct = rectangle(l, b)
     ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
     lst = get_lst(lon, radians)
-    hrd = np.dot(np.linalg.inv(M_eq_to_ha(lst)), ra_dec)
-    topo = np.dot(M_ha_to_topo(phi), hrd)
+    hrd = np.dot(np.linalg.inv(M_eq_to_ha(lst, radians=True)), ra_dec)
+    topo = np.dot(M_ha_to_topo(phi, radians=True), hrd)
     return new_sphere(topo, radians)
 
 """
