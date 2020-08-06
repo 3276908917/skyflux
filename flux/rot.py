@@ -143,7 +143,7 @@ def eq_to_topo(ra, dec,
     Convert a position in the equatorial format
         (right ascension = @ra, declination = @dec)
     to the topocentric-coordinates position
-        (az : local azimuth, alt = local altitude)
+        (az : local azimuth, alt : local altitude)
 
     @radians determines the interpretation of BOTH the input
     and output. By default everything is in degrees.

@@ -53,12 +53,7 @@ def J_matrix(ra, dec, lat=None, lst=None, nu=150e6):
     The default argument comes from the beam that I
     had access to when this was written.
     """
-    if lst is None:
-        lst = rot.get_lst(radians=True)
-    if lat is None:
-        lat = np.radians(rot.hera_lat)
     az, alt = rot.eq_to_topo(ra, dec, lat=lat, lst=lst, radians=True)
-
     az = np.array([az])
     alt = np.array([alt])
 
@@ -80,7 +75,5 @@ def A_matrix(ra, dec, lat=None, lst=None, nu=150e6):
     had access to when this was written.
     """
     J = J_matrix(ra, dec, lat, lst, nu)
-    print(J)
     J_outer = np.kron(J, np.conj(J))
-    print(J_outer)
     return np.dot(S, np.dot(J_outer, np.linalg.inv(S)))
