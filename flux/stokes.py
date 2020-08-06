@@ -26,9 +26,9 @@ def format_J(J_RIMEz):
     a hard-coded J matrix, one would merely confuse the order.
     """
     new_J = np.copy(J_RIMEz)
-    for J in new_J:
-        J[0, 0], J[1, 0], J[0, 1], J[1, 1] = \
-        J[1, 0], J[0, 0], J[1, 1], J[0, 1]
+    for i in range(len(new_J)):
+        new_J[i, 0, 0], new_J[i, 1, 0], new_J[i, 0, 1], new_J[i, 1, 1] = \
+        new_J[i, 0, 1], new_J[i, 0, 0], new_J[i, 1, 1], new_J[i, 1, 0]
     return new_J
 
 # This is a constant change of basis matrix
