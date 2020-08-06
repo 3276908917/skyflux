@@ -92,13 +92,16 @@ def M_ha_to_topo(phi=None, radians=False):
     c = np.cos(phi)
     return np.array([[-s, 0, c], [0, -1, 0], [c, 0, s]])
 
-def rectangle(a, b):
+def rectangle(a, b, radians=False):
     """
     Given a pair of angles
         @a : float, radians
         @b : float, radians
     return the corresponding 3x1 rectangular / Cartesian vector.
     """
+    if not radians:
+        a = np.radians(a)
+        b = np.radians(b)
     return np.array([np.cos(b) * np.cos(a), np.cos(b) * np.sin(a), np.sin(b)])
 
 def new_sphere(out_arr, radians=False):
@@ -126,7 +129,7 @@ def eq_to_gal(ra, dec, radians=False):
     if not radians:
         ra = np.radians(ra)
         dec = np.radians(dec)
-    eq_vector = rectangle(ra, dec)
+    eq_vector = rectangle(ra, dec, radians=True)
     gal_vector = np.dot(M_eq_to_gal, eq_vector)
     return new_sphere(gal_vector, radians)
 
@@ -155,7 +158,7 @@ def eq_to_topo(ra, dec,
         ra = np.radians(ra)
         dec = np.radians(dec)
         lst = np.radians(lst)
-    eq_vector = rectangle(ra, dec)
+    eq_vector = rectangle(ra, dec, radians=True)
     ha_vector = np.dot(M_eq_to_ha(lst, radians=True), eq_vector)
     topo_vector = np.dot(M_ha_to_topo(lat, radians=True), ha_vector)
     return new_sphere(topo_vector, radians)
@@ -174,7 +177,7 @@ def ha_to_eq(ha, dec, lat, radians=False):
         ha = np.radians(ha)
         dec = np.radians(dec)
         lat = np.radians(lat)
-    rct = rectangle(ha, dec)
+    rct = rectangle(ha, dec, radians=True)
     eq = np.dot(np.linalg.inv(M_eq_to_ha(lat, radians=True)), rct)
     return new_sphere(eq, radians)
 
@@ -198,7 +201,7 @@ def ha_to_gal(ha, dec, lst, radians=False):
         ha = np.radians(ha)
         dec = np.radians(dec)
         lst = np.radians(lst)
-    rct = rectangle(ha, dec)
+    rct = rectangle(ha, dec, radians=True)
     ra_dec = np.dot(np.linalg.inv(M_eq_to_ha(lst, radians=True)), rct)
     gal = np.dot(M_eq_to_gal, ra_dec)
     return new_sphere(gal, radians)
@@ -225,7 +228,7 @@ def ha_to_topo(ha, dec, lat, radians=False):
         ha = np.radians(ha)
         dec = np.radians(dec)
         lat = np.radians(lat)
-    rct = rectangle(ha, dec)
+    rct = rectangle(ha, dec, radians=True)
     topo = np.dot(M_ha_to_topo(lat, radians=True), rct)
     return new_sphere(topo, radians)
 
@@ -242,7 +245,7 @@ def gal_to_eq(el, be, radians=False):
     if not radians:
         el = np.radians(el)
         be = np.radians(be)
-    rct = rectangle(el, be)
+    rct = rectangle(el, be, radians=True)
     ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
     return new_sphere(ra_dec, radians)
 
@@ -264,7 +267,7 @@ def gal_to_topo(el, be, lat, lon, radians=False):
         el = np.radians(el)
         be = np.radians(be)
         lat = np.radians(lat)
-    rct = rectangle(l, b)
+    rct = rectangle(l, b, radians=True)
     ra_dec = np.dot(np.linalg.inv(M_eq_to_gal), rct)
     lst = get_lst(lon, radians)
     hrd = np.dot(np.linalg.inv(M_eq_to_ha(lst, radians=True)), ra_dec)
