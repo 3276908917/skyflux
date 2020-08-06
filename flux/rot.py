@@ -66,7 +66,8 @@ def M_eq_to_ha(lst=None, radians=False):
     Return the change-of-basis matrix between the equatorial and
     hour-angle coordinate systems.
     The conversion depends on the
-        local sidereal time @lst : float, radians
+        local sidereal time @lst : float
+    @radians: classifies the units of @lst
     """
     if lst is None:
         lst = get_lst(radians=True)
@@ -82,7 +83,8 @@ def M_ha_to_topo(phi=None, radians=False):
     Return the change-of-basis matrix between the hour-angle
     and topocentric coordinate systems.
     The conversion depends on the
-        latitude of the observer @phi : float, radians
+        latitude of the observer @phi : float
+    @radians: classifies the units of @phi
     """
     if phi is None:
         phi = np.radians(hera_lat)
@@ -95,9 +97,11 @@ def M_ha_to_topo(phi=None, radians=False):
 def rectangle(a, b, radians=False):
     """
     Given a pair of angles
-        @a : float, radians
-        @b : float, radians
+        @a : float
+        @b : float
     return the corresponding 3x1 rectangular / Cartesian vector.
+
+    @radians: classifies the units of @a and @b
     """
     if not radians:
         a = np.radians(a)
