@@ -38,37 +38,48 @@ S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, -1j],
                   [1, -1, 0, 0]])
 
-def J_matrix(ra, dec, lst=None, nu=150e6):
+def J_matrix(ra, dec, lat=None, lst=None, nu=150e6):
     """
     Return the Jones matrix J.
     @ra: right ascension of the source, in radians.
     @dec: right ascension of the source, in radians.
+    @lat: latitude of point of observation, in radians
+        default: HERA array
+    @lst: local sidereal time, in radians
+        default: time of execution
+    
     @nu: frequency of interest, in Hz.
-
+        default: 150 MHz
     The default argument comes from the beam that I
     had access to when this was written.
     """
     if lst is None:
         lst = rot.get_lst(radians=True)
-    lat = np.radians(rot.hera_lat)
-    az, alt = rot.eq_to_topo(ra, dec, lat, lst=lst, radians=True)
+    if lat is None:
+        lat = np.radians(rot.hera_lat)
+    az, alt = rot.eq_to_topo(ra, dec, lat=lat, lst=lst, radians=True)
 
     az = np.array([az])
     alt = np.array([alt])
 
     return format_J(spline_beam_func(nu, alt, az))
 
-def A_matrix(ra, dec, lst=None, nu=150e6):
+def A_matrix(ra, dec, lat=None, lst=None, nu=150e6):
     """
     Return the Mueller matrix A.
     @ra: right ascension of the source, in radians.
     @dec: declination of the source, in radians.
+    @lat: latitude of point of observation, in radians
+        default: HERA array
+    @lst: local sidereal time, in radians
+        default: time of execution
+        
     @nu: frequency of interest, in Hz.
-
+        default: 150 MHz
     The default argument comes from the beam that I
     had access to when this was written.
     """
-    J = J_matrix(ra, dec, lst, nu)
+    J = J_matrix(ra, dec, lat, lst, nu)
     print(J)
     J_outer = np.kron(J, np.conj(J))
     print(J_outer)
