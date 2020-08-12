@@ -10,18 +10,18 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name='flux',
+    name='skyflux',
     # the very first version was 1!1.1a1
     # I will always start with ones and end with nines because I think
         # that is cleaner
-    version='1!1.1b5',
+    version='1!1.1b6',
     # additionally, remember that we change versions in the following order
         # increase the last digit to nine, reset to 1
         # cycle between a, b, and finally rc
         # increase the remaining digits to nine, reset to 1
     author='Lukas Finkbeiner, C. D. Nunhokee, Aaron Parsons',
     author_email='lfinkbeiner@berkeley.edu',
-    description='Primitive source handling functions',
+    description='Primitive point source visibility utilities',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/3276908917/HERA',
@@ -34,5 +34,5 @@ setup(
     ]},
     include_package_data=True,
     # until RIMEz updates its rumba references:
-    install_requires=['numba < 0.49.0'], #I definitely need to come back and fix this
+    install_requires=[''], #I definitely need to come back and fix this
 )

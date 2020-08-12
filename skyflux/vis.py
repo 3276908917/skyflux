@@ -4,10 +4,10 @@ Utilities for evaluating the visibility sky integral.
 
 import numpy as np
 
-from flux import rot
-from flux import ant
-from flux import stokes
-from flux import catalog
+from skyflux import rot
+from skyflux import ant
+from skyflux import stokes
+from skyflux import catalog
 
 #! the default arguments for 'nu' are inconsistent across functions...
 def visibility(ant1, ant2, source, nu=151e6, time=None):

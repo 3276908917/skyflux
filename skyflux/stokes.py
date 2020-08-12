@@ -2,7 +2,7 @@ import os
 import numpy as np
 from RIMEz import beam_models
 
-from flux import rot
+from skyflux import rot
 
 beam_origin = os.path.dirname(os.path.abspath(__file__)) + "/ant.h5"
 

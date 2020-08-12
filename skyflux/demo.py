@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-from flux import catalog
-from flux import ant
+from skyflux import catalog
+from skyflux import ant
 
 def frame():
     """

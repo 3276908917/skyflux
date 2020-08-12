@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-from flux import rot
+from skyflux import rot
 
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 

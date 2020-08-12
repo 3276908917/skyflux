@@ -1,10 +1,10 @@
-import flux.generate_model
-import flux.rot
-import flux.catalog
-import flux.ant
-import flux.vis
-import flux.stokes
-import flux.demo
+import skyflux.generate_model
+import skyflux.rot
+import skyflux.catalog
+import skyflux.ant
+import skyflux.vis
+import skyflux.stokes
+import skyflux.demo
 
 """
 I wanted to use this block of code to automatically import any new
