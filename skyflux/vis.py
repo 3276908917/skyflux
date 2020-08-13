@@ -31,8 +31,7 @@ def visibility(ant1, ant2, source, nu=151e6, time=None):
     phi = ant.phase_factor(ant1, ant2, r, nu)
 
     malformed_result = np.dot(np.dot(stokes.A_matrix(ra, dec, nu), s), phi)
-    # There is something fishy about this array hack.
-    # Its necessity bespeaks ill omen
+    # Hack to get rid of extra array shell surrounding answer
     return malformed_result[:, 0]
 
 def visibility_integrand(ant1, ant2, nu=151e6, time=None):
