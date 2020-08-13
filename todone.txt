@@ -1,3 +1,12 @@
+Low priority:
+* I fixed the all ones notebook. The returned visibility vector correctly
+	gives the source's flux without extraneous phase and with the expected zero-entries
+	in the other cells of the vector.
+
+Not worth talking about:
+* updated the package name and installation details, primarily to avoid name clash with existing flux package
+
+--------
 In principle, it should not matter which flux-by-frequency
 you order by. However, in practice (as we can see in
 parser_demos.py), some sources are brighter than others
