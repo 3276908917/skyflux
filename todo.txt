@@ -6,7 +6,7 @@ https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.html
 
 
 IMPORTANT GOALS
-* We want to generate the J matrix enough and rotate the sky, not the beam!
+* We want to generate the J matrix once and then rotate the sky, not the beam!
 	i.e. do not use time as a parameter in J matrix calculation
 * Healpy has rotate-by-time functionality
 
@@ -17,6 +17,7 @@ same frequency, intensity increasing and decreasing for a single source over tim
 0. J matrix all-ones test
 1. plot an A matrix (which one?)
 2. plot the cold patch data
+	* you should do the time evolution the other way around
 3. investigate the J matrix zero debacle?
 4. verify that ALL of the functions in rot return (az, alt) and not (alt, az)
 5. update every notebook in the repository
