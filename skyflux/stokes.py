@@ -103,7 +103,7 @@ def create_A(ra=None, dec=None, az=None, alt=None, J=None,
         if alt is not None:
             raise TypeError('create_A accepts only one input representation; both J and alt were given.')
     else:
-        J = J_matrix(ra, dec, az alt, lat, lst, nu)
+        J = J_matrix(ra, dec, az, alt, lat, lst, nu)
         
     J_outer = np.kron(J, np.conj(J))
     return np.dot(S, np.dot(J_outer, np.linalg.inv(S)))
