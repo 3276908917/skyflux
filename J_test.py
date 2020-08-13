@@ -1,8 +1,14 @@
+"""
+This is a modified form of skyflux's stokes.py and vis.py
+It allows for direct input of the J matrix, for debugging purposes
+"""
+
 import numpy as np
-from flux import catalog
-from flux import rot
-from flux import ant
-from flux import stokes
+
+from skyflux import catalog
+from skyflux import rot
+from skyflux import ant
+from skyflux import stokes
 
 S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, 1j],
@@ -11,7 +17,7 @@ S = .5 * np.array([[1, 1, 0, 0,],
 
 def A_matrix(J):
     J_outer = np.kron(J, np.conj(J))
-    return np.dot(np.linalg.inv(S), np.dot(J_outer, S))
+    return np.dot(S, np.dot(J_outer, np.linalg.inv(S)))
 
 def visibility(J, ant1, ant2, source, ra, dec, nu=151e6, time=None):
     """
