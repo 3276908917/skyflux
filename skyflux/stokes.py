@@ -69,19 +69,23 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     if alt is not None and az is None:
         raise TypeError('alt was provided without accompanying az.')
 
-    # Now we perform the math
+    # Now we ensure we are in topocentric coordinates
     if az is None and alt is None:
         az, alt = rot.eq_to_topo(ra, dec, lat=lat, lst=lst, radians=True)
 
-    # This isn't right. With numpy, the objects are going to be numpy arrays,
-    # rather than lists.
-    #if type(az) != list and type(alt) != list:
-    #    az = np.array([az])
-    #    alt = np.array([alt])
-    #elif type(az) == list or type(az) == list:
-    #    raise TypeError('shapes of inputs must be the same (got one list and one scalar).')
+    # This section handles different input objects
+    if type(az) == list:
+        az = np.array(az)
+    if type(alt) == list:
+        alt = np.array(alt)
 
-    return format_J(spline_beam_func(nu, alt, az))
+    if type(az) != np.ndarray and type(alt) != np.ndarray
+        az = np.array([az])
+        alt = np.array([alt])
+    elif type(az) == np.ndarray and type(az) == np.ndarray:
+        return format_J(spline_beam_func(nu, alt, az))
+    
+    raise TypeError('shapes of inputs must be the same (got one list and one scalar).')
 
 def create_A(ra=None, dec=None, az=None, alt=None, J=None,
              lat=None, lst=None, nu=150e6):
