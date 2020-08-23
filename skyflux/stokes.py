@@ -79,7 +79,7 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     if type(alt) == list:
         alt = np.array(alt)
 
-    if type(az) != np.ndarray and type(alt) != np.ndarray
+    if type(az) != np.ndarray and type(alt) != np.ndarray:
         az = np.array([az])
         alt = np.array([alt])
     elif type(az) == np.ndarray and type(az) == np.ndarray:
