@@ -72,8 +72,14 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     # Now we perform the math
     if az is None and alt is None:
         az, alt = rot.eq_to_topo(ra, dec, lat=lat, lst=lst, radians=True)
-    az = np.array([az])
-    alt = np.array([alt])
+
+    # This isn't right. With numpy, the objects are going to be numpy arrays,
+    # rather than lists.
+    #if type(az) != list and type(alt) != list:
+    #    az = np.array([az])
+    #    alt = np.array([alt])
+    #elif type(az) == list or type(az) == list:
+    #    raise TypeError('shapes of inputs must be the same (got one list and one scalar).')
 
     return format_J(spline_beam_func(nu, alt, az))
 
@@ -104,6 +110,9 @@ def create_A(ra=None, dec=None, az=None, alt=None, J=None,
             raise TypeError('create_A accepts only one input representation; both J and alt were given.')
     else:
         J = J_matrix(ra, dec, az, alt, lat, lst, nu)
-        
+
+    # It would be cool to switch functionality if we were given an array of J's
+    # in which case, we should individually calculate the A matrix for each one, and return that.
+    
     J_outer = np.kron(J, np.conj(J))
     return np.dot(S, np.dot(J_outer, np.linalg.inv(S)))

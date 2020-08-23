@@ -1,34 +1,59 @@
+Send Ridhima the plot for the old results on time simulation,
+	we use these to compare and verify the NEW implementation.
+
+Do an A 4x4 grid for:
+	* imaginary
+	* real
+	* fix the formatting
+
+	> log view
+		* adjust log scale to get more contrast
+		* you might need to adjust the axes so that all of the plots run along the same scales
+			(comparison easier that way)
+	* apply a grid
+
+You can do a time simulation for an arbitrary window,
+	although it is true that in the end we only care about the cold patch.
+
+"Return projected map -> store in variable
+    variable -> imshow"
+
+-----------------
+
 Monday or so: script with code, from paper
 
 https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.rotate_map_pixel.html
 
 https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.html
 
-
-IMPORTANT GOALS
-* We want to generate the J matrix once and then rotate the sky, not the beam!
-	i.e. do not use time as a parameter in J matrix calculation
-* Healpy has rotate-by-time functionality
-
-Implement J_matrix
-
-same frequency, intensity increasing and decreasing for a single source over time
-
-0. J matrix all-ones test
-1. plot an A matrix (which one?)
-2. plot the cold patch data
-	* you should do the time evolution the other way around
-3. investigate the J matrix zero debacle?
-4. verify that ALL of the functions in rot return (az, alt) and not (alt, az)
-5. update every notebook in the repository
+flux s1 = (nu1 / nu2) ^ \alpha * s2 (flux s2)
+	* s2 is 150 in our case
 
 S ~/prop\nu^alpha
 S_{200} = S_{150} * (200/150)^\alpha
 
-simple test for the computation:
-at zenith (ra = LST), a source should be real
-(phase is zero)
+0. proper A matrix visualization formatting (see above)
+1. implement proper time rotation, and plot the cold patch data
+	* We want to generate the J matrix once and then rotate the sky, not the beam!
+	i.e. do not use time as a parameter in J matrix calculation
+	* Healpy has rotate-by-time functionality
 
+	* create 1D plot from cold patch
+	    great Slack question: what is the best way
+	    to visually represent the results?
+	* time axis (2D), frequency axis (3D)
+2. verify that ALL of the functions in rot return (az, alt) and not (alt, az)
+	this is for consistency sake, and for anyone looking to use my code	
+3. investigate the J matrix zero debacle? It is not an issue anymore,
+	but I wonder why it happens
+4. update every notebook in the repository
+	* import skyflux as sf
+
+beam variation is what we will eventually be handling anyway
+"I will leave the chunking of frequency and time up to you."
+
+
+???:
 PING RIDHIMA TO GET FREQUENCY BEAM
     once you have your current pipeline working for this
         frequency
@@ -41,21 +66,6 @@ use constant flux independent of frequency
 	(this is the same as saying that alpha is equal to one)
 	then varying frequency from 100-200 MHz
 	'assume it is the same beam between 100 and 200 MHz'
-beam variation is what we will eventually be handling anyway
-"I will leave the chunking of frequency and time up to you."
-
-create 1D plot from cold patch
-    great Slack question: what is the best way
-    to visually represent the results?
-
-time axis (2D), frequency axis (3D)
-
-feel free to use orthview to get the
-Mueller matrix plots. Figure 1 in (Nunhokee et al)
-did not actually use healpy, so feel free to
-tinker.
-    "Return projected map -> store in variable
-    variable -> imshow"
 
 read up on healpy.cartview,
     that is a third option besides Mollview and orthview
