@@ -1,4 +1,5 @@
 import skyflux as sf
+
 import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
@@ -11,8 +12,6 @@ alt = np.pi/2 - theta
 J = sf.stokes.create_J(az=az, alt=alt)
 
 A = np.array([sf.stokes.create_A(J=Ji) for Ji in J])
-
-
 
 def project_A(A, func):
     def orth(i, j, panel, ttl=None):
