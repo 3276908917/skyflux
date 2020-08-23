@@ -39,7 +39,7 @@ S = .5 * np.array([[1, 1, 0, 0,],
                   [1, -1, 0, 0]])
 
 def create_J(ra=None, dec=None, az=None, alt=None,
-             lat=None, lst=None, nu=150e6):
+             lat=None, lst=None, nu=150e6, radians=False):
     """
     Return the Jones matrix J.
     @ra: right ascension of the source, in radians.
@@ -71,7 +71,11 @@ def create_J(ra=None, dec=None, az=None, alt=None,
 
     # Now we ensure we are in topocentric coordinates
     if az is None and alt is None:
-        az, alt = rot.eq_to_topo(ra, dec, lat=lat, lst=lst, radians=True)
+        az, alt = rot.eq_to_topo(ra, dec, lat=lat, lst=lst, radians=radians)
+
+    if not radians:
+        az = np.radians(az)
+        alt = np.radians(alt)
 
     # This section handles different input objects
     if type(az) == list:
@@ -88,7 +92,7 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     raise TypeError('shapes of inputs must be the same (got one list and one scalar).')
 
 def create_A(ra=None, dec=None, az=None, alt=None, J=None,
-             lat=None, lst=None, nu=150e6):
+             lat=None, lst=None, nu=150e6, radians=False):
     """
     Return the Mueller matrix A.
     @ra: right ascension of the source, in radians.
@@ -113,7 +117,7 @@ def create_A(ra=None, dec=None, az=None, alt=None, J=None,
         if alt is not None:
             raise TypeError('create_A accepts only one input representation; both J and alt were given.')
     else:
-        J = J_matrix(ra, dec, az, alt, lat, lst, nu)
+        J = J_matrix(ra, dec, az, alt, lat, lst, nu, radians)
 
     # It would be cool to switch functionality if we were given an array of J's
     # in which case, we should individually calculate the A matrix for each one, and return that.
