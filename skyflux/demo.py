@@ -55,7 +55,6 @@ if False: # keep this section on ice until we are satisfied
         put_subplot(1, 1, 4, 'yy')
 
     def project_A(A, data_transform=np.abs, rep=hp.orthview):
-        # this breaks for cartview
         def put_subplot(i, j, panel, ttl=None):
             if ttl is None:
                 ttl = str(i) + ', ' + str(j)

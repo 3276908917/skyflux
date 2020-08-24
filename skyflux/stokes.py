@@ -54,7 +54,7 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     The default argument comes from the beam that I
     had access to when this was written.
     """
-    # This section handles the many possible bad inputs
+    # This section handles the many possible bad combinations of inputs
     if ra is not None:
         if dec is None:
             raise TypeError('ra was provided without accompanying dec.')

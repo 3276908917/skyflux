@@ -293,8 +293,8 @@ def radec2lm(ra, dec, ra0=None, dec0=np.radians(hera_lat)):
         ra0 = get_lst(np.radians(hera_lon), radians=True)
 
     l = np.cos(dec) * np.sin(ra0 - ra)
-    m = -1 * (np.sin(dec) * np.cos(dec0) - \
-        np.cos(dec) * np.sin(dec0) * np.cos(ra - ra0))
+    m = np.cos(dec) * np.sin(dec0) * np.cos(ra - ra0) - \
+        np.sin(dec) * np.cos(dec0)
     return l, m
 
 """
