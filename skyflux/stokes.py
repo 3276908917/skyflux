@@ -86,10 +86,12 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     if type(az) != np.ndarray and type(alt) != np.ndarray:
         az = np.array([az])
         alt = np.array([alt])
-    elif type(az) == np.ndarray and type(az) == np.ndarray:
-        return format_J(spline_beam_func(nu, alt, az))
-    
-    raise TypeError('shapes of inputs must be the same (got one list and one scalar).')
+
+    # one of the inputs did not get converted
+    if type(az) != np.ndarray or type(alt) != np.ndarray:
+        raise TypeError('shapes of inputs must be the same (got one list and one scalar).')    
+        
+    return format_J(spline_beam_func(nu, alt, az))
 
 def create_A(ra=None, dec=None, az=None, alt=None, J=None,
              lat=None, lst=None, nu=150e6, radians=False):
@@ -117,7 +119,7 @@ def create_A(ra=None, dec=None, az=None, alt=None, J=None,
         if alt is not None:
             raise TypeError('create_A accepts only one input representation; both J and alt were given.')
     else:
-        J = J_matrix(ra, dec, az, alt, lat, lst, nu, radians)
+        J = create_J(ra, dec, az, alt, lat, lst, nu, radians)
 
     # It would be cool to switch functionality if we were given an array of J's
     # in which case, we should individually calculate the A matrix for each one, and return that.
