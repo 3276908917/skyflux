@@ -69,7 +69,9 @@ def sky_over_time(ant1, ant2, start, end, interval, nu=151e6):
     list_visibilities = []
     lst = start
     while lst <= end:
-        list_visibilities.append(visibility_integrand(ant1, ant2, nu, lst))
+        list_visibilities.append(
+            np.array([lst, visibility_integrand(ant1, ant2, nu, lst)])
+        )
         lst += interval
     # perhaps not necessary. Better safe than sorry:
     return np.array(list_visibilities)
