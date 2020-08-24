@@ -26,7 +26,7 @@ def visibility(ant1, ant2, source, nu=151e6, time=None):
 
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
-    A = stokes.create_A(ra=ra, dec=dec, radians=True)
+    A = stokes.create_A(ra=ra, dec=dec, lst=time, radians=True)
     
     r = rot.radec2lm(ra, dec, ra0=time)
 
@@ -97,7 +97,9 @@ def source_over_time(ant1, ant2, source, start, end, interval, nu=151e6):
     list_visibilities = []
     lst = start
     while lst <= end:
-        list_visibilities.append(visibility(ant1, ant2, source, nu, lst))
+        list_visibilities.append(
+            np.array([lst, visibility(ant1, ant2, source, nu, time=lst)])
+        )
         lst += interval
     # perhaps not necessary. Better safe than sorry:
     return np.array(list_visibilities)

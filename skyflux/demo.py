@@ -37,32 +37,54 @@ if False: # keep this section on ice until we are satisfied
     #! Does this work the same, if I insert az/alt directly into create_A?
     A = np.array([stokes.create_A(J=Ji) for Ji in J])
 
-    def project_A(A, data_transform=np.abs, rep=hp.orthview):
-        def orth(i, j, panel, ttl=None):
+    def project_J(J, data_transform=np.abs, rep=hp.orthview):
+        def put_subplot(i, j, panel, ttl=None):
             if ttl is None:
                 ttl = str(i) + ', ' + str(j)
-            rep(data_transform(A[:, i, j]), rot=[0, 90],
-                        half_sky=True, sub=[5, 4, panel], title=ttl)
+            # hard-coding is always bad
+            if rep is hp.cartview:
+                rep(data_transform(J[:, i, j]),
+                    half_sky=True, sub=[3, 2, panel], title=ttl)
+            else:
+                rep(data_transform(J[:, i, j]), rot=[0, 90],
+                    half_sky=True, sub=[3, 2, panel], title=ttl)
+
+        put_subplot(0, 0, 1, 'xx')
+        put_subplot(1, 0, 2, 'yx')
+        put_subplot(0, 1, 3, 'xy')
+        put_subplot(1, 1, 4, 'yy')
+
+    def project_A(A, data_transform=np.abs, rep=hp.orthview):
+        # this breaks for cartview
+        def put_subplot(i, j, panel, ttl=None):
+            if ttl is None:
+                ttl = str(i) + ', ' + str(j)
+            if rep is hp.cartview:
+                rep(data_transform(A[:, i, j]),
+                    half_sky=True, sub=[5, 4, panel], title=ttl)
+            else:
+                rep(data_transform(A[:, i, j]), rot=[0, 90]
+                    half_sky=True, sub=[5, 4, panel], title=ttl)
         
-        orth(0, 0, 1, 'I\' <- I')
-        orth(0, 1, 2)
-        orth(0, 2, 3)
-        orth(0, 3, 4)
+        put_subplot(0, 0, 1, 'I\' <- I')
+        put_subplot(0, 1, 2)
+        put_subplot(0, 2, 3)
+        put_subplot(0, 3, 4)
         
-        orth(1, 0, 5)
-        orth(1, 1, 6, 'Q\' <- Q')
-        orth(1, 2, 7)
-        orth(1, 3, 8)
+        put_subplot(1, 0, 5)
+        put_subplot(1, 1, 6, 'Q\' <- Q')
+        put_subplot(1, 2, 7)
+        put_subplot(1, 3, 8)
         
-        orth(2, 0, 9)
-        orth(2, 1, 10)
-        orth(2, 2, 11, 'U\' <- U')
-        orth(2, 3, 12)
+        put_subplot(2, 0, 9)
+        put_subplot(2, 1, 10)
+        put_subplot(2, 2, 11, 'U\' <- U')
+        put_subplot(2, 3, 12)
         
-        orth(3, 0, 13)
-        orth(3, 1, 14)
-        orth(3, 2, 15)
-        orth(3, 3, 16, 'V\' <- V')
+        put_subplot(3, 0, 13)
+        put_subplot(3, 1, 14)
+        put_subplot(3, 2, 15)
+        put_subplot(3, 3, 16, 'V\' <- V')
 
 # GLEAMEGCAT section
 
