@@ -58,31 +58,31 @@ if False: # keep this section on ice until we are satisfied
         def put_subplot(i, j, panel, ttl=None):
             if ttl is None:
                 ttl = str(i) + ', ' + str(j)
-            if rep is hp.cartview:
-                rep(data_transform(A[:, i, j]),
+            if rep is hp.orthview:
+                rep(data_transform(A[:, i, j]), rot=[0, 90],
                     half_sky=True, sub=[5, 4, panel], title=ttl)
             else:
-                rep(data_transform(A[:, i, j]), rot=[0, 90]
-                    half_sky=True, sub=[5, 4, panel], title=ttl)
-        
+                rep(data_transform(A[:, i, j]), rot=[0, 90],
+                    sub=[5, 4, panel], title=ttl)
+
         put_subplot(0, 0, 1, 'I\' <- I')
-        put_subplot(0, 1, 2)
-        put_subplot(0, 2, 3)
-        put_subplot(0, 3, 4)
-        
-        put_subplot(1, 0, 5)
+        put_subplot(0, 1, 2, 'I\' <- Q')
+        put_subplot(0, 2, 3, 'I\' <- U')
+        put_subplot(0, 3, 4, 'I\' <- V')
+
+        put_subplot(1, 0, 5, 'Q\' <- I')
         put_subplot(1, 1, 6, 'Q\' <- Q')
-        put_subplot(1, 2, 7)
-        put_subplot(1, 3, 8)
-        
-        put_subplot(2, 0, 9)
-        put_subplot(2, 1, 10)
+        put_subplot(1, 2, 7, 'Q\' <- U')
+        put_subplot(1, 3, 8, 'Q\' <- V')
+
+        put_subplot(2, 0, 9, 'U\' <- I')
+        put_subplot(2, 1, 10, 'U\' <- Q')
         put_subplot(2, 2, 11, 'U\' <- U')
-        put_subplot(2, 3, 12)
-        
-        put_subplot(3, 0, 13)
-        put_subplot(3, 1, 14)
-        put_subplot(3, 2, 15)
+        put_subplot(2, 3, 12, 'U\' <- V')
+
+        put_subplot(3, 0, 13, 'V\' <- I')
+        put_subplot(3, 1, 14, 'V\' <- Q')
+        put_subplot(3, 2, 15, 'V\' <- U')
         put_subplot(3, 3, 16, 'V\' <- V')
 
 # GLEAMEGCAT section
