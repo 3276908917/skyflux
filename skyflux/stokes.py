@@ -125,4 +125,4 @@ def create_A(ra=None, dec=None, az=None, alt=None, J=None,
     # in which case, we should individually calculate the A matrix for each one, and return that.
     
     J_outer = np.kron(J, np.conj(J))
-    return np.dot(S, np.dot(J_outer, np.linalg.inv(S)))
+    return np.dot(np.linalg.inv(S), np.dot(J_outer, S))
