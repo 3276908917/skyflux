@@ -1,16 +1,28 @@
+
+Query Ridhima about the strange phase shift in my source_over_time function (it employs the beam rotation approach)
+
+How do I create a rotator? The theory I am still working on it.
+	Maybe I can make some
+
+---------
+
 Send Ridhima the plot for the old results on time simulation,
 	we use these to compare and verify the NEW implementation.
 
 Do an A 4x4 grid for:
-	* imaginary
-	* real
-	* fix the formatting
+	$ imaginary
+	$ real
+	$~ fix the formatting
 
-	> log view
-		* adjust log scale to get more contrast
-		* you might need to adjust the axes so that all of the plots run along the same scales
+	>$ log view
+		> adjust log scale to get more contrast
+		> you might need to adjust the axes so that the plots run along the same scales
 			(comparison easier that way)
+			(this applies JUST to the same diagonal terms)
+			
 	* apply a grid
+	* use matplotlib fig and subplot.ispace and edgespace?
+		to allow larger plots
 
 You can do a time simulation for an arbitrary window,
 	although it is true that in the end we only care about the cold patch.

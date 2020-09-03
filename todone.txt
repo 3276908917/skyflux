@@ -1,3 +1,9 @@
+
+As I mentioned on Slack, I fixed that particular notebook, but the visibility plot still has the odd non-monotonic lobes.
+
+I fixed the plot sizes, and I completed all of the subplot titles.
+
+------------
 Low priority:
 * I fixed the all ones notebook. The returned visibility vector correctly
 	gives the source's flux without extraneous phase and with the expected zero-entries
