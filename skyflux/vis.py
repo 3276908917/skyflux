@@ -10,18 +10,40 @@ from skyflux import stokes
 from skyflux import catalog
 
 #! the default arguments for 'nu' are inconsistent across functions...
-def visibility(ant1, ant2, source, nu=151e6, time=None):
+def visibility(ant1, ant2, source, nu=151, time=None):
     """
     Visibility integrand evaluated for a single source.
     @ant1 and @ant2 are indices of antannae,
         to specify a baseline
     @source is a GLEAM catalog object
         (see catalog.py for specifications)
-    @nu : signal frequency [Hz]
+    @nu : signal frequency [MHz]
     @time : local sidereal time [float, radians]
         default: None corresponds to run-time LST.
     """
-    I = source.flux_by_frq[nu / 1e6]
+    # make a copy to ensure write safety
+    ef = catalog.expected_frequencies.copy()
+    
+    # keep in mind that ef is in ascending order
+    if nu in ef: # we have an observed value for this frequency
+        I = source.flux_by_frq[nu]
+    elif nu < ef[0] or nu > ef[len(ef - 1)]: # "danger of extrapolation" --Aaron Simon
+        raise NotImplementedError("That frequency would have to be extrapolated.")
+    else: # we linearly interpolate between the two neighboring frequencies
+        # I imagine there are several ways to refine this approach,
+            # (for example, include the frequency before last and the frequency after next, too)
+        # and linear interpolation may not even be a reasonable model for this problem,
+        # so take this suite as a placeholder
+        i = 0
+        while expected_frequencies[i] > nu:
+            i += 1
+        nu_a = expected_frequencies[i - 1]
+        nu_b = expected_frequencies[i]
+        span = nu_b - nu_a
+        interp_a = (nu_b - nu) * source.flux_by_frq[nu_a]
+        interp_b = (nu - nu_a) * source.flux_by_frq[nu_b]
+        I = (interp_a + interp_b) / span
+        
     s = np.array([complex(I), 0, 0, 0])
 
     ra = np.radians(source.ra_angle)
