@@ -1,4 +1,19 @@
 
+as of 9/9/20:
+* Lay down some frequency boilerplate code
+
+* Invent J rotation-by-time theory
+
+* Single source needs some serious cleanup
+* Re-run multi source. It is true that I have not found a theory,
+	but the output graph may look different based on the fixes that I have applied
+	during the correction of single_source.
+	* Furthermore, we need to use np.abs rather than np.real. np.real gives negative visibilities,
+		but we do not care about phase just yet.
+* Clean up old notebooks with contemporary commentary
+
+----------
+
 Query Ridhima about the strange phase shift in my source_over_time function (it employs the beam rotation approach)
 
 How do I create a rotator? The theory I am still working on it.

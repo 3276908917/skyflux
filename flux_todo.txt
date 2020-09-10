@@ -1,3 +1,21 @@
+I:
+	vary power law formula to get frequency
+	baseline will change in terms of frequency
+	A will change in terms of frequency
+		For A, we need the different frequency beam files
+
+For bragging about brilliance:
+	ON YOUR OWN, you want to find the equation which rotates the J and/or matrices according to time
+	ON YOUR OWN, you want to find the equation which predicts the HERA beam patterns,
+		i.e. find an equation which makes-obsolete the many files of the form
+			HERA_4.9m_E-pattern_151MHz.txt
+	
+FOR NOW, use simple linear interpolation between the results for a frequency between the
+	predecessor and successor frequency nodes (CST text files).
+
+
+
+
 $1. finish rotations docstrings
 
 $2. finish parser docstrings and rename the file
