@@ -27,7 +27,7 @@ def visibility(ant1, ant2, source, nu=151, time=None):
     # keep in mind that ef is in ascending order
     if nu in ef: # we have an observed value for this frequency
         I = source.flux_by_frq[nu]
-    elif nu < ef[0] or nu > ef[len(ef - 1)]: # "danger of extrapolation" --Aaron Simon
+    elif nu < ef[0] or nu > ef[len(ef)-1]: # "danger of extrapolation" --Aaron Simon
         raise NotImplementedError("That frequency would have to be extrapolated.")
     else: # we linearly interpolate between the two neighboring frequencies
         # I imagine there are several ways to refine this approach,
