@@ -40,9 +40,9 @@ def sources_over_time(ant1, ant2, list_sources=None,
                         start=0, end=2/3*np.pi, interval=np.pi/72, nu=151e6):
     """
     Return an array containing the visibilities at different points of time.
-    @ant1 and @ant2 are indices of antennae, to specify a baseline
+    @ant1 and @ant2 are indices of antennae, to specify a baseline.
     @list_sources is an array of GLEAM catalog objects (see catalog.py for specifications)
-        default value translates to the entire downloaded segment of the catalog
+        default value translates to the entire downloaded segment of the catalog.
     @start: starting LST of integration [float, radians]
         default: 0 hours (cold patch)
     @end: terminal LST of integration [float, radians]
@@ -51,7 +51,7 @@ def sources_over_time(ant1, ant2, list_sources=None,
         default: 10 minutes = np.pi / 72
     @nu frequency in Hertz
     """
-    if list_sources is None
+    if list_sources is None:
         # make a copy to ensure write safety
         list_sources = catalog.obj_catalog.copy()
 
@@ -66,9 +66,50 @@ def sources_over_time(ant1, ant2, list_sources=None,
     while lst <= end:
         next_vista = np.array([0j, 0j, 0j, 0j])
         for source in list_sources:
-            next_vista += visibility(ant1, ant2, source, nu, time)
+            next_vista += visibility(ant1, ant2, source, nu=nu, time=lst)
 
         list_visibilities.append(next_vista)
         lst += interval
+    # perhaps not necessary. Better safe than sorry:
+    return np.array(list_visibilities)
+
+def sources_over_frequency(ant1, ant2, list_sources=None,
+                        start=76e6, end=227e6, interval=1e6, time=None):
+    """
+    Return an array containing the visibilities at different values for the frequency
+        of incident light.
+    @ant1 and @ant2 are indices of antennae, to specify a baseline.
+    @list_sources is an array of GLEAM catalog objects (see catalog.py for specifications)
+        default value translates to the entire downloaded segment of the catalog.
+    @start: starting frequency of integration 
+        default: 76 MHz (minimum frequency described by the GLEAM catalog)
+    @end: terminal frequency of integration
+        default: 227 MHz
+    @interval: integration window width
+        default: 1 MHz (arbitrary)
+    @time fixed LST at which to evaluate all visibilities
+        default: None translates to the LST as of the initial call of this function
+    """
+    if list_sources is None:
+        # make a copy to ensure write safety
+        list_sources = catalog.obj_catalog.copy()
+    if time is None:
+        time = rot.get_lst(radians=True)
+
+    # If the user has entered a single source directly,
+    # we can automatically standardize the formatting
+    # by placing it by itself in a list
+    if type(list_sources) != list:
+        list_sources = [list_sources]
+    
+    list_visibilities = []
+    lfreq = start
+    while lfreq <= end:
+        next_vista = np.array([0j, 0j, 0j, 0j])
+        for source in list_sources:
+            next_vista += visibility(ant1, ant2, source, nu=lfreq, time=time)
+
+        list_visibilities.append(next_vista)
+        lfreq += interval
     # perhaps not necessary. Better safe than sorry:
     return np.array(list_visibilities)
