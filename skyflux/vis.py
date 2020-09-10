@@ -44,18 +44,22 @@ def sources_over_time(ant1, ant2, list_sources=None,
     @list_sources is an array of GLEAM catalog objects (see catalog.py for specifications)
         default value translates to the entire downloaded segment of the catalog
     @start: starting LST of integration [float, radians]
+        default: 0 hours (cold patch)
     @end: terminal LST of integration [float, radians]
+        default: 8 hours = 2/3 pi (cold patch)
     @interval: integration window width [float, radians]
+        default: 10 minutes = np.pi / 72
     @nu frequency in Hertz
-    
-    The cold patch has start = 0 hours, end = 8 hours,
-        and we set out to measure at ten minute intervals.
-    (ant1, ant2, 0, 2 / 3 * np.pi, np.pi / 72, nu)
-    to-do: error-checking on inputs
     """
     if list_sources is None
         # make a copy to ensure write safety
         list_sources = catalog.obj_catalog.copy()
+
+    # If the user has entered a single source directly,
+    # we can automatically standardize the formatting
+    # by placing it by itself in a list
+    if type(list_sources) != list:
+        list_sources = [list_sources]
     
     list_visibilities = []
     lst = start
