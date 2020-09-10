@@ -54,7 +54,7 @@ def visibility(ant1, ant2, source, nu=151, time=None):
     A = stokes.create_A(ra=ra, dec=dec, lst=time, radians=True)
     
     r = rot.radec2lm(ra, dec, ra0=time)
-    phi = ant.phase_factor(ant1, ant2, r, nu)
+    phi = ant.phase_factor(ant1, ant2, r, nu * 1e6)
 
     malformed_result = np.dot(np.dot(A, s), phi)
     # Hack to get rid of extra array shell surrounding answer
