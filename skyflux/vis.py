@@ -35,6 +35,9 @@ def visibility(ant1, ant2, source, nu=151, time=None):
         # and linear interpolation may not even be a reasonable model for this problem,
         # so take this suite as a placeholder
         i = 0
+
+        # Use power law formula here; use the spectral index
+        # s1/s2 = nu1/nu2 * s2
         while expected_frequencies[i] > nu:
             i += 1
         nu_a = expected_frequencies[i - 1]
@@ -90,7 +93,7 @@ def sources_over_time(ant1, ant2, list_sources=None,
         for source in list_sources:
             next_vista += visibility(ant1, ant2, source, nu=nu, time=lst)
 
-        list_visibilities.append(next_vista)
+        list_visibilities.append(np.array([lst, next_vista]))
         lst += interval
     # perhaps not necessary. Better safe than sorry:
     return np.array(list_visibilities)
@@ -131,7 +134,7 @@ def sources_over_frequency(ant1, ant2, list_sources=None,
         for source in list_sources:
             next_vista += visibility(ant1, ant2, source, nu=lfreq, time=time)
 
-        list_visibilities.append(next_vista)
+        list_visibilities.append(np.array([lfreq, next_vista]))
         lfreq += interval
     # perhaps not necessary. Better safe than sorry:
     return np.array(list_visibilities)
