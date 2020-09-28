@@ -1,4 +1,3 @@
-import skyflux.generate_model
 import skyflux.rot
 import skyflux.catalog
 import skyflux.ant
