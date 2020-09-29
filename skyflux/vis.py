@@ -9,8 +9,11 @@ from skyflux import ant
 from skyflux import stokes
 from skyflux import catalog
 
+# Spectral index, coefficient of proportionality, empirically tuned
+cop = lambda source, nu : source.flux_by_frq[nu / 1e6] / nu ** source.alpha
+
 #! the default arguments for 'nu' are inconsistent across functions...
-def visibility(ant1, ant2, source, nu=151, time=None):
+def visibility(ant1, ant2, source, nu=151e6, time=None):
     """
     Visibility integrand evaluated for a single source.
     @ant1 and @ant2 are indices of antannae,
@@ -26,26 +29,33 @@ def visibility(ant1, ant2, source, nu=151, time=None):
     
     # keep in mind that ef is in ascending order
     if nu in ef: # we have an observed value for this frequency
-        I = source.flux_by_frq[nu]
-    elif nu < ef[0] or nu > ef[len(ef)-1]: # "danger of extrapolation" --Aaron Simon
+        I = source.flux_by_frq[nu / 1e6]
+    elif nu < ef[0] * 1e6 or nu > ef[len(ef)-1] * 1e6:
+        # "beware the danger of extrapolation" --Aaron Simon
         raise NotImplementedError("That frequency would have to be extrapolated.")
-    else: # we linearly interpolate between the two neighboring frequencies
-        # I imagine there are several ways to refine this approach,
-            # (for example, include the frequency before last and the frequency after next, too)
-        # and linear interpolation may not even be a reasonable model for this problem,
-        # so take this suite as a placeholder
+    else: # we use the power law spectral index formulation here
+        # conceptually, I may have made an error.
+        # I think I want flux, but I am here calculating flux per unit frequency
+        # See "single_source_over_nu.ipynb" for an example plot of how alpha varies...
         i = 0
 
         # Use power law formula here; use the spectral index
         # s1/s2 = nu1/nu2 * s2
         while expected_frequencies[i] > nu:
             i += 1
+
         nu_a = expected_frequencies[i - 1]
         nu_b = expected_frequencies[i]
         span = nu_b - nu_a
-        interp_a = (nu_b - nu) * source.flux_by_frq[nu_a]
-        interp_b = (nu - nu_a) * source.flux_by_frq[nu_b]
-        I = (interp_a + interp_b) / span
+
+        cop_a = cop(source, nu_a * 1e6)
+        cop_b = cop(source, nu_b * 1e6)
+
+        interp_a = (nu_b - nu) * cop_a
+        interp_b = (nu - nu_a) * cop_b
+        this_cop = (interp_a + interp_b) / span
+
+        I = this_cop * nu ** source.alpha
         
     s = np.array([complex(I), 0, 0, 0])
 
