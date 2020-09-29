@@ -6,10 +6,12 @@ from spin1_beam_model import cst_processing
 frqs = []
 
 # split up the pathing components to facilitate maintenance
+
+# the following line cannot be replicated in any shell
 here = os.path.dirname(os.path.abspath(__file__))
-package_dir = here + "/skyflux/"
+package_dir = here + "/skyflux"
 data_dir = package_dir + "/patterns"
-output_model_name ="/HERA_spin1_harmonics.h5"
+output_model_name = "/HERA_spin1_harmonics"
 
 # Some files have a space after the last underscore in what I guess is
 # a representation of a zero in the hundreds place. Fortunately, this
@@ -39,7 +41,9 @@ processor = cst_processing.CSTDataProcessor(
 )
 
 processor.compute_spin1_harmonics()
-processor.write_model_data(package_dir + output_model_name, output_model_name)
+
+# os.path.join sucks, but CST processor uses it. Here's a hack:
+processor.write_model_data("", package_dir + output_model_name)
 
 print("Successfully output ant.h5 file. Found the following frequencies (MHz):")
 print(frqs)
