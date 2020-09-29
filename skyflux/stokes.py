@@ -6,7 +6,7 @@ from skyflux import rot
 
 #! This is hard-coded. The value is updated each time we run
 #! generate_model.py. Needs fixing.
-frqs = np.append(np.arange(50e6, 100e6, 1e6), np.array(151e6))
+beam_frqs = np.append(np.arange(50e6, 100e6, 1e6), np.array(151e6))
 
 # It is imperative that the name here line up with that used in
 # generate_model.py (a file NOT included in the installation, but
@@ -20,7 +20,7 @@ spline_beam_func = beam_models.model_data_to_spline_beam_func(
     beam_origin,
     # Like in generate_model.py, we have some hard-coded frequencies
     # which we want to re-evaluate in the future.
-    frqs
+    beam_frqs
 )
 
 def format_J(J_RIMEz):
@@ -47,7 +47,7 @@ S = .5 * np.array([[1, 1, 0, 0,],
                   [1, -1, 0, 0]])
 
 def create_J(ra=None, dec=None, az=None, alt=None,
-             lat=None, lst=None, nu=150e6, radians=False):
+             lat=None, lst=None, nu=151e6, radians=False):
     """
     Return the Jones matrix J.
     @ra: right ascension of the source, in radians.
@@ -58,11 +58,14 @@ def create_J(ra=None, dec=None, az=None, alt=None,
         default: time of execution
     
     @nu: frequency of interest, in Hz.
-        default: 150 MHz
+        default: 151 MHz
     The default argument comes from the beam that I
     had access to when this was written.
     """
     # This section handles the many possible bad combinations of inputs
+    if nu not in beam_frqs:
+        raise NotImplementedError("No routine for interpolating between beam frequencies.")
+    
     if ra is not None:
         if dec is None:
             raise TypeError('ra was provided without accompanying dec.')
@@ -102,7 +105,7 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     return format_J(spline_beam_func(nu, alt, az))
 
 def create_A(ra=None, dec=None, az=None, alt=None, J=None,
-             lat=None, lst=None, nu=150e6, radians=False):
+             lat=None, lst=None, nu=151e6, radians=False):
     """
     Return the Mueller matrix A.
     @ra: right ascension of the source, in radians.
@@ -113,7 +116,7 @@ def create_A(ra=None, dec=None, az=None, alt=None, J=None,
         default: time of execution
         
     @nu: frequency of interest, in Hz.
-        default: 150 MHz
+        default: 151 MHz
     The default argument comes from the beam that I
     had access to when this was written.
     """
