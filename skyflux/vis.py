@@ -26,11 +26,13 @@ def visibility(ant1, ant2, source, nu=151e6, time=None):
     """
     # make a copy to ensure write safety
     ef = catalog.expected_frequencies.copy()
+
+    index_nu = nu / 1e6
     
     # keep in mind that ef is in ascending order
-    if nu in ef: # we have an observed value for this frequency
-        I = source.flux_by_frq[nu / 1e6]
-    elif nu < ef[0] * 1e6 or nu > ef[len(ef)-1] * 1e6:
+    if index_nu in ef: # we have an observed value for this frequency
+        I = source.flux_by_frq[index_nu]
+    elif index_nu < ef[0] or index_nu > ef[len(ef)-1]:
         # "beware the danger of extrapolation" --Aaron Simon
         raise NotImplementedError("That frequency would have to be extrapolated.")
     else: # we use the power law spectral index formulation here
@@ -41,15 +43,15 @@ def visibility(ant1, ant2, source, nu=151e6, time=None):
 
         # Use power law formula here; use the spectral index
         # s1/s2 = nu1/nu2 * s2
-        while expected_frequencies[i] > nu:
+        while ef[i] > index_nu:
             i += 1
 
-        nu_a = expected_frequencies[i - 1]
-        nu_b = expected_frequencies[i]
+        nu_a = ef[i - 1] * 1e6
+        nu_b = ef[i] * 1e6
         span = nu_b - nu_a
 
-        cop_a = cop(source, nu_a * 1e6)
-        cop_b = cop(source, nu_b * 1e6)
+        cop_a = cop(source, nu_a)
+        cop_b = cop(source, nu_b)
 
         interp_a = (nu_b - nu) * cop_a
         interp_b = (nu - nu_a) * cop_b
@@ -61,10 +63,10 @@ def visibility(ant1, ant2, source, nu=151e6, time=None):
 
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
-    A = stokes.create_A(ra=ra, dec=dec, lst=time, radians=True)
+    A = stokes.create_A(ra=ra, dec=dec, lst=time, nu=nu, radians=True)
     
     r = rot.radec2lm(ra, dec, ra0=time)
-    phi = ant.phase_factor(ant1, ant2, r, nu * 1e6)
+    phi = ant.phase_factor(ant1, ant2, r, nu)
 
     malformed_result = np.dot(np.dot(A, s), phi)
     # Hack to get rid of extra array shell surrounding answer
