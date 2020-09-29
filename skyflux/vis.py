@@ -118,9 +118,9 @@ def sources_over_frequency(ant1, ant2, list_sources=None,
     @ant1 and @ant2 are indices of antennae, to specify a baseline.
     @list_sources is an array of GLEAM catalog objects (see catalog.py for specifications)
         default value translates to the entire downloaded segment of the catalog.
-    @start: starting frequency of integration 
+    @start: starting frequency of integration, inclusive
         default: 76 MHz (minimum frequency described by the GLEAM catalog)
-    @end: terminal frequency of integration
+    @end: terminal frequency of integration, inclusive
         default: 227 MHz
     @interval: integration window width
         default: 1 MHz (arbitrary)
