@@ -4,7 +4,15 @@ from RIMEz import beam_models
 
 from skyflux import rot
 
-beam_origin = os.path.dirname(os.path.abspath(__file__)) + "/ant.h5"
+#! This is hard-coded. The value is updated each time we run
+#! generate_model.py. Needs fixing.
+frqs = np.append(np.arange(50e6, 100e6, 1e6), np.array(151e6))
+
+# It is imperative that the name here line up with that used in
+# generate_model.py (a file NOT included in the installation, but
+# included in the Git repository!)
+beam_origin = os.path.dirname(os.path.abspath(__file__)) + \
+              "/HERA_spin1_harmonics.h5"
 
 # My understanding of the documentation is that
 # alt, az are both in radians
@@ -12,7 +20,7 @@ spline_beam_func = beam_models.model_data_to_spline_beam_func(
     beam_origin,
     # Like in generate_model.py, we have some hard-coded frequencies
     # which we want to re-evaluate in the future.
-    np.array([150e6, 151e6, 152e6])
+    frqs
 )
 
 def format_J(J_RIMEz):

@@ -14,14 +14,14 @@ setup(
     # the very first version was 1!1.1a1
     # I will always start with ones and end with nines because I think
         # that is cleaner than using zeros
-    version='1!1.1rc5',
+    version='1!1.1rc6',
     # additionally, remember that we change versions in the following order
         # increase the last digit to nine, reset to 1
         # cycle between a, b, and finally rc
         # increase the remaining digits to nine, reset to 1
     author='Lukas Finkbeiner, C. D. Nunhokee, Aaron Parsons',
     author_email='lfinkbeiner@berkeley.edu',
-    description='Primitive point source visibility utilities',
+    description='Basic utilities for point source visibility',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/3276908917/HERA',
@@ -29,8 +29,7 @@ setup(
     package_data={'': [
         'gleam_with_alpha.txt',
         'ant_dict.pk',
-        'ant.h5',
-        'HERA_4.9m_E-pattern_151MHz.txt'
+        'HERA_spin1_harmonics.h5'
     ]},
     include_package_data=True,
     # until RIMEz updates its rumba references:
