@@ -64,6 +64,9 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     """
     # This section handles the many possible bad combinations of inputs
     if type(nu) == list:
+        nu = np.array(list)
+    
+    if type(nu) == np.ndarray:
         for frequency in nu:
             if frequency not in beam_frqs:
                 raise NotImplementedError("No routine for interpolating between beam frequencies.")
