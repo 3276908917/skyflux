@@ -67,7 +67,7 @@ def create_J(ra=None, dec=None, az=None, alt=None,
         for frequency in nu:
             if frequency not in beam_frqs:
                 raise NotImplementedError("No routine for interpolating between beam frequencies.")
-    if nu not in beam_frqs:
+    elif nu not in beam_frqs:
         raise NotImplementedError("No routine for interpolating between beam frequencies.")
     
     if ra is not None:
