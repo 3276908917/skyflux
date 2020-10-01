@@ -63,6 +63,10 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     had access to when this was written.
     """
     # This section handles the many possible bad combinations of inputs
+    if type(nu) == list:
+        for frequency in nu:
+            if frequency not in beam_frqs:
+                raise NotImplementedError("No routine for interpolating between beam frequencies.")
     if nu not in beam_frqs:
         raise NotImplementedError("No routine for interpolating between beam frequencies.")
     
@@ -100,7 +104,11 @@ def create_J(ra=None, dec=None, az=None, alt=None,
 
     # one of the inputs did not get converted
     if type(az) != np.ndarray or type(alt) != np.ndarray:
-        raise TypeError('shapes of inputs must be the same (got one list and one scalar).')    
+        if type(az) != np.ndarray:
+            az = az * np.ones(len(alt))
+        elif type(alt) != np.ndarray:
+            alt = alt * np.ones(len(alt))
+        #raise TypeError('shapes of inputs must be the same (got one list and one scalar).')    
         
     return format_J(spline_beam_func(nu, alt, az))
 
