@@ -139,7 +139,7 @@ def new_sources_over_time(ant1, ant2, list_sources=None,
             list_visibilities[k] += malformed_result[:, 0]
             
     # perhaps not necessary. Better safe than sorry:
-    return np.array(list_visibilities)
+    return list_lst, np.array(list_visibilities)
 
 def sources_over_time(ant1, ant2, list_sources=None,
                         start=0, end=2/3*np.pi, interval=np.pi/72, nu=151e6):
