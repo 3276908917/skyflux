@@ -105,34 +105,36 @@ def new_sources_over_time(ant1, ant2, list_sources=None,
     if type(list_sources) != list:
         list_sources = [list_sources]
 
-    # establish values common to all visibility calculations
-    I = get_I(source, nu)
-    s = np.array([complex(I), 0, 0, 0])
-    ra = np.radians(source.ra_angle)
-    dec = np.radians(source.dec_angle)
-    
-    list_visibilities = []
+    list_lst = []
     lst = start
     while lst <= end:
-        next_vista = np.array([0j, 0j, 0j, 0j])
-        for source in list_sources:
-            next_vista += visibility(ant1, ant2, source, nu=nu, time=lst)
+        list_lst.append(lst)
+        lst += interval
+    list_lst = np.array(list_lst)
 
-            # probably inefficient to keep passing in the same arguments,
-                # but I am tired of trying to shove all of skyflux inside this one function
-            az, alt = rot.eq_to_topo(ra, dec, lat=lat, lst=lst, radians=radians)
+    list_visibilities = np.zeros(len(list_lst), 4)
+
+    for source in list_sources:
+        # establish values common to all visibility calculations
+        I = get_I(source, nu)
+        s = np.array([complex(I), 0, 0, 0])
+        ra = np.radians(source.ra_angle)
+        dec = np.radians(source.dec_angle)
+
+        for k in range(len(list_lst)):
+            curr_lst = list_lst[k]
+
+            az, alt = rot.eq_to_topo(ra, dec, lat=lat, lst=curr_lst, radians=radians)
             A = interpolator(az, alt)
-            
-            r = rot.radec2lm(ra, dec, ra0=time)
-            
+
+            r = rot.radec2lm(ra, dec, ra0=curr_lst)
             phi = ant.phase_factor(ant1, ant2, r, nu)
 
             malformed_result = np.dot(np.dot(A, s), phi)
-            # Hack to get rid of extra array shell surrounding answer
-            new_vista += malformed_result[:, 0]
 
-        list_visibilities.append(np.array([lst, next_vista]))
-        lst += interval
+            # Hack to get rid of extra array shell surrounding answer
+            list_visibilities[k] += malformed_result[:, 0]
+            
     # perhaps not necessary. Better safe than sorry:
     return np.array(list_visibilities)
 
