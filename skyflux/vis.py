@@ -12,18 +12,7 @@ from skyflux import catalog
 # Spectral index, coefficient of proportionality, empirically tuned
 cop = lambda source, nu : source.flux_by_frq[nu / 1e6] / nu ** source.alpha
 
-#! the default arguments for 'nu' are inconsistent across functions...
-def visibility(ant1, ant2, source, nu=151e6, time=None):
-    """
-    Visibility integrand evaluated for a single source.
-    @ant1 and @ant2 are indices of antannae,
-        to specify a baseline
-    @source is a GLEAM catalog object
-        (see catalog.py for specifications)
-    @nu : signal frequency [MHz]
-    @time : local sidereal time [float, radians]
-        default: None corresponds to run-time LST.
-    """
+def get_I(source, nu=151e6):
     # make a copy to ensure write safety
     ef = catalog.expected_frequencies.copy()
 
@@ -31,7 +20,7 @@ def visibility(ant1, ant2, source, nu=151e6, time=None):
     
     # keep in mind that ef is in ascending order
     if index_nu in ef: # we have an observed value for this frequency
-        I = source.flux_by_frq[index_nu]
+        return source.flux_by_frq[index_nu]
     elif index_nu < ef[0] or index_nu > ef[len(ef)-1]:
         # "beware the danger of extrapolation" --Aaron Simon
         raise NotImplementedError("That frequency would have to be extrapolated.")
@@ -57,21 +46,95 @@ def visibility(ant1, ant2, source, nu=151e6, time=None):
         interp_b = (nu - nu_a) * cop_b
         this_cop = (interp_a + interp_b) / span
 
-        I = this_cop * nu ** source.alpha
+        return this_cop * nu ** source.alpha
+
+#! the default arguments for 'nu' are inconsistent across functions...
+def visibility(ant1, ant2, source, nu=151e6, time=None):
+    """
+    Visibility integrand evaluated for a single source.
+    @ant1 and @ant2 are indices of antannae,
+        to specify a baseline
+    @source is a GLEAM catalog object
+        (see catalog.py for specifications)
+    @nu : signal frequency [MHz]
+    @time : local sidereal time [float, radians]
+        default: None corresponds to run-time LST.
+    """
+    I = get_I(source, nu)
         
     s = np.array([complex(I), 0, 0, 0])
 
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
-    A = stokes.create_A(ra=ra, dec=dec, lst=time, nu=nu, radians=True)
     
+    A = stokes.create_A(ra=ra, dec=dec, lst=time, nu=nu, radians=True)
     r = rot.radec2lm(ra, dec, ra0=time)
+    
     phi = ant.phase_factor(ant1, ant2, r, nu)
 
     malformed_result = np.dot(np.dot(A, s), phi)
     # Hack to get rid of extra array shell surrounding answer
     return malformed_result[:, 0]
 
+# Incoming function, intended to replace sources_over_time
+def new_sources_over_time(ant1, ant2, list_sources=None,
+                        start=0, end=2/3*np.pi, interval=np.pi/72, nu=151e6, interpolator=None):
+    """
+    Return an array containing the visibilities at different points of time.
+    @ant1 and @ant2 are indices of antennae, to specify a baseline.
+    @list_sources is an array of GLEAM catalog objects (see catalog.py for specifications)
+        default value translates to the entire downloaded segment of the catalog.
+    @start: starting LST of integration [float, radians]
+        default: 0 hours (cold patch)
+    @end: terminal LST of integration [float, radians]
+        default: 8 hours = 2/3 pi (cold patch)
+    @interval: integration window width [float, radians]
+        default: 10 minutes = np.pi / 72
+    @nu frequency in Hertz
+    """
+    if interpolator is None:
+        raise NotImplementedError("We are currently hard-coding interpolators.")
+    
+    if list_sources is None:
+        # make a copy to ensure write safety
+        list_sources = catalog.obj_catalog.copy()
+
+    # If the user has entered a single source directly,
+    # we can automatically standardize the formatting
+    # by placing it by itself in a list
+    if type(list_sources) != list:
+        list_sources = [list_sources]
+
+    # establish values common to all visibility calculations
+    I = get_I(source, nu)
+    s = np.array([complex(I), 0, 0, 0])
+    ra = np.radians(source.ra_angle)
+    dec = np.radians(source.dec_angle)
+    
+    list_visibilities = []
+    lst = start
+    while lst <= end:
+        next_vista = np.array([0j, 0j, 0j, 0j])
+        for source in list_sources:
+            next_vista += visibility(ant1, ant2, source, nu=nu, time=lst)
+
+            # probably inefficient to keep passing in the same arguments,
+                # but I am tired of trying to shove all of skyflux inside this one function
+            az, alt = rot.eq_to_topo(ra, dec, lat=lat, lst=lst, radians=radians)
+            A = interpolator(az, alt)
+            
+            r = rot.radec2lm(ra, dec, ra0=time)
+            
+            phi = ant.phase_factor(ant1, ant2, r, nu)
+
+            malformed_result = np.dot(np.dot(A, s), phi)
+            # Hack to get rid of extra array shell surrounding answer
+            new_vista += malformed_result[:, 0]
+
+        list_visibilities.append(np.array([lst, next_vista]))
+        lst += interval
+    # perhaps not necessary. Better safe than sorry:
+    return np.array(list_visibilities)
 
 def sources_over_time(ant1, ant2, list_sources=None,
                         start=0, end=2/3*np.pi, interval=np.pi/72, nu=151e6):
