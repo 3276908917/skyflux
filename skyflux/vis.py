@@ -112,7 +112,7 @@ def new_sources_over_time(ant1, ant2, list_sources=None,
         lst += interval
     list_lst = np.array(list_lst)
 
-    list_visibilities = np.zeros(len(list_lst), 4)
+    list_visibilities = np.zeros((len(list_lst), 4), dtype=np.complex128)
 
     for source in list_sources:
         # establish values common to all visibility calculations
@@ -124,7 +124,10 @@ def new_sources_over_time(ant1, ant2, list_sources=None,
         for k in range(len(list_lst)):
             curr_lst = list_lst[k]
 
-            az, alt = rot.eq_to_topo(ra, dec, lat=lat, lst=curr_lst, radians=radians)
+            # no input for latitude. Code is no longer general :(
+            # no input for radians either. We have to rely on the user
+                # to provide a radian-based interpolator.
+            az, alt = rot.eq_to_topo(ra, dec, lst=curr_lst, radians=True)
             A = interpolator(az, alt)
 
             r = rot.radec2lm(ra, dec, ra0=curr_lst)
