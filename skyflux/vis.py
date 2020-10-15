@@ -136,7 +136,7 @@ def new_sources_over_time(ant1, ant2, list_sources=None,
             malformed_result = np.dot(np.dot(A, s), phi)
 
             # Hack to get rid of extra array shell surrounding answer
-            list_visibilities[k] += malformed_result[:, 0]
+            list_visibilities[k] += malformed_result
             
     # perhaps not necessary. Better safe than sorry:
     return list_lst, np.array(list_visibilities)
