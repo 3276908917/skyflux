@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import healpy as hp
 from RIMEz import beam_models
 
 from skyflux import rot
