@@ -3,9 +3,11 @@ Utilities for displaying various plots concerning the distributions
 of the GLEAM objects in the parser buffer (catalog.obj_catalog).
 """
 
+import math
+
 import matplotlib.pyplot as plt
 import numpy as np
-import math
+import healpy as hp
 
 from skyflux import catalog
 from skyflux import ant
