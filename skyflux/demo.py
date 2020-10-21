@@ -10,6 +10,8 @@ import math
 from skyflux import catalog
 from skyflux import ant
 
+# general helpers and utilities
+
 def frame():
     """
     Set up generic infrastructure for an improved-looking plot.
@@ -25,65 +27,88 @@ def frame():
 
     return fig, ax
 
+def is_constrained(value, min_acceptable=None, max_acceptable=None):
+    """
+    Return True if @max_acceptable >= @value >= @min_acceptable,
+        False otherwise.
+    Although this is written as a general helper function,
+        it is chiefly used in filtering the data for the histogram.
+    """
+    if min_acceptable is not None and value < min_acceptable:
+        return False
+    if max_acceptable is not None and value > max_acceptable:
+        return False
+    return True
+
 # Visibility section
 
-if False: # keep this section on ice until we are satisfied
-    nside = 128
-    theta, phi = hp.pix2ang(nside, np.arange(12 * nside * nside))
-    az = phi
-    alt = np.pi/2 - theta
+### todo: we want a command that will force all of the scales to run from the same values
 
-    J = stokes.create_J(az=az, alt=alt, radians=True)
-    #! Does this work the same, if I insert az/alt directly into create_A?
-    A = np.array([stokes.create_A(J=Ji) for Ji in J])
+def project_J(J, data_transform=np.abs, rep=hp.orthview):
+    """
+    Generate a 2x2 plot of the four Jones components,
+    assuming that J has conventional formatting [[xx, xy], [yx, yy]]
+    @data_transform : function applied to each index of the J matrix
+    @rep : one of the healpy projection functions, such as
+        orthview, cartview, and mollview
+    """
+    def put_subplot(i, j, panel, ttl=None):
+        if ttl is None:
+            ttl = str(i) + ', ' + str(j)
+        # hard-coding is always bad
+        if rep is hp.cartview:
+            rep(data_transform(J[:, i, j]),
+                half_sky=True, sub=[3, 2, panel], title=ttl)
+        else:
+            rep(data_transform(J[:, i, j]), rot=[0, 90],
+                half_sky=True, sub=[3, 2, panel], title=ttl)
 
-    def project_J(J, data_transform=np.abs, rep=hp.orthview):
-        def put_subplot(i, j, panel, ttl=None):
-            if ttl is None:
-                ttl = str(i) + ', ' + str(j)
-            # hard-coding is always bad
-            if rep is hp.cartview:
-                rep(data_transform(J[:, i, j]),
-                    half_sky=True, sub=[3, 2, panel], title=ttl)
-            else:
-                rep(data_transform(J[:, i, j]), rot=[0, 90],
-                    half_sky=True, sub=[3, 2, panel], title=ttl)
+    put_subplot(0, 0, 1, 'xx')
+    put_subplot(1, 0, 2, 'yx')
+    put_subplot(0, 1, 3, 'xy')
+    put_subplot(1, 1, 4, 'yy')
 
-        put_subplot(0, 0, 1, 'xx')
-        put_subplot(1, 0, 2, 'yx')
-        put_subplot(0, 1, 3, 'xy')
-        put_subplot(1, 1, 4, 'yy')
+def project_A(A, data_transform=np.abs, rep=hp.orthview):
+    """
+    Generate a 4x4 plot of the sixteen Mueller components,
+    assuming that A has conventional formatting
+        [[I' <- I, I' <- Q, I' <- U, I' <- V],
+        [Q' <- I, Q' <- Q, Q' <- U, Q' <- V],
+        [U' <- I, U' <- Q, U' <- U, U' <- V],
+        [V' <- I, V' <- Q, V' <- U, V' <- V]]
+    @data_transform : function applied to each index of the J matrix
+    @rep : one of the healpy projection functions, such as
+        orthview, cartview, and mollview
+    """
+    def put_subplot(i, j, panel, ttl=None):
+        if ttl is None:
+            ttl = str(i) + ', ' + str(j)
+        if rep is hp.orthview:
+            rep(data_transform(A[:, i, j]), rot=[0, 90],
+                half_sky=True, sub=[5, 4, panel], title=ttl)
+        else:
+            rep(data_transform(A[:, i, j]), rot=[0, 90],
+                sub=[5, 4, panel], title=ttl)
 
-    def project_A(A, data_transform=np.abs, rep=hp.orthview):
-        def put_subplot(i, j, panel, ttl=None):
-            if ttl is None:
-                ttl = str(i) + ', ' + str(j)
-            if rep is hp.orthview:
-                rep(data_transform(A[:, i, j]), rot=[0, 90],
-                    half_sky=True, sub=[5, 4, panel], title=ttl)
-            else:
-                rep(data_transform(A[:, i, j]), rot=[0, 90],
-                    sub=[5, 4, panel], title=ttl)
+    put_subplot(0, 0, 1, 'I\' <- I')
+    put_subplot(0, 1, 2, 'I\' <- Q')
+    put_subplot(0, 2, 3, 'I\' <- U')
+    put_subplot(0, 3, 4, 'I\' <- V')
 
-        put_subplot(0, 0, 1, 'I\' <- I')
-        put_subplot(0, 1, 2, 'I\' <- Q')
-        put_subplot(0, 2, 3, 'I\' <- U')
-        put_subplot(0, 3, 4, 'I\' <- V')
+    put_subplot(1, 0, 5, 'Q\' <- I')
+    put_subplot(1, 1, 6, 'Q\' <- Q')
+    put_subplot(1, 2, 7, 'Q\' <- U')
+    put_subplot(1, 3, 8, 'Q\' <- V')
 
-        put_subplot(1, 0, 5, 'Q\' <- I')
-        put_subplot(1, 1, 6, 'Q\' <- Q')
-        put_subplot(1, 2, 7, 'Q\' <- U')
-        put_subplot(1, 3, 8, 'Q\' <- V')
+    put_subplot(2, 0, 9, 'U\' <- I')
+    put_subplot(2, 1, 10, 'U\' <- Q')
+    put_subplot(2, 2, 11, 'U\' <- U')
+    put_subplot(2, 3, 12, 'U\' <- V')
 
-        put_subplot(2, 0, 9, 'U\' <- I')
-        put_subplot(2, 1, 10, 'U\' <- Q')
-        put_subplot(2, 2, 11, 'U\' <- U')
-        put_subplot(2, 3, 12, 'U\' <- V')
-
-        put_subplot(3, 0, 13, 'V\' <- I')
-        put_subplot(3, 1, 14, 'V\' <- Q')
-        put_subplot(3, 2, 15, 'V\' <- U')
-        put_subplot(3, 3, 16, 'V\' <- V')
+    put_subplot(3, 0, 13, 'V\' <- I')
+    put_subplot(3, 1, 14, 'V\' <- Q')
+    put_subplot(3, 2, 15, 'V\' <- U')
+    put_subplot(3, 3, 16, 'V\' <- V')
 
 # GLEAMEGCAT section
 
@@ -121,19 +146,6 @@ def brightest_source(frq=151):
     print("Largest flux value encountered:", max_obj.flux_by_frq[frq])
     print("Name of associated object:", max_obj.name)
     return max_obj
-
-def is_constrained(value, min_acceptable=None, max_acceptable=None):
-    """
-    Return True if @max_acceptable >= @value >= @min_acceptable,
-        False otherwise.
-    Although this is written as a general helper function,
-        it is chiefly used in filtering the data for the histogram.
-    """
-    if min_acceptable is not None and value < min_acceptable:
-        return False
-    if max_acceptable is not None and value > max_acceptable:
-        return False
-    return True
 
 def hist_data(list_source, frq=151, ln=False, data_lim=None):
     """
@@ -213,20 +225,6 @@ def brightness_distr(frq=151, ln=False, data_lim=None, ylim=None):
         else:
             plt.ylim(ylim[0], ylim[1])
 
-"""
-76 MHz
-Largest flux value encountered: 85.960663
-Name of associated object: GLEAM J052257-362727
-
-(This object holds all records on the range [76, 130])
-
-151 MHz
-Largest flux value encountered: 55.942432000000004
-Name of associated object: GLEAM J052257-362727
-
-(This object holds all records on the range [143, 227])
-"""
-
 # Antenna section
 
 """
@@ -237,7 +235,7 @@ of the array
 
 def list_baselines(ant_ID):
     """
-    Print every baseline that features antenna # @ant_ID
+    Print every available baseline that features antenna # @ant_ID
     """
     print ("Baselines between antenna " + str(ant_ID) + " and antenna...")
     for ID in ant.ant_pos:
@@ -249,11 +247,7 @@ active_ants.sort()
 
 def all_baselines():
     """
-    Print every baseline, without duplicating.
-
-    To-do: eventually I am going to want to figure out how to propagate
-        the particular order (in which I am subtracting coordinates)
-        out to the integral that I am taking.
+    Print every available baseline, without duplicating.
     """
     for i in range(len(active_ants)):
         ID1 = active_ants[i]

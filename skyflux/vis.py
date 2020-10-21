@@ -48,7 +48,6 @@ def get_I(source, nu=151e6):
 
         return this_cop * nu ** source.alpha
 
-#! the default arguments for 'nu' are inconsistent across functions...
 def visibility(ant1, ant2, source, nu=151e6, time=None):
     """
     Visibility integrand evaluated for a single source.

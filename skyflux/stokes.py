@@ -115,6 +115,24 @@ def create_J(ra=None, dec=None, az=None, alt=None,
         
     return format_J(spline_beam_func(nu, alt, az))
 
+def create_J_space(nside, nu=151e6):
+    """
+    Create a deck of J matrices to describe the whole sky
+    @nside : integer, power of 2
+        greater nside yields a more finely-grained deck
+    @nu : Hz
+        frequency of beam for which we are generating a whole-sky deck
+    Use create_A_space if a Mueller sky is desired as the output.
+    """
+    theta, phi = hp.pix2ang(nside, np.arange(12 * nside * nside))
+    az = phi
+    alt = phi / 2 - theta
+    J_raw = spline_beam_func(nu, alt, az)
+    return format_J(J_raw)
+
+create_A_space = lambda nside, nu=151e6: \
+    np.array([create_A(J=Ji) for Ji in create_J_space(nside, nu)])
+
 def create_A(ra=None, dec=None, az=None, alt=None, J=None,
              lat=None, lst=None, nu=151e6, radians=False):
     """
