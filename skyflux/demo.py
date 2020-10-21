@@ -44,6 +44,7 @@ def is_constrained(value, min_acceptable=None, max_acceptable=None):
 
 ### todo: we want a command that will force all of the scales to run from the same values
 
+# Appearances: jones_matrices/A_Catalog.ipynb
 def project_J(J, data_transform=np.abs, rep=hp.orthview):
     """
     Generate a 2x2 plot of the four Jones components,
@@ -68,6 +69,7 @@ def project_J(J, data_transform=np.abs, rep=hp.orthview):
     put_subplot(0, 1, 3, 'xy')
     put_subplot(1, 1, 4, 'yy')
 
+# Appearances: jones_matrices/A_Catalog.ipynb
 def project_A(A, data_transform=np.abs, rep=hp.orthview):
     """
     Generate a 4x4 plot of the sixteen Mueller components,
