@@ -26,6 +26,8 @@ label_start = len(data_dir + file_prefix)
 
 pattern_list = []
 
+print("\nAll header variables processed. Walking file directory...")
+
 for file in glob.glob(data_dir + "/*"):
     label_end = len(file) - len(file_suffix)
     label = file[label_start:label_end]
@@ -34,16 +36,21 @@ for file in glob.glob(data_dir + "/*"):
 
     pattern_list.append(file)
 
+print("\nWalk complete. Generating CST data processor...")
+
 processor = cst_processing.CSTDataProcessor(
     pattern_list,
     np.array(frqs),
     1, 1e-4 #! magic...
 )
 
+print("\nCST data processor generated. Computing spin harmonics...")
+
 processor.compute_spin1_harmonics()
 
 # os.path.join sucks, but CST processor uses it. Here's a hack:
 processor.write_model_data("", package_dir + output_model_name)
 
-print("Successfully output ant.h5 file. Found the following frequencies (MHz):")
+print("\nSuccessfully wrote spin harmonics to disk." + \
+      "\nFound the following frequencies (MHz):")
 print(frqs)

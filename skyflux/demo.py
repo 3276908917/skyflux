@@ -72,7 +72,8 @@ def project_J(J, data_transform=np.abs, rep=hp.orthview):
     put_subplot(1, 1, 4, 'yy')
 
 # Appearances: jones_matrices/A_Catalog.ipynb
-def project_A(A, data_transform=np.abs, rep=hp.orthview):
+# todo: widest scale / custom scale
+def project_A(A, data_transform=np.abs, rep=hp.orthview, widest_scale=False):
     """
     Generate a 4x4 plot of the sixteen Mueller components,
     assuming that A has conventional formatting
@@ -93,6 +94,10 @@ def project_A(A, data_transform=np.abs, rep=hp.orthview):
         else:
             rep(data_transform(A[:, i, j]), rot=[0, 90],
                 sub=[5, 4, panel], title=ttl)
+
+    limits = None
+    if widest_scale:
+        limits = (np.min(A), np.max(A))
 
     put_subplot(0, 0, 1, 'I\' <- I')
     put_subplot(0, 1, 2, 'I\' <- Q')
