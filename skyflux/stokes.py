@@ -7,7 +7,7 @@ from skyflux import rot
 
 #! This is hard-coded. The value is updated each time we run
 #! generate_model.py. Needs fixing.
-beam_frqs = np.append(np.arange(50e6, 100e6, 1e6), np.array(151e6))
+beam_frqs = np.append(np.arange(50e6, 250e6, 1e6), np.array(151e6))
 
 # It is imperative that the name here line up with that used in
 # generate_model.py (a file NOT included in the installation, but
@@ -69,7 +69,7 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     
     if type(nu) == np.ndarray:
         for frequency in nu:
-            if frequency not in beam_frqs:
+            if frequencbeamqs:
                 raise NotImplementedError("No routine for interpolating between beam frequencies.")
     elif nu not in beam_frqs:
         raise NotImplementedError("No routine for interpolating between beam frequencies.")
@@ -125,9 +125,9 @@ def create_J_sky(nside, nu=151e6):
         frequency of beam for which we are generating a whole-sky deck
     Use create_A_space if a Mueller sky is desired as the output.
     """
-    theta, phi = hp.pix2ang(nside, np.arange(12 * nside ** 2))
+    theta, phi = hp.pix2ang(nside, np.arange(12 * nside * nside))
     az = phi
-    alt = np.pi / 2 - theta
+    alt = phi / 2 - theta
     J_raw = spline_beam_func(nu, alt, az)
     return format_J(J_raw)
 
