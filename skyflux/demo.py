@@ -55,6 +55,16 @@ def project_J(J, data_transform=np.abs, rep=hp.orthview):
     @rep : one of the healpy projection functions, such as
         orthview, cartview, and mollview
     """
+    scale_max = max_
+    scale_min = min_
+
+    if widest_scale:
+        if max_ is not None or min_ is not None:
+            raise TypeError("Cannot have automatic and manual " + \
+                            "axes simultaneously.")
+        scale_max = np.max(J)
+        scale_min = np.min(J)
+    
     def put_subplot(i, j, panel, ttl=None):
         if ttl is None:
             ttl = str(i) + ', ' + str(j)
@@ -72,8 +82,8 @@ def project_J(J, data_transform=np.abs, rep=hp.orthview):
     put_subplot(1, 1, 4, 'yy')
 
 # Appearances: jones_matrices/A_Catalog.ipynb
-# todo: widest scale / custom scale
-def project_A(A, data_transform=np.abs, rep=hp.orthview, widest_scale=False):
+def project_A(A, data_transform=np.abs, rep=hp.orthview,
+              widest_scale=False, max_=None, min_=None):
     """
     Generate a 4x4 plot of the sixteen Mueller components,
     assuming that A has conventional formatting
@@ -85,19 +95,31 @@ def project_A(A, data_transform=np.abs, rep=hp.orthview, widest_scale=False):
     @rep : one of the healpy projection functions, such as
         orthview, cartview, and mollview
     """
+    scale_max = max_
+    scale_min = min_
+
+    # Actually, I think it is legal to specify a min without a max
+    #if scale_max is None and scale_min is not None or \
+    #   scale_max is not None and scale_min is None:
+    #    raise TypeError("")
+
+    if widest_scale:
+        if max_ is not None or min_ is not None:
+            raise TypeError("Cannot have automatic and manual " + \
+                            "axes simultaneously.")
+        scale_max = np.max(A)
+        scale_min = np.min(A)
+    
     def put_subplot(i, j, panel, ttl=None):
         if ttl is None:
             ttl = str(i) + ', ' + str(j)
         if rep is hp.orthview:
             rep(data_transform(A[:, i, j]), rot=[0, 90],
-                half_sky=True, sub=[5, 4, panel], title=ttl)
+                half_sky=True, sub=[5, 4, panel], title=ttl,
+                max=scale_max, min=scale_min)
         else:
             rep(data_transform(A[:, i, j]), rot=[0, 90],
                 sub=[5, 4, panel], title=ttl)
-
-    limits = None
-    if widest_scale:
-        limits = (np.min(A), np.max(A))
 
     put_subplot(0, 0, 1, 'I\' <- I')
     put_subplot(0, 1, 2, 'I\' <- Q')
