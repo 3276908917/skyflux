@@ -59,6 +59,15 @@ single_nu, single_t, v_tensor = sf.demo.vis_tensor(23, 37, np.array([src]))
 # a 4x1 complex vector of I, Q, U, and V
 plt.plot(single_nu, v_tensor[:, 0, 0])
 plt.plot(single_t, v_tensor[0, :, 0])
+
+# begin actual experiment
+nu14, lst14, vt14 = vis_tensor(23, 37)
+nu30, lst30, vt30 = vis_tensor(37, 68)
+
+np.savez_compressed('14m_baseline',
+    frequency_axis=nu14, lst_axis=lst14, visibility_tensor=vt14)
+np.savez_compressed('30m_baseline',
+    frequency_axis=nu30, lst_axis=lst30, visibility_tensor=vt30)
 """
 def vis_tensor(ant1, ant2, sources=None):
     """
