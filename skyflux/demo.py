@@ -72,10 +72,12 @@ def project_J(J, data_transform=np.abs, rep=hp.orthview,
         # hard-coding is always bad
         if rep is hp.cartview:
             rep(data_transform(J[:, i, j]),
-                half_sky=True, sub=[3, 2, panel], title=ttl)
+                half_sky=True, sub=[3, 2, panel], title=ttl,
+                max=scale_max, min=scale_min)
         else:
             rep(data_transform(J[:, i, j]), rot=[0, 90],
-                half_sky=True, sub=[3, 2, panel], title=ttl)
+                half_sky=True, sub=[3, 2, panel], title=ttl,
+                max=scale_max, min=scale_min)
 
     put_subplot(0, 0, 1, 'xx')
     put_subplot(1, 0, 2, 'yx')
@@ -120,7 +122,8 @@ def project_A(A, data_transform=np.abs, rep=hp.orthview,
                 max=scale_max, min=scale_min)
         else:
             rep(data_transform(A[:, i, j]), rot=[0, 90],
-                sub=[5, 4, panel], title=ttl)
+                sub=[5, 4, panel], title=ttl,
+                max=scale_max, min=scale_min)
 
     put_subplot(0, 0, 1, 'I\' <- I')
     put_subplot(0, 1, 2, 'I\' <- Q')

@@ -69,7 +69,7 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     
     if type(nu) == np.ndarray:
         for frequency in nu:
-            if frequencbeamqs:
+            if frequency not in beam_frqs:
                 raise NotImplementedError("No routine for interpolating between beam frequencies.")
     elif nu not in beam_frqs:
         raise NotImplementedError("No routine for interpolating between beam frequencies.")
@@ -125,9 +125,9 @@ def create_J_sky(nside, nu=151e6):
         frequency of beam for which we are generating a whole-sky deck
     Use create_A_space if a Mueller sky is desired as the output.
     """
-    theta, phi = hp.pix2ang(nside, np.arange(12 * nside * nside))
+    theta, phi = hp.pix2ang(nside, np.arange(12 * nside ** 2))
     az = phi
-    alt = phi / 2 - theta
+    alt = np.pi / 2 - theta
     J_raw = spline_beam_func(nu, alt, az)
     return format_J(J_raw)
 
