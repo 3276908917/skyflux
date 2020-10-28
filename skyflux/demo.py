@@ -12,6 +12,10 @@ import healpy as hp
 from skyflux import catalog
 from skyflux import ant
 
+# disgustingly hacky
+
+MACRO_EPSILON = 0.001
+
 # general helpers and utilities
 
 def frame():
@@ -44,15 +48,38 @@ def is_constrained(value, min_acceptable=None, max_acceptable=None):
 
 # Visibility section
 
-def write_full(ant1, ant2):
-    sources = catalog.obj_catalog.copy()
+def vis_tensor(ant1, ant2, sources=None):
+    """
+    Returns a giant block of visibility sums.
+    The first return value is the x-axis, also known as the first index.
+        It describes the frequency used for that row.
+    The second return value is the y-axis, also known as the second index.
+        It describes the time used for that column.
+    The third return value is the z-axis, also known as the data block.
+        It describes the summed visibilities of all ~3000 catalog objects
+        for a given time and frequency.
+    """
+    # if one LST day is 2 pi radians,
+    # ten minutes = 2 pi / 24 hours / 6 = pi / 72
+    
+    t_axis = np.arange(0, 2 * np.pi + MACRO_EPSILON, np.pi / 72)
+    nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
+
+    vis_axis = []
+
+    if sources is None:
+        sources = catalog.obj_catalog.copy()
+
     list_visibilities=[]
-    lst = 0
-    while lst <= end:
-        next_vista = np.array([0j, 0j, 0j, 0j])
-    x_axis = []
-    y_axis = []
-    z_axis = []
+
+    for nu in nu_axis:
+        vis_axis.append([])
+        for t in t_axis:
+            next_vista = np.array([0j, 0j, 0j, 0j])
+            for source in sources:
+                next_vista += visibility(ant1, ant2, source, nu=nu, time=t)
+
+            vis_axis[len(vis_axis) - 1].append(next_vista)
 
 
 ### todo: we want a command that will force all of the scales to run from the same values
