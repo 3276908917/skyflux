@@ -44,6 +44,17 @@ def is_constrained(value, min_acceptable=None, max_acceptable=None):
 
 # Visibility section
 
+def write_full(ant1, ant2):
+    sources = catalog.obj_catalog.copy()
+    list_visibilities=[]
+    lst = 0
+    while lst <= end:
+        next_vista = np.array([0j, 0j, 0j, 0j])
+    x_axis = []
+    y_axis = []
+    z_axis = []
+
+
 ### todo: we want a command that will force all of the scales to run from the same values
 
 # Appearances: jones_matrices/A_Catalog.ipynb
