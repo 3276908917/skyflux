@@ -11,6 +11,7 @@ import healpy as hp
 
 from skyflux import catalog
 from skyflux import ant
+from skyflux import vis
 
 # disgustingly hacky
 
@@ -69,6 +70,24 @@ def vis_tensor(ant1, ant2, sources=None):
     The third return value is the z-axis, also known as the data block.
         It describes the summed visibilities of all ~3000 catalog objects
         for a given time and frequency.
+
+    nu_axis = np.arange(77e6, 226e6 + MACRO_EPSILON, 1e6)
+    t_axis = np.arange(0, 2 * np.pi, np.pi / 72)
+    v_tensor = []
+
+    if sources is None:
+        sources = catalog.obj_catalog.copy()
+
+    for nu in nu_axis:
+        v_tensor.append([])
+        for t in t_axis:
+            next_vista = np.array([0j, 0j, 0j, 0j])
+            for source in sources:
+                next_vista += vis.visibility(ant1, ant2, source, nu=nu, time=t)
+
+            v_tensor[len(v_tensor) - 1].append(next_vista)
+
+    return nu_axis, t_axis, np.array(v_tensor)
     """
     # if one LST day is 2 pi radians,
     # ten minutes = 2 pi / 24 hours / 6 = pi / 72
