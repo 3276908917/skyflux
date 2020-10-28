@@ -76,7 +76,7 @@ def vis_tensor(ant1, ant2, sources=None):
     # 14 and 30m baselines
 
     nu_axis = np.arange(77e6, 226e6 + MACRO_EPSILON, 1e6)
-    t_axis = np.arange(0, 2 * np.pi + MACRO_EPSILON, np.pi / 72)
+    t_axis = np.arange(0, 2 * np.pi, np.pi / 72)
     v_tensor = []
 
     if sources is None:
@@ -91,7 +91,7 @@ def vis_tensor(ant1, ant2, sources=None):
 
             v_tensor[len(v_tensor) - 1].append(next_vista)
 
-    return nu_axis, t_axis, v_tensor
+    return nu_axis, t_axis, np.array(v_tensor)
 
 ### todo: we want a command that will force all of the scales to run from the same values
 
