@@ -2,6 +2,8 @@
 Utilities for evaluating the visibility sky integral.
 """
 
+import warnings as w
+
 import numpy as np
 
 from skyflux import rot
@@ -27,7 +29,7 @@ def get_I(source, nu=151e6):
         #raise NotImplementedError("That frequency would have to be extrapolated.")
 
     if index_nu < ef[0] or index_nu > ef[len(ef)-1]:
-        raise UserWarning("Using an extrapolated frequency: " + str(nu))
+        w.warn("Using an extrapolated frequency: " + str(nu))
 
     # we use the power law spectral index formulation here
         # conceptually, I may have made an error.

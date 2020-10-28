@@ -72,14 +72,12 @@ def vis_tensor(ant1, ant2, sources=None):
     if sources is None:
         sources = catalog.obj_catalog.copy()
 
-    list_visibilities=[]
-
     for nu in nu_axis:
         vis_axis.append([])
         for t in t_axis:
             next_vista = np.array([0j, 0j, 0j, 0j])
             for source in sources:
-                next_vista += visibility(ant1, ant2, source, nu=nu, time=t)
+                next_vista += vis.visibility(ant1, ant2, source, nu=nu, time=t)
 
             vis_axis[len(vis_axis) - 1].append(next_vista)
 
