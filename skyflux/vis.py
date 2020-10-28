@@ -24,12 +24,12 @@ def get_I(source, nu=151e6):
     #if index_nu in ef: # we have an observed value for this frequency
     #    return source.flux_by_frq[index_nu]
 
-    #elif index_nu < ef[0] or index_nu > ef[len(ef)-1]:
-        # "beware the danger of extrapolation" --Aaron Simon
-        #raise NotImplementedError("That frequency would have to be extrapolated.")
-
     if index_nu < ef[0] or index_nu > ef[len(ef)-1]:
-        w.warn("Using an extrapolated frequency: " + str(nu))
+        #"beware the danger of extrapolation" --Aaron Simon
+        raise NotImplementedError("That frequency would have to be extrapolated.")
+
+    #if index_nu < ef[0] or index_nu > ef[len(ef)-1]:
+    #    w.warn("Using an extrapolated frequency: " + str(nu))
 
     # we use the power law spectral index formulation here
         # conceptually, I may have made an error.

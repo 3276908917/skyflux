@@ -52,13 +52,12 @@ def is_constrained(value, min_acceptable=None, max_acceptable=None):
 Some ideas for testing the output of vis_tensor
 
 src = sf.catalog.obj_catalog[0]
-single_nu, single_t, v_tensor = vis_tensor(23, 37, src)
+single_nu, single_t, v_tensor = sf.demo.vis_tensor(23, 37, np.array([src]))
 
 # remember that each element of the visibility tensor is
 # a 4x1 complex vector of I, Q, U, and V
 plt.plot(single_nu, v_tensor[:, 0, 0])
 plt.plot(single_t, v_tensor[0, :, 0])
-
 """
 def vis_tensor(ant1, ant2, sources=None):
     """
@@ -76,7 +75,7 @@ def vis_tensor(ant1, ant2, sources=None):
 
     # 14 and 30m baselines
 
-    nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
+    nu_axis = np.arange(77e6, 226e6 + MACRO_EPSILON, 1e6)
     t_axis = np.arange(0, 2 * np.pi + MACRO_EPSILON, np.pi / 72)
     v_tensor = []
 
@@ -84,7 +83,7 @@ def vis_tensor(ant1, ant2, sources=None):
         sources = catalog.obj_catalog.copy()
 
     for nu in nu_axis:
-        vis_axis.append([])
+        v_tensor.append([])
         for t in t_axis:
             next_vista = np.array([0j, 0j, 0j, 0j])
             for source in sources:
