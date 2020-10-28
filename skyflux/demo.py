@@ -61,6 +61,8 @@ def vis_tensor(ant1, ant2, sources=None):
     """
     # if one LST day is 2 pi radians,
     # ten minutes = 2 pi / 24 hours / 6 = pi / 72
+
+    # 14 and 30m baselines
     
     t_axis = np.arange(0, 2 * np.pi + MACRO_EPSILON, np.pi / 72)
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
@@ -328,3 +330,27 @@ def all_baselines():
             ID2 = active_ants[j]
             print("Baseline between antennae " + str(ID1) + \
                   " and " + str(ID2) + " = " + str(ant.baseline(ID1, ID2)))
+
+def find_baseline(objective):
+    """
+    Returns the baseline
+        (antenna 1 ID #, antenna 2 ID #)
+    that is closest in length to
+    objective out of all possible antenna pairs.
+    """
+    best_err = float('inf')
+    best_ants = None
+    
+    for i in range(len(active_ants)):
+        ID1 = active_ants[i]
+        for j in range(i + 1, len(active_ants[i + 1:])):
+            ID2 = active_ants[j]
+            b = ant.baseline(ID1, ID2)
+            sq_err = (objective - np.linalg.norm(b)) ** 2
+
+            if sq_err < best_err:
+                best_err = sq_err
+                best_ants = (ID1, ID2)
+
+    print("Best squared error:", best_err)
+    return best_ants
