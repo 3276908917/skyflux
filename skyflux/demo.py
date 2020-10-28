@@ -90,6 +90,11 @@ def vis_tensor(ant1, ant2, sources=None):
         for a given time and frequency.
 
     def vis_tensor(ant1, ant2, sources=None):
+
+        import time as t
+        print("Unix time upon function call:", str(t.time())
+
+        percent_interval = 100 / 144 / 150
     
         nu_axis = np.arange(77e6, 226e6 + sf.demo.MACRO_EPSILON, 1e6)
         t_axis = np.arange(0, 2 * np.pi, np.pi / 72)
@@ -98,6 +103,7 @@ def vis_tensor(ant1, ant2, sources=None):
         if sources is None:
             sources = sf.catalog.obj_catalog.copy()
 
+        percent = 0
         for nu in nu_axis:
             v_tensor.append([])
             for t in t_axis:
@@ -106,15 +112,19 @@ def vis_tensor(ant1, ant2, sources=None):
                     next_vista += sf.vis.visibility(
                     ant1, ant2, source, nu=nu, time=t)
 
+                percent += percent_interval
                 v_tensor[len(v_tensor) - 1].append(next_vista)
+
+                percent_status = str(np.around(percent, 4))
+                print("Visibility tensor: " + percent_status + "% complete.")
 
         return nu_axis, t_axis, np.array(v_tensor)
     """
-    # if one LST day is 2 pi radians,
-    # ten minutes = 2 pi / 24 hours / 6 = pi / 72
+    import time as t
+    print("Unix time upon function call:", str(t.time())
 
-    # 14 and 30m baselines
-
+    percent_interval = 100 / 144 / 150
+    
     nu_axis = np.arange(77e6, 226e6 + MACRO_EPSILON, 1e6)
     t_axis = np.arange(0, 2 * np.pi, np.pi / 72)
     v_tensor = []
@@ -122,6 +132,7 @@ def vis_tensor(ant1, ant2, sources=None):
     if sources is None:
         sources = catalog.obj_catalog.copy()
 
+    percent = 0
     for nu in nu_axis:
         v_tensor.append([])
         for t in t_axis:
@@ -129,7 +140,11 @@ def vis_tensor(ant1, ant2, sources=None):
             for source in sources:
                 next_vista += vis.visibility(ant1, ant2, source, nu=nu, time=t)
 
+            percent += percent_interval
             v_tensor[len(v_tensor) - 1].append(next_vista)
+
+            percent_status = str(np.around(percent, 4))
+            print("Visibility tensor: " + percent_status + "% complete.")
 
     return nu_axis, t_axis, np.array(v_tensor)
 
