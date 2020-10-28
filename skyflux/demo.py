@@ -48,6 +48,18 @@ def is_constrained(value, min_acceptable=None, max_acceptable=None):
 
 # Visibility section
 
+"""
+Some ideas for testing the output of vis_tensor
+
+src = sf.catalog.obj_catalog[0]
+single_nu, single_t, v_tensor = vis_tensor(23, 37, src)
+
+# remember that each element of the visibility tensor is
+# a 4x1 complex vector of I, Q, U, and V
+plt.plot(single_nu, v_tensor[:, 0, 0])
+plt.plot(single_t, v_tensor[0, :, 0])
+
+"""
 def vis_tensor(ant1, ant2, sources=None):
     """
     Returns a giant block of visibility sums.
@@ -63,11 +75,10 @@ def vis_tensor(ant1, ant2, sources=None):
     # ten minutes = 2 pi / 24 hours / 6 = pi / 72
 
     # 14 and 30m baselines
-    
-    t_axis = np.arange(0, 2 * np.pi + MACRO_EPSILON, np.pi / 72)
-    nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
 
-    vis_axis = []
+    nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
+    t_axis = np.arange(0, 2 * np.pi + MACRO_EPSILON, np.pi / 72)
+    v_tensor = []
 
     if sources is None:
         sources = catalog.obj_catalog.copy()
@@ -79,8 +90,9 @@ def vis_tensor(ant1, ant2, sources=None):
             for source in sources:
                 next_vista += vis.visibility(ant1, ant2, source, nu=nu, time=t)
 
-            vis_axis[len(vis_axis) - 1].append(next_vista)
+            v_tensor[len(v_tensor) - 1].append(next_vista)
 
+    return nu_axis, t_axis, v_tensor
 
 ### todo: we want a command that will force all of the scales to run from the same values
 
