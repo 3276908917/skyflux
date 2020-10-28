@@ -64,10 +64,19 @@ plt.plot(single_t, v_tensor[0, :, 0])
 nu14, lst14, vt14 = vis_tensor(23, 37)
 nu30, lst30, vt30 = vis_tensor(37, 68)
 
+ss = sf.catalog.obj_catalog[3871]
+nu14_s, lst14_s, vt14_s = vis_tensor(23, 37, ss)
+nu30_s, lst30_s, vt30_s = vis_tensor(37, 68, ss)
+
 np.savez_compressed('14m_baseline',
     frequency_axis=nu14, lst_axis=lst14, visibility_tensor=vt14)
 np.savez_compressed('30m_baseline',
     frequency_axis=nu30, lst_axis=lst30, visibility_tensor=vt30)
+
+np.savez_compressed('14m_single_source',
+    frequency_axis=nu14_s, lst_axis=lst14_s, visibility_tensor=vt14_s)
+np.savez_compressed('30m_single_source',
+    frequency_axis=nu30_s, lst_axis=lst30_s, visibility_tensor=vt30_s)
 """
 def vis_tensor(ant1, ant2, sources=None):
     """
@@ -80,23 +89,26 @@ def vis_tensor(ant1, ant2, sources=None):
         It describes the summed visibilities of all ~3000 catalog objects
         for a given time and frequency.
 
-    nu_axis = np.arange(77e6, 226e6 + MACRO_EPSILON, 1e6)
-    t_axis = np.arange(0, 2 * np.pi, np.pi / 72)
-    v_tensor = []
+    def vis_tensor(ant1, ant2, sources=None):
+    
+        nu_axis = np.arange(77e6, 226e6 + sf.demo.MACRO_EPSILON, 1e6)
+        t_axis = np.arange(0, 2 * np.pi, np.pi / 72)
+        v_tensor = []
 
-    if sources is None:
-        sources = catalog.obj_catalog.copy()
+        if sources is None:
+            sources = sf.catalog.obj_catalog.copy()
 
-    for nu in nu_axis:
-        v_tensor.append([])
-        for t in t_axis:
-            next_vista = np.array([0j, 0j, 0j, 0j])
-            for source in sources:
-                next_vista += vis.visibility(ant1, ant2, source, nu=nu, time=t)
+        for nu in nu_axis:
+            v_tensor.append([])
+            for t in t_axis:
+                next_vista = np.array([0j, 0j, 0j, 0j])
+                for source in sources:
+                    next_vista += sf.vis.visibility(
+                    ant1, ant2, source, nu=nu, time=t)
 
-            v_tensor[len(v_tensor) - 1].append(next_vista)
+                v_tensor[len(v_tensor) - 1].append(next_vista)
 
-    return nu_axis, t_axis, np.array(v_tensor)
+        return nu_axis, t_axis, np.array(v_tensor)
     """
     # if one LST day is 2 pi radians,
     # ten minutes = 2 pi / 24 hours / 6 = pi / 72
