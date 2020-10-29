@@ -92,7 +92,7 @@ def vis_tensor(ant1, ant2, sources=None):
     def vis_tensor(ant1, ant2, sources=None):
 
         import time as t
-        print("Unix time upon function call:", str(t.time())
+        print("Unix time upon function call:", str(t.time()))
 
         percent_interval = 100 / 144 / 150
     
@@ -121,7 +121,7 @@ def vis_tensor(ant1, ant2, sources=None):
         return nu_axis, t_axis, np.array(v_tensor)
     """
     import time as t
-    print("Unix time upon function call:", str(t.time())
+    print("Unix time upon function call:", str(t.time()))
 
     percent_interval = 100 / 144 / 150
     
