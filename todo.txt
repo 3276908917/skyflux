@@ -59,13 +59,7 @@ https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.html
 2. verify that ALL of the functions in rot return (az, alt) and not (alt, az)
 	this is for consistency sake, and who might mischance upon my code in the future
 3. investigate the J matrix zero debacle? It is not an issue anymore,
-	but I wonder why it happens
-4. update every notebook in the repository
-	* import skyflux as sf, etc etc
-5. absorb more notebooks into the skyflux.demo module
-	Furthermore, split the skyflux.demo module into several child modules,
-	each of which is intended to illustrate and elaborate upon the functionality
-	of one of the non-demo scripts.
+	but I wonder why it happens 
 
 I need to plot the A matrix, to see the leakage terms.
 Plot it in healpix. It doesn't have to look like in Ridhima's

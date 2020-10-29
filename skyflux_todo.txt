@@ -7,3 +7,12 @@
 	returned altitude and azimuth.
 
 3. add a __repr__ function for the GLEAM object.
+
+4. update every notebook in the repository
+	* import skyflux as sf, etc etc
+	* delete all de-bugging cells, condense comments
+
+5. absorb more notebooks into the skyflux.demo module
+	Furthermore, split the skyflux.demo module into several child modules,
+	each of which is intended to illustrate and elaborate upon the functionality
+	of one of the non-demo scripts.
