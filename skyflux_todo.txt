@@ -1,0 +1,9 @@
+# Package/code maintenance, rather than theory / specific simulation tasks
+
+
+1. Test gal_to_topo to make sure it still works
+
+2. Test ha_to_topo to verify the docstring has the correct ordering of
+	returned altitude and azimuth.
+
+3. add a __repr__ function for the GLEAM object.
