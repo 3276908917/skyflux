@@ -1,39 +1,12 @@
-I:
-	vary power law formula to get frequency
-	baseline will change in terms of frequency
-	A will change in terms of frequency
-		For A, we need the different frequency beam files
+1. Want to find the equation which rotates the J and/or matrices according to time
 
-For bragging about brilliance:
-	ON YOUR OWN, you want to find the equation which rotates the J and/or matrices according to time
-	ON YOUR OWN, you want to find the equation which predicts the HERA beam patterns,
-		i.e. find an equation which makes-obsolete the many files of the form
-			HERA_4.9m_E-pattern_151MHz.txt
-	
-FOR NOW, use simple linear interpolation between the results for a frequency between the
-	predecessor and successor frequency nodes (CST text files).
+2. Want to find the equation which predicts the HERA beam patterns,
+i.e. find an equation which makes-obsolete the many files of the form
+	HERA_4.9m_E-pattern_151MHz.txt
 
+3. Test gal_to_topo to make sure it still works
 
-
-
-$1. finish rotations docstrings
-
-$2. finish parser docstrings and rename the file
-
-$3. repair the flux package so that we return to the level of functionality
-	which we had before we started along the J_script branch
-
-$4. update at least three notebooks so that they correctly interact with this
-	newer edition of the package.
-	4a. the histogram notebook
-	4b. ?
-	4c. ?
-
-5. Actually work on 2 things that Ridhima suggested in one of the previous calls.
-
-6. Test gal_to_topo to make sure it still works
-Test ha_to_topo to verify the docstring has the correct ordering of
+4. Test ha_to_topo to verify the docstring has the correct ordering of
 	returned altitude and azimuth.
-$Test eq_to_topo similarly
 
-7. add a __repr__ function for the GLEAM object.
+5. add a __repr__ function for the GLEAM object.
