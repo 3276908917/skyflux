@@ -5,9 +5,12 @@ from RIMEz import beam_models
 
 from skyflux import rot
 
+# disgusting hack
+MACRO_EPSILON = 0.001
+
 #! This is hard-coded. The value is updated each time we run
 #! generate_model.py. Needs fixing.
-beam_frqs = np.append(np.arange(50e6, 250e6, 1e6), np.array(151e6))
+beam_frqs = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
 
 # It is imperative that the name here line up with that used in
 # generate_model.py (a file NOT included in the installation, but
