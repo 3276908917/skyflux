@@ -18,6 +18,8 @@ from skyflux import vis
 # disgustingly hacky
 
 MACRO_EPSILON = 0.001
+S = sf.stokes.S
+Si = sf.stokes.Si
 
 from skyflux import stokes
 from skyflux import rot
@@ -29,6 +31,8 @@ def A_tensor(nu_axis, t_axis, sources):
     with source index s, time index t, and frequency index f, we say
         this_A = A_tensor[f][s][t]
     """
+    import time as t
+    print("Unix time upon function call:", str(t.time()))
     percent_interval = 100 / len(nu_axis) / len(sources)
     
     A_tensor = []
@@ -46,12 +50,19 @@ def A_tensor(nu_axis, t_axis, sources):
                 alts.append(alt)
                 azs.append(az)
             J_source = stokes.create_J(az=azs, alt=alts, nu=nu, radians=True)
-            A_source = np.array([stokes.create_A(J=J) for J in J_source])
 
-            A_tensor[len(A_tensor) - 1].append(A_source)
+            J_source_conj = np.conj(J_source)
+            A_source = []
+            # bypass the if statement
+            for i in range(len(J_source)):
+                J_outer = np.kron(J_source[i], J_source_conj[i])
+                A_source.append(np.dot(si, np.dot(J_outer, S)))
+
+            A_tensor[len(A_tensor) - 1].append(np.array(A_source))
             percent += percent_interval
-            print("A_tensor " + str(percent_interval) + "% built.")
-    return A_tensor
+            percent_status = str(np.around(percent, 4))
+            print("A_tensor " + percent_status + "% built.")
+    return np.array(A_tensor)
 
 """
 To-do:

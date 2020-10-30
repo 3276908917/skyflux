@@ -49,6 +49,7 @@ S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, 1j],
                   [0, 0, 1, -1j],
                   [1, -1, 0, 0]])
+Si = np.linalg.inv(S)
 
 def create_J(ra=None, dec=None, az=None, alt=None,
              lat=None, lst=None, nu=151e6, radians=False):
@@ -169,4 +170,4 @@ def create_A(ra=None, dec=None, az=None, alt=None, J=None,
     # in which case, we should individually calculate the A matrix for each one, and return that.
     
     J_outer = np.kron(J, np.conj(J))
-    return np.dot(np.linalg.inv(S), np.dot(J_outer, S))
+    return np.dot(Si, np.dot(J_outer, S))
