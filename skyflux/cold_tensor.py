@@ -18,11 +18,13 @@ from skyflux import vis
 # disgustingly hacky
 
 MACRO_EPSILON = 0.001
-S = sf.stokes.S
-Si = sf.stokes.Si
 
 from skyflux import stokes
 from skyflux import rot
+
+S = stokes.S
+#! Change this once we update to the latest edition of skyflux
+Si = np.linalg.inv(S)
 
 def A_tensor(nu_axis, t_axis, sources):
     """
@@ -56,7 +58,7 @@ def A_tensor(nu_axis, t_axis, sources):
             # bypass the if statement
             for i in range(len(J_source)):
                 J_outer = np.kron(J_source[i], J_source_conj[i])
-                A_source.append(np.dot(si, np.dot(J_outer, S)))
+                A_source.append(np.dot(Si, np.dot(J_outer, S)))
 
             A_tensor[len(A_tensor) - 1].append(np.array(A_source))
             percent += percent_interval

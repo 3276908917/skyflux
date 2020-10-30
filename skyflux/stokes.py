@@ -26,6 +26,11 @@ spline_beam_func = beam_models.model_data_to_spline_beam_func(
     # which we want to re-evaluate in the future.
     beam_frqs
 )
+#! Is there any way that I can store this object so that I do not
+# have to call this extremely expensive function every time I import the
+# package?
+
+#!!! Maybe we can pickle the object!
 
 def format_J(J_RIMEz):
     """

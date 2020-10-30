@@ -16,6 +16,11 @@ expected_frequencies = [76, 84, 92, 99, 107, 115, 122, 130,
                     143, 151, 158, 166, 174, 181, 189,
                     197, 204, 212, 220, 227]
 
+#! It is technically completely wasteful to regenerate this catalog
+# every time that we import skyflux.
+# Unfortunately, such an improvement would not be very meaningful at this
+# stage of development, because the import time is by far dominated by the
+# spline_beam_func generation
 class GLEAM_entry:
     def __init__(self, line):
         """
