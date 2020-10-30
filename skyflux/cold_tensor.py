@@ -26,6 +26,18 @@ S = stokes.S
 #! Change this once we update to the latest edition of skyflux
 Si = np.linalg.inv(S)
 
+"""
+    Yeah, this is not working. It ices the computer's memory!
+    So, instead, I am guessing we do for each source:
+        make a 1-source A_tensor
+        make a 1-source cold tensor
+        (implicitly) garbage collect old 1-source A_tensor
+            by relabeling A_tensor to 1-source A_tensor of the next
+            source in the sequence
+        make a 1-source cold tensor with this new A_tensor,
+            then ADD the result to the existing cold tensor
+        (implicitly) garbage collect separate 1-source cold tensor
+"""
 def A_tensor(nu_axis, t_axis, sources):
     """
     Returned format: an |nu_axis| * |sources| * |t_axis| * 4 * 4 matrix
