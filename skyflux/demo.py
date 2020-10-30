@@ -272,9 +272,9 @@ def cleaned_list():
     ws_oc = catalog.obj_catalog.copy() # write-safe read copy for the GLEAM object catalog
     cat = catalog.obj_catalog.copy()
     # we loop in reverse, to avoid concurrent modification exceptions
-    for i in range(len(ws_oc), 0, -1):
+    for i in range(len(ws_oc) - 1, 0, -1):
         # classic. The easiest way to check if a value is NaN: it does not equal itself
-        if ws_oc[i].alpha != ws.oc[i].alpha:
+        if ws_oc[i].alpha != ws_oc[i].alpha:
             del cat[i]
     return cat
 
