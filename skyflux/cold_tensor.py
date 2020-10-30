@@ -19,6 +19,34 @@ from skyflux import vis
 
 MACRO_EPSILON = 0.001
 
+from skyflux import stokes
+from skyflux import rot
+
+def A_tensor(nu_axis, t_axis, sources):
+    """
+    Returned format: an |nu_axis| * |sources| * |t_axis| * 4 * 4 matrix
+    Contains every possible exact A matrix. When performing calculations
+    with source index s, time index t, and frequency index f, we say
+        this_A = A_tensor[f][s][t]
+    """
+    A_tensor = []
+    for nu in nu_axis:
+        A_tensor.append([])
+        for source in sources:
+            ra = np.radians(sources.ra_angle)
+            dec = np.radians(souces.dec_angle)
+            azs = []
+            alts = []
+            for lst in t_axis:
+                az, alt = eq_to_topo(ra, dec, lst=lst, radians=True)
+                alts.append(alt)
+                azs.append(az)
+            J_source = stokes.create_J(az=azs, alt=alts, nu=nu, radians=True)
+            A_source = np.array([stokes.create_A(J) for J in J_source])
+
+            A_tensor[len(A_tensor) - 1].append(A_source)
+    return A_tensor
+
 """
 To-do:
     1. Saving routine: let us say that it saves our work for every
@@ -59,11 +87,20 @@ def cold_tensor(ant1, ant2, sources=None):
     percent_interval = 100 / 961 / 251
     
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
-    t_axis = np.arange(0, 2 * np.pi, np.pi / 72)
+    t_axis = np.arange(0, 2 * np.pi / 3 + MACRO_EPSILON, np.pi / 1440)
     v_tensor = []
 
     if sources is None:
         sources = catalog.obj_catalog.copy()
+
+
+    ### We want to pre-generate all the A matrices
+
+    A_tensor = []
+
+    for nu in nu_axis
+
+    ###
 
     percent = 0
     for nu in nu_axis:
