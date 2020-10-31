@@ -22,10 +22,6 @@ MACRO_EPSILON = 0.001
 from skyflux import stokes
 from skyflux import rot
 
-S = stokes.S
-#! Change this once we update to the latest edition of skyflux
-Si = np.linalg.inv(S)
-
 """
     Yeah, this is not working. It ices the computer's memory!
     So, instead, I am guessing we do for each source:
@@ -38,7 +34,7 @@ Si = np.linalg.inv(S)
             then ADD the result to the existing cold tensor
         (implicitly) garbage collect separate 1-source cold tensor
 """
-def A_tensor(nu_axis, t_axis, sources):
+def A_tensor(nu_axis, t_axis, source):
     """
     Returned format: an |nu_axis| * |sources| * |t_axis| * 4 * 4 matrix
     Contains every possible exact A matrix. When performing calculations
@@ -47,35 +43,29 @@ def A_tensor(nu_axis, t_axis, sources):
     """
     import time as t
     print("Unix time upon function call:", str(t.time()))
-    percent_interval = 100 / len(nu_axis) / len(sources)
+    percent_interval = 100 / len(nu_axis)
     
     A_tensor = []
 
     percent = 0
+
+    ra = np.radians(source.ra_angle)
+    dec = np.radians(source.dec_angle)
+    azs = []
+    alts = []
+    for lst in t_axis:
+        az, alt = rot.eq_to_topo(ra, dec, lst=lst, radians=True)
+        alts.append(alt)
+        azs.append(az)
+
     for nu in nu_axis:
-        A_tensor.append([])
-        for source in sources:
-            ra = np.radians(source.ra_angle)
-            dec = np.radians(source.dec_angle)
-            azs = []
-            alts = []
-            for lst in t_axis:
-                az, alt = rot.eq_to_topo(ra, dec, lst=lst, radians=True)
-                alts.append(alt)
-                azs.append(az)
-            J_source = stokes.create_J(az=azs, alt=alts, nu=nu, radians=True)
+        J_source = stokes.create_J(az=azs, alt=alts, nu=nu, radians=True)
+        A_source = np.array([stokes.create_A(J=J) for J in J_source])
 
-            J_source_conj = np.conj(J_source)
-            A_source = []
-            # bypass the if statement
-            for i in range(len(J_source)):
-                J_outer = np.kron(J_source[i], J_source_conj[i])
-                A_source.append(np.dot(Si, np.dot(J_outer, S)))
-
-            A_tensor[len(A_tensor) - 1].append(np.array(A_source))
-            percent += percent_interval
-            percent_status = str(np.around(percent, 4))
-            print("A_tensor " + percent_status + "% built.")
+        A_tensor.append(np.array(A_source))
+        percent += percent_interval
+        percent_status = str(np.around(percent, 4))
+        print("A_tensor " + percent_status + "% built.")
     return np.array(A_tensor)
 
 """

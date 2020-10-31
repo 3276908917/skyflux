@@ -1,36 +1,13 @@
-import os
 import numpy as np
 import healpy as hp
-from RIMEz import beam_models
 
 from skyflux import rot
 
+from skyflux.compiled_beam_func import spline_beam_func
+from skyflux.compiled_beam_func import beam_frqs
+
 # disgusting hack
 MACRO_EPSILON = 0.001
-
-#! This is hard-coded. The value is updated each time we run
-#! generate_model.py. Needs fixing.
-beam_frqs = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
-
-# It is imperative that the name here line up with that used in
-# generate_model.py (a file NOT included in the installation, but
-# included in the Git repository!)
-beam_origin = os.path.dirname(os.path.abspath(__file__)) + \
-              "/HERA_spin1_harmonics.h5"
-
-# My understanding of the documentation is that
-# alt, az are both in radians
-spline_beam_func = beam_models.model_data_to_spline_beam_func(
-    beam_origin,
-    # Like in generate_model.py, we have some hard-coded frequencies
-    # which we want to re-evaluate in the future.
-    beam_frqs
-)
-#! Is there any way that I can store this object so that I do not
-# have to call this extremely expensive function every time I import the
-# package?
-
-#!!! Maybe we can pickle the object!
 
 def format_J(J_RIMEz):
     """
