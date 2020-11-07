@@ -18,6 +18,8 @@ from RIMEz import beam_models
 # disgusting hack
 MACRO_EPSILON = 0.001
 
+#! I guess, to stay on the safe side, we will want to pickle
+    # the beam_frequencies separately from the spline_beam_func. 
 beam_frqs = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
 
 # It is imperative that the name here line up with that used in
