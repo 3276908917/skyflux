@@ -88,12 +88,11 @@ To-do:
         one pair is 14m long and the other is 30m long.
 
         Answer: 84->85 East to West
-                85->86 East to West
+                84->86 East to West
             You should calculate the magnitudes of the distances involved.
 """
-def cold_tensor(ant1, ant2,
-                start_index=0, end_index=3871,
-                save_interval=4):
+def cold_tensor(label, ant1, ant2,
+                start_index=0, end_index=3871, save_interval=4):
     """
     Returns a giant block of visibility sums. Specifications:
         cold patch: 0 to 8 hours LST in 30 second increments
@@ -129,20 +128,19 @@ def cold_tensor(ant1, ant2,
         
         raI = np.radians(source.ra_angle)
         decI = np.radians(source.dec_angle)
-        AI = A_tensor(source, ra, dec)
+        AI = A_tensor(raI, decI)
 
         for ni in range(len(nu_axis)):
             nu = nu_axis[ni]
             next_vt.append([])
 
+            I = vis.get_I(source, nu)
+            s = np.array([complex(I), 0, 0, 0])
+
             A_n = AI[ni]
             
             for ti in range(len(t_axis)):
                 t = t_axis[ti]
-                
-                I = vis.get_I(source, nu)
-
-                s = np.array([complex(I), 0, 0, 0])
 
                 A = A_n[ti]
                 r = rot.radec2lm(raI, decI, ra0=t)
@@ -155,12 +153,20 @@ def cold_tensor(ant1, ant2,
         
         percent += percent_interval
         percent_status = str(np.around(percent, 4))
-        print("\nVisibility tensor: " + percent_status + \
-              "% complete (finished i=" + str(i) + ").\n")
+        print("Visibility tensor: " + percent_status + \
+              "% complete (finished i=" + str(i) + ").")
 
         unsaved_counter += 1
         if unsaved_counter > save_interval:
-            np.savez("backup_tensor", na=nu_axis, ta=t_axis, vt=v_tensor)
+            np.savez("backup_" + label, na=nu_axis, ta=t_axis, vt=v_tensor)
             unsaved_counter = 0
 
         i += 1
+
+"""
+Visualization:
+plt.imshow(np.abs(vt[:, :, 0].T), extent=[50, 250, 8 * 60, 0])
+plt.xlabel('Beam Frequency [MHz]')
+plt.ylabel('LST [minutes]')
+plt.show()
+"""
