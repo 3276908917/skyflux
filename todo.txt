@@ -1,11 +1,15 @@
+as of 10/28/20:
+	The two big priorities are still the equations: 
+
+	1. Want to find the equation which rotates the J and/or matrices according to time
+
+	2. Want to find the equation which predicts the HERA beam patterns,
+i.e. find an equation which makes-obsolete the many files of the form
+		HERA_4.9m_E-pattern_151MHz.txt
 
 as of 9/9/20:
-* Lay down some frequency boilerplate code
-
 * Invent J rotation-by-time theory
-
-* Single source needs some serious cleanup
-* Re-run multi source. It is true that I have not found a theory,
+* Re-run multi source. It is true that I have not yet found a theory,
 	but the output graph may look different based on the fixes that I have applied
 	during the correction of single_source.
 	* Furthermore, we need to use np.abs rather than np.real. np.real gives negative visibilities,
@@ -16,26 +20,19 @@ as of 9/9/20:
 
 Query Ridhima about the strange phase shift in my source_over_time function (it employs the beam rotation approach)
 
-How do I create a rotator? The theory I am still working on it.
-	Maybe I can make some
+How do I create a rotator? The theory: I am still working on it.
 
 ---------
 
-Send Ridhima the plot for the old results on time simulation,
-	we use these to compare and verify the NEW implementation.
+We use the old time evolution results to verify the NEW implementation.
+	Even though the old implementation is ponderous, it is technically accurate.
 
-Do an A 4x4 grid for:
-	$ imaginary
-	$ real
-	$~ fix the formatting
-
-	>$ log view
-		> adjust log scale to get more contrast
-		> you might need to adjust the axes so that the plots run along the same scales
-			(comparison easier that way)
-			(this applies JUST to the same diagonal terms)
+A 4x4 grid todo:
+	> adjust the axes so that the plots run along the same scales
+		(we have already written the code; we want to test and debug it now)			"this applies JUST to the same diagonal terms"
 			
-	* apply a grid
+	* apply grid lines
+
 	* use matplotlib fig and subplot.ispace and edgespace?
 		to allow larger plots
 
@@ -53,60 +50,17 @@ https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.rotate_
 
 https://healpy.readthedocs.io/en/latest/generated/healpy.rotator.Rotator.html
 
-flux s1 = (nu1 / nu2) ^ \alpha * s2 (flux s2)
-	* s2 is 150 in our case
-
-S ~/prop\nu^alpha
-S_{200} = S_{150} * (200/150)^\alpha
-
-0. proper A matrix visualization formatting (see above)
 1. implement proper time rotation, and plot the cold patch data
 	* We want to generate the J matrix once and then rotate the sky, not the beam!
 	i.e. do not use time as a parameter in J matrix calculation
 	* Healpy has rotate-by-time functionality
 
 	* create 1D plot from cold patch
-	    great Slack question: what is the best way
-	    to visually represent the results?
-	* time axis (2D), frequency axis (3D)
 2. verify that ALL of the functions in rot return (az, alt) and not (alt, az)
-	this is for consistency sake, and for anyone looking to use my code	
+	this is for consistency sake, and who might mischance upon my code in the future
 3. investigate the J matrix zero debacle? It is not an issue anymore,
-	but I wonder why it happens
-4. update every notebook in the repository
-	* import skyflux as sf
-
-beam variation is what we will eventually be handling anyway
-"I will leave the chunking of frequency and time up to you."
-
-
-???:
-PING RIDHIMA TO GET FREQUENCY BEAM
-    once you have your current pipeline working for this
-        frequency
-
-for now, assume that 100-200 MHz is the same frequency
-    use spectral index to scale the result
-    split it at 1 MHz for now.
-    (i.e. same Jones matrix 100-200 MHz for now).
-use constant flux independent of frequency
-	(this is the same as saying that alpha is equal to one)
-	then varying frequency from 100-200 MHz
-	'assume it is the same beam between 100 and 200 MHz'
-
-read up on healpy.cartview,
-    that is a third option besides Mollview and orthview
-
-do not worry if the axes are not in RA and Dec,
-    just get the healpy grid on the A matrices
-    like in the Stack Overflow
-
-15 m or 30 m baseline East-West
-    I do not remember what this means.
+	but I wonder why it happens 
 
 I need to plot the A matrix, to see the leakage terms.
 Plot it in healpix. It doesn't have to look like in Ridhima's
 paper because she did not use healpix.
-
-(Ask for Ridhima's power spectrum notebook plot for a
-single baseline, once the above work has been completed and tested.)

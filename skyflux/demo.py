@@ -11,6 +11,11 @@ import healpy as hp
 
 from skyflux import catalog
 from skyflux import ant
+from skyflux import vis
+
+# disgustingly hacky
+
+MACRO_EPSILON = 0.001
 
 # general helpers and utilities
 
@@ -44,10 +49,110 @@ def is_constrained(value, min_acceptable=None, max_acceptable=None):
 
 # Visibility section
 
+"""
+Some ideas for testing the output of vis_tensor
+
+src = sf.catalog.obj_catalog[0]
+single_nu, single_t, v_tensor = sf.demo.vis_tensor(23, 37, np.array([src]))
+
+# remember that each element of the visibility tensor is
+# a 4x1 complex vector of I, Q, U, and V
+plt.plot(single_nu, v_tensor[:, 0, 0])
+plt.plot(single_t, v_tensor[0, :, 0])
+
+# begin actual experiment
+nu14, lst14, vt14 = vis_tensor(23, 37)
+nu30, lst30, vt30 = vis_tensor(37, 68)
+
+ss = sf.catalog.obj_catalog[3871]
+nu14_s, lst14_s, vt14_s = vis_tensor(23, 37, ss)
+nu30_s, lst30_s, vt30_s = vis_tensor(37, 68, ss)
+
+np.savez_compressed('14m_baseline',
+    frequency_axis=nu14, lst_axis=lst14, visibility_tensor=vt14)
+np.savez_compressed('30m_baseline',
+    frequency_axis=nu30, lst_axis=lst30, visibility_tensor=vt30)
+
+np.savez_compressed('14m_single_source',
+    frequency_axis=nu14_s, lst_axis=lst14_s, visibility_tensor=vt14_s)
+np.savez_compressed('30m_single_source',
+    frequency_axis=nu30_s, lst_axis=lst30_s, visibility_tensor=vt30_s)
+"""
+def vis_tensor(ant1, ant2, sources=None):
+    """
+    Returns a giant block of visibility sums.
+    The first return value is the x-axis, also known as the first index.
+        It describes the frequency used for that row.
+    The second return value is the y-axis, also known as the second index.
+        It describes the time used for that column.
+    The third return value is the z-axis, also known as the data block.
+        It describes the summed visibilities of all ~3000 catalog objects
+        for a given time and frequency.
+
+    def vis_tensor(ant1, ant2, sources=None):
+
+        import time as t
+        print("Unix time upon function call:", str(t.time()))
+
+        percent_interval = 100 / 144 / 150
+    
+        nu_axis = np.arange(77e6, 226e6 + sf.demo.MACRO_EPSILON, 1e6)
+        t_axis = np.arange(0, 2 * np.pi, np.pi / 72)
+        v_tensor = []
+
+        if sources is None:
+            sources = sf.catalog.obj_catalog.copy()
+
+        percent = 0
+        for nu in nu_axis:
+            v_tensor.append([])
+            for t in t_axis:
+                next_vista = np.array([0j, 0j, 0j, 0j])
+                for source in sources:
+                    next_vista += sf.vis.visibility(
+                    ant1, ant2, source, nu=nu, time=t)
+
+                percent += percent_interval
+                v_tensor[len(v_tensor) - 1].append(next_vista)
+
+                percent_status = str(np.around(percent, 4))
+                print("Visibility tensor: " + percent_status + "% complete.")
+
+        return nu_axis, t_axis, np.array(v_tensor)
+    """
+    import time as t
+    print("Unix time upon function call:", str(t.time()))
+
+    percent_interval = 100 / 144 / 150
+    
+    nu_axis = np.arange(77e6, 226e6 + MACRO_EPSILON, 1e6)
+    t_axis = np.arange(0, 2 * np.pi, np.pi / 72)
+    v_tensor = []
+
+    if sources is None:
+        sources = catalog.obj_catalog.copy()
+
+    percent = 0
+    for nu in nu_axis:
+        v_tensor.append([])
+        for t in t_axis:
+            next_vista = np.array([0j, 0j, 0j, 0j])
+            for source in sources:
+                next_vista += vis.visibility(ant1, ant2, source, nu=nu, time=t)
+
+            percent += percent_interval
+            v_tensor[len(v_tensor) - 1].append(next_vista)
+
+            percent_status = str(np.around(percent, 4))
+            print("Visibility tensor: " + percent_status + "% complete.")
+
+    return nu_axis, t_axis, np.array(v_tensor)
+
 ### todo: we want a command that will force all of the scales to run from the same values
 
 # Appearances: jones_matrices/A_Catalog.ipynb
-def project_J(J, data_transform=np.abs, rep=hp.orthview):
+def project_J(J, data_transform=np.abs, rep=hp.orthview,
+              widest_scale=False, max_=None, min_=None):
     """
     Generate a 2x2 plot of the four Jones components,
     assuming that J has conventional formatting [[xx, xy], [yx, yy]]
@@ -71,10 +176,12 @@ def project_J(J, data_transform=np.abs, rep=hp.orthview):
         # hard-coding is always bad
         if rep is hp.cartview:
             rep(data_transform(J[:, i, j]),
-                half_sky=True, sub=[3, 2, panel], title=ttl)
+                half_sky=True, sub=[3, 2, panel], title=ttl,
+                max=scale_max, min=scale_min)
         else:
             rep(data_transform(J[:, i, j]), rot=[0, 90],
-                half_sky=True, sub=[3, 2, panel], title=ttl)
+                half_sky=True, sub=[3, 2, panel], title=ttl,
+                max=scale_max, min=scale_min)
 
     put_subplot(0, 0, 1, 'xx')
     put_subplot(1, 0, 2, 'yx')
@@ -119,7 +226,8 @@ def project_A(A, data_transform=np.abs, rep=hp.orthview,
                 max=scale_max, min=scale_min)
         else:
             rep(data_transform(A[:, i, j]), rot=[0, 90],
-                sub=[5, 4, panel], title=ttl)
+                sub=[5, 4, panel], title=ttl,
+                max=scale_max, min=scale_min)
 
     put_subplot(0, 0, 1, 'I\' <- I')
     put_subplot(0, 1, 2, 'I\' <- Q')
@@ -142,6 +250,33 @@ def project_A(A, data_transform=np.abs, rep=hp.orthview,
     put_subplot(3, 3, 16, 'V\' <- V')
 
 # GLEAMEGCAT section
+
+def lookup(name):
+    """
+    Given the @name field for a GLEAMEGCAT object,
+    return the index (in the master array) corresponding to that object.
+
+    Returns -1 if the name was not found in the catalog.
+    """
+    for i in range(len(catalog.obj_catalog)):
+        if catalog.obj_catalog.name == name:
+            return i
+    return -1
+
+def cleaned_list():
+    """
+    Returns a copy of the GLEAMEGCAT list, for which we have eliminated all entries with
+    unspecified spectral indices. By construction, objects without spectral indices were
+    automatically assigned 'NaN' for the field.
+    """
+    ws_oc = catalog.obj_catalog.copy() # write-safe read copy for the GLEAM object catalog
+    cat = catalog.obj_catalog.copy()
+    # we loop in reverse, to avoid concurrent modification exceptions
+    for i in range(len(ws_oc) - 1, 0, -1):
+        # classic. The easiest way to check if a value is NaN: it does not equal itself
+        if ws_oc[i].alpha != ws_oc[i].alpha:
+            del cat[i]
+    return cat
 
 def sources_range(start=3, end=5, frq=151):
     """
@@ -286,3 +421,27 @@ def all_baselines():
             ID2 = active_ants[j]
             print("Baseline between antennae " + str(ID1) + \
                   " and " + str(ID2) + " = " + str(ant.baseline(ID1, ID2)))
+
+def find_baseline(objective):
+    """
+    Returns the baseline
+        (antenna 1 ID #, antenna 2 ID #)
+    that is closest in length to
+    objective out of all possible antenna pairs.
+    """
+    best_err = float('inf')
+    best_ants = None
+    
+    for i in range(len(active_ants)):
+        ID1 = active_ants[i]
+        for j in range(i + 1, len(active_ants[i + 1:])):
+            ID2 = active_ants[j]
+            b = ant.baseline(ID1, ID2)
+            sq_err = (objective - np.linalg.norm(b)) ** 2
+
+            if sq_err < best_err:
+                best_err = sq_err
+                best_ants = (ID1, ID2)
+
+    print("Best squared error:", best_err)
+    return best_ants

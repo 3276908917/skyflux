@@ -16,3 +16,4 @@ dist
 
 # materials used for one-time model generation. Not intended for client use.
 patterns
+*.npz

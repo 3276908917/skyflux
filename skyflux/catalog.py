@@ -3,6 +3,8 @@ import numpy as np
 
 from skyflux import rot
 
+import warnings as w
+
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 # The following section is hard-coded to the GLEAMEGCAT format,
@@ -14,6 +16,11 @@ expected_frequencies = [76, 84, 92, 99, 107, 115, 122, 130,
                     143, 151, 158, 166, 174, 181, 189,
                     197, 204, 212, 220, 227]
 
+#! It is technically completely wasteful to regenerate this catalog
+# every time that we import skyflux.
+# Unfortunately, such an improvement would not be very meaningful at this
+# stage of development, because the import time is by far dominated by the
+# spline_beam_func generation
 class GLEAM_entry:
     def __init__(self, line):
         """
@@ -48,15 +55,17 @@ class GLEAM_entry:
                 self.flux_by_frq[expected_frq] = \
                     float(line[:line.index("|")].strip()) / 1000
             except ValueError:
-                print("Missing flux value for:", self.name,
-                      "at frequency:", expected_frq, "MHz.")
+                warning = "Missing flux value for: " + self.name + \
+                      " at frequency: " + str(expected_frq) + " MHz."
+                w.warn(warning)
                 self.flux_by_frq[expected_frq] = np.NaN
             line = line[line.index("|") + 1:]
 
         try:
             self.alpha = float(line[:line.index("|")])
         except ValueError:
-            print("Missing spectral index for:", self.name)
+            warning = "Missing spectral index for: " + self.name
+            w.warn(warning)
             self.alpha = np.NaN
 
     def _format_ra(self):

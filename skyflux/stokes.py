@@ -1,28 +1,13 @@
-import os
 import numpy as np
 import healpy as hp
-from RIMEz import beam_models
 
 from skyflux import rot
 
-#! This is hard-coded. The value is updated each time we run
-#! generate_model.py. Needs fixing.
-beam_frqs = np.append(np.arange(50e6, 250e6, 1e6), np.array(151e6))
+from skyflux.compiled_beam_func import spline_beam_func
+from skyflux.compiled_beam_func import beam_frqs
 
-# It is imperative that the name here line up with that used in
-# generate_model.py (a file NOT included in the installation, but
-# included in the Git repository!)
-beam_origin = os.path.dirname(os.path.abspath(__file__)) + \
-              "/HERA_spin1_harmonics.h5"
-
-# My understanding of the documentation is that
-# alt, az are both in radians
-spline_beam_func = beam_models.model_data_to_spline_beam_func(
-    beam_origin,
-    # Like in generate_model.py, we have some hard-coded frequencies
-    # which we want to re-evaluate in the future.
-    beam_frqs
-)
+# disgusting hack
+MACRO_EPSILON = 0.001
 
 def format_J(J_RIMEz):
     """
@@ -46,6 +31,7 @@ S = .5 * np.array([[1, 1, 0, 0,],
                   [0, 0, 1, 1j],
                   [0, 0, 1, -1j],
                   [1, -1, 0, 0]])
+Si = np.linalg.inv(S)
 
 def create_J(ra=None, dec=None, az=None, alt=None,
              lat=None, lst=None, nu=151e6, radians=False):
@@ -69,7 +55,7 @@ def create_J(ra=None, dec=None, az=None, alt=None,
     
     if type(nu) == np.ndarray:
         for frequency in nu:
-            if frequencbeamqs:
+            if frequency not in beam_frqs:
                 raise NotImplementedError("No routine for interpolating between beam frequencies.")
     elif nu not in beam_frqs:
         raise NotImplementedError("No routine for interpolating between beam frequencies.")
@@ -125,9 +111,9 @@ def create_J_sky(nside, nu=151e6):
         frequency of beam for which we are generating a whole-sky deck
     Use create_A_space if a Mueller sky is desired as the output.
     """
-    theta, phi = hp.pix2ang(nside, np.arange(12 * nside * nside))
+    theta, phi = hp.pix2ang(nside, np.arange(12 * nside ** 2))
     az = phi
-    alt = phi / 2 - theta
+    alt = np.pi / 2 - theta
     J_raw = spline_beam_func(nu, alt, az)
     return format_J(J_raw)
 
@@ -166,4 +152,4 @@ def create_A(ra=None, dec=None, az=None, alt=None, J=None,
     # in which case, we should individually calculate the A matrix for each one, and return that.
     
     J_outer = np.kron(J, np.conj(J))
-    return np.dot(np.linalg.inv(S), np.dot(J_outer, S))
+    return np.dot(Si, np.dot(J_outer, S))
