@@ -28,7 +28,7 @@ from skyflux import demo
 nu_axis = None
 t_axis = None
 
-import time as t
+import time
 
 """
     Yeah, this is not working. It ices the computer's memory!
@@ -51,7 +51,7 @@ def A_tensor(source):
     """
     global nu_axis
     global t_axis
-    start_time = t.time()
+    start_time = time.time()
     print("Starting new A tensor at unix time:", str(start_time))
     percent_interval = 100 / len(nu_axis)
     
@@ -122,9 +122,7 @@ def cold_tensor(ant1, ant2,
     """
     global nu_axis
     global t_axis
-    print("Unix time upon function call:", str(t.time()))
-
-    percent_interval = 100 / 961 / 201
+    print("Unix time upon function call:", str(time.time()))
     
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
     t_axis = np.arange(0, 2 * np.pi / 3 + MACRO_EPSILON, np.pi / 1440)
@@ -132,31 +130,43 @@ def cold_tensor(ant1, ant2,
 
     cleaned = demo.cleaned_list()
 
-    i = start_index
-    while i < end_index and i < len(cleaned):
-        
-        Ai = A_tensor(nu_axis, t_axis, source)
-
-    ### We want to pre-generate all the A matrices
-
-    A_tensor = []
-
-    #for nu in nu_axis
-
-    ###
-
+    percent_interval = 100 / 201 / (end_index - start_index + 1)
     percent = 0
-    for nu in nu_axis:
-        v_tensor.append([])
-        for t in t_axis:
-            next_vista = np.array([0j, 0j, 0j, 0j])
-            for source in sources:
-                next_vista += vis.visibility(ant1, ant2, source, nu=nu, time=t)
+
+    unsaved_counter = 0
+    i = start_index
+    while i < end_index and i < len(cleaned):    
+        AI = A_tensor(source)
+        raI = np.radians(source.ra_angle)
+        decI = np.radians(source.dec_angle)
+
+        for ni in range(len(nu_axis)):
+            nu = nu_axis[ni]
+            v_tensor.append([])
+
+            A_n = AI[ni]
+            
+            for ti in range(len(t_axis)):
+                t = t_axis[ti]
+                
+                I = vis.get_I(source, nu)
+
+                s = np.array([complex(I), 0, 0, 0])
+
+                A = A_n[t]
+                r = rot.radec2lm(raI, decI, ra0=t)
+                phi = ant.phase_factor(ant1, ant2, r, nu)
+
+                malformed_result = np.dot(np.dot(A, s), phi)
+                
+                v_tensor[len(v_tensor) - 1].append(malformed_result[:, 0])
 
             percent += percent_interval
-            v_tensor[len(v_tensor) - 1].append(next_vista)
-
             percent_status = str(np.around(percent, 4))
-            print("Visibility tensor: " + percent_status + "% complete.")
+            print("\nVisibility tensor: " + percent_status + "% complete.\n")
 
-    return nu_axis, t_axis, np.array(v_tensor)
+        unsaved_counter += 1
+        if unsaved_counter > save_interval:
+            
+
+    #return nu_axis, t_axis, np.array(v_tensor)
