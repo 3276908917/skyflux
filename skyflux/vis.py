@@ -16,17 +16,17 @@ cop = lambda source, nu : source.flux_by_frq[nu / 1e6] / nu ** source.alpha
 
 def get_I(source, nu=151e6):
     # make a copy to ensure write safety
-    ef = catalog.expected_frequencies.copy()
+    #ef = catalog.expected_frequencies.copy()
 
-    index_nu = nu / 1e6
+    #index_nu = nu / 1e6
     
     # keep in mind that ef is in ascending order
     #if index_nu in ef: # we have an observed value for this frequency
     #    return source.flux_by_frq[index_nu]
 
-    if index_nu < ef[0] or index_nu > ef[len(ef)-1]:
+    #if index_nu < ef[0] or index_nu > ef[len(ef)-1]:
         #"beware the danger of extrapolation" --Aaron Simon
-        raise NotImplementedError("That frequency would have to be extrapolated.")
+    #    raise NotImplementedError("That frequency would have to be extrapolated.")
 
     #if index_nu < ef[0] or index_nu > ef[len(ef)-1]:
     #    w.warn("Using an extrapolated frequency: " + str(nu))
