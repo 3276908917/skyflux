@@ -35,17 +35,19 @@ def get_I(source, nu=151e6):
         # conceptually, I may have made an error.
         # I think I want flux, but I am here calculating flux per unit frequency
         # See "single_source_over_nu.ipynb" for an example plot of how alpha varies...
+
+    # You should double-down on interpolation;
+    # give up on trying to use any real values for flux
+    # we want a smooth spectrum, and these real references
+    # create discontinuities.
+
+    """
     i = 0
 
     # Use power law formula here; use the spectral index
     # s1/s2 = nu1/nu2 * s2
     while ef[i] > index_nu:
         i += 1
-
-    # You should double-down on interpolation;
-    # give up on trying to use any real values for flux
-    # we want a smooth spectrum, and these real references
-    # create discontinuities.
 
     nu_a = ef[i - 1] * 1e6
     nu_b = ef[i] * 1e6
@@ -57,8 +59,14 @@ def get_I(source, nu=151e6):
     interp_a = (nu_b - nu) * cop_a
     interp_b = (nu - nu_a) * cop_b
     this_cop = (interp_a + interp_b) / span
+    """
 
-    return this_cop * nu ** source.alpha
+    # S1 / S2 = (nu1 / nu2) ** alpha
+    # S1 = S2 * (nu1 / nu2) ** alpha
+
+    # magic
+    S151 = source.flux_by_frq[151]
+    return S151 * (nu / 151e6) ** source.alpha
 
 def visibility(ant1, ant2, source, nu=151e6, time=None):
     """

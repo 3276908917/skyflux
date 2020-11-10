@@ -36,13 +36,14 @@ from skyflux import rot
 """
 def A_tensor(nu_axis, t_axis, source):
     """
-    Returned format: an |nu_axis| * |sources| * |t_axis| * 4 * 4 matrix
+    Returned format: an |nu_axis| * |t_axis| * 4 * 4 matrix
     Contains every possible exact A matrix. When performing calculations
     with source index s, time index t, and frequency index f, we say
         this_A = A_tensor[f][s][t]
     """
     import time as t
-    print("Unix time upon function call:", str(t.time()))
+    start_time = t.time()
+    print("Unix time upon function call:", str(start_time))
     percent_interval = 100 / len(nu_axis)
     
     A_tensor = []
@@ -53,6 +54,7 @@ def A_tensor(nu_axis, t_axis, source):
     dec = np.radians(source.dec_angle)
     azs = []
     alts = []
+    
     for lst in t_axis:
         az, alt = rot.eq_to_topo(ra, dec, lst=lst, radians=True)
         alts.append(alt)
@@ -64,6 +66,7 @@ def A_tensor(nu_axis, t_axis, source):
 
         A_tensor.append(np.array(A_source))
         percent += percent_interval
+        
         percent_status = str(np.around(percent, 4))
         print("A_tensor " + percent_status + "% built.")
     return np.array(A_tensor)
