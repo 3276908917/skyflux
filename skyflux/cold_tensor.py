@@ -158,10 +158,14 @@ def cold_tensor(label, ant1, ant2,
 
         unsaved_counter += 1
         if unsaved_counter > save_interval:
-            np.savez("backup_" + label, na=nu_axis, ta=t_axis, vt=v_tensor)
+            np.savez("backup_" + label, na=nu_axis, ta=t_axis, vt=v_tensor,
+                     dying_index=np.array(i))
             unsaved_counter = 0
 
         i += 1
+
+    np.savez("backup_" + label, na=nu_axis, ta=t_axis, vt=v_tensor,
+                     dying_index=np.array(-1))    
 
 """
 Visualization:
