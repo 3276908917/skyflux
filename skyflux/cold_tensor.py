@@ -42,7 +42,7 @@ import time
             then ADD the result to the existing cold tensor
         (implicitly) garbage collect separate 1-source cold tensor
 """
-def A_tensor(source):
+def A_tensor(ra, dec):
     """
     Returned format: an |nu_axis| * |t_axis| * 4 * 4 matrix
     Contains every possible exact A matrix. When performing calculations
@@ -51,16 +51,9 @@ def A_tensor(source):
     """
     global nu_axis
     global t_axis
-    start_time = time.time()
-    print("Starting new A tensor at unix time:", str(start_time))
-    percent_interval = 100 / len(nu_axis)
     
     A_tensor = []
 
-    percent = 0
-
-    ra = np.radians(source.ra_angle)
-    dec = np.radians(source.dec_angle)
     azs = []
     alts = []
     
@@ -75,10 +68,7 @@ def A_tensor(source):
         A_source = np.array([stokes.create_A(J=J) for J in J_source])
 
         A_tensor.append(np.array(A_source))
-        percent += percent_interval
         
-        percent_status = str(np.around(percent, 4))
-        print("A_tensor " + percent_status + "% built.")
     return np.array(A_tensor)
 
 """
@@ -123,7 +113,7 @@ def cold_tensor(ant1, ant2,
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
     t_axis = np.arange(0, 2 * np.pi / 3 + MACRO_EPSILON, np.pi / 1440)
 
-    v_tensor = np.zeros((len(nu_axis), len(t_axis), 4))
+    v_tensor = np.zeros((len(nu_axis), len(t_axis), 4), dtype=np.complex128)
 
     cleaned = demo.cleaned_list()
 
@@ -136,9 +126,10 @@ def cold_tensor(ant1, ant2,
     while i < end_index and i < len(cleaned):    
         next_vt = []
         source = cleaned[i]
-        AI = A_tensor(source)
+        
         raI = np.radians(source.ra_angle)
         decI = np.radians(source.dec_angle)
+        AI = A_tensor(source, ra, dec)
 
         for ni in range(len(nu_axis)):
             nu = nu_axis[ni]
