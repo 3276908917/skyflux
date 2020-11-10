@@ -21,6 +21,14 @@ MACRO_EPSILON = 0.001
 
 from skyflux import stokes
 from skyflux import rot
+from skyflux import demo
+
+# we keep these as global parameters to avoid the potential overhead
+# of passing by value
+nu_axis = None
+t_axis = None
+
+import time as t
 
 """
     Yeah, this is not working. It ices the computer's memory!
@@ -34,16 +42,17 @@ from skyflux import rot
             then ADD the result to the existing cold tensor
         (implicitly) garbage collect separate 1-source cold tensor
 """
-def A_tensor(nu_axis, t_axis, source):
+def A_tensor(source):
     """
     Returned format: an |nu_axis| * |t_axis| * 4 * 4 matrix
     Contains every possible exact A matrix. When performing calculations
     with source index s, time index t, and frequency index f, we say
         this_A = A_tensor[f][s][t]
     """
-    import time as t
+    global nu_axis
+    global t_axis
     start_time = t.time()
-    print("Unix time upon function call:", str(start_time))
+    print("Starting new A tensor at unix time:", str(start_time))
     percent_interval = 100 / len(nu_axis)
     
     A_tensor = []
@@ -91,8 +100,14 @@ To-do:
     3. Examine the antennae chart and decide which two pairs of antannae
         we will use: we want them to be in the same direction, but
         one pair is 14m long and the other is 30m long.
+
+        Answer: 84->85 East to West
+                85->86 East to West
+            You should calculate the magnitudes of the distances involved.
 """
-def cold_tensor(ant1, ant2, sources=None):
+def cold_tensor(ant1, ant2,
+                start_index=0, end_index=3871,
+                save_interval=4):
     """
     Returns a giant block of visibility sums. Specifications:
         cold patch: 0 to 8 hours LST in 30 second increments
@@ -105,7 +120,8 @@ def cold_tensor(ant1, ant2, sources=None):
         It describes the summed visibilities of all ~3000 catalog objects
         for a given time and frequency.
     """
-    import time as t
+    global nu_axis
+    global t_axis
     print("Unix time upon function call:", str(t.time()))
 
     percent_interval = 100 / 961 / 201
@@ -114,9 +130,12 @@ def cold_tensor(ant1, ant2, sources=None):
     t_axis = np.arange(0, 2 * np.pi / 3 + MACRO_EPSILON, np.pi / 1440)
     v_tensor = []
 
-    if sources is None:
-        sources = catalog.obj_catalog.copy()
+    cleaned = demo.cleaned_list()
 
+    i = start_index
+    while i < end_index and i < len(cleaned):
+        
+        Ai = A_tensor(nu_axis, t_axis, source)
 
     ### We want to pre-generate all the A matrices
 
