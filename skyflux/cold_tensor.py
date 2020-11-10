@@ -65,6 +65,7 @@ def A_tensor(source):
     alts = []
     
     for lst in t_axis:
+        #! We should definitely vectorize this
         az, alt = rot.eq_to_topo(ra, dec, lst=lst, radians=True)
         alts.append(alt)
         azs.append(az)
@@ -121,23 +122,27 @@ def cold_tensor(ant1, ant2,
     
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
     t_axis = np.arange(0, 2 * np.pi / 3 + MACRO_EPSILON, np.pi / 1440)
-    v_tensor = []
+
+    v_tensor = np.zeros((len(nu_axis), len(t_axis), 4))
 
     cleaned = demo.cleaned_list()
 
-    percent_interval = 100 / 201 / (end_index - start_index + 1)
+    percent_interval = 100 / (end_index - start_index + 1)
     percent = 0
 
     unsaved_counter = 0
     i = start_index
+    
     while i < end_index and i < len(cleaned):    
+        next_vt = []
+        source = cleaned[i]
         AI = A_tensor(source)
         raI = np.radians(source.ra_angle)
         decI = np.radians(source.dec_angle)
 
         for ni in range(len(nu_axis)):
             nu = nu_axis[ni]
-            v_tensor.append([])
+            next_vt.append([])
 
             A_n = AI[ni]
             
@@ -148,22 +153,23 @@ def cold_tensor(ant1, ant2,
 
                 s = np.array([complex(I), 0, 0, 0])
 
-                A = A_n[t]
+                A = A_n[ti]
                 r = rot.radec2lm(raI, decI, ra0=t)
                 phi = ant.phase_factor(ant1, ant2, r, nu)
 
-                malformed_result = np.dot(np.dot(A, s), phi)
-                
-                v_tensor[len(v_tensor) - 1].append(malformed_result[:, 0])
+                next_vista = np.dot(np.dot(A, s), phi)
+                next_vt[len(next_vt) - 1].append(next_vista)
 
-            percent += percent_interval
-            percent_status = str(np.around(percent, 4))
-            print("\nVisibility tensor: " + percent_status + \ +
-                  "% complete (finished i=" + ni + ").\n")
+        v_tensor += np.array(next_vt)
+        
+        percent += percent_interval
+        percent_status = str(np.around(percent, 4))
+        print("\nVisibility tensor: " + percent_status + \
+              "% complete (finished i=" + str(i) + ").\n")
 
         unsaved_counter += 1
         if unsaved_counter > save_interval:
-            np.savez("backup_tensor", vt=v_tensor)
+            np.savez("backup_tensor", na=nu_axis, ta=t_axis, vt=v_tensor)
             unsaved_counter = 0
 
-    #return nu_axis, t_axis, np.array(v_tensor)
+        i += 1
