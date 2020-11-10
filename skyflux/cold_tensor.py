@@ -91,13 +91,8 @@ To-do:
             it will be reasonable to simply save the whole tensor
             (rather than tracking exclusively new work),
             strict upper bound of 336 MB worth of saves.
-    2. Extrapolation routine:
-        We want to fix the code, which for some reason uses a linear
-            interpolation *on top* of a power law relation.
-        The fix should be simple, but we will certainly want to re-run
-        the single_source_over_nu notebook to make sure our results
-        did not change.
-    3. Examine the antennae chart and decide which two pairs of antannae
+
+    two pairs of antannae
         we will use: we want them to be in the same direction, but
         one pair is 14m long and the other is 30m long.
 
@@ -163,10 +158,12 @@ def cold_tensor(ant1, ant2,
 
             percent += percent_interval
             percent_status = str(np.around(percent, 4))
-            print("\nVisibility tensor: " + percent_status + "% complete.\n")
+            print("\nVisibility tensor: " + percent_status + \ +
+                  "% complete (finished i=" + ni + ").\n")
 
         unsaved_counter += 1
         if unsaved_counter > save_interval:
-            
+            np.savez("backup_tensor", vt=v_tensor)
+            unsaved_counter = 0
 
     #return nu_axis, t_axis, np.array(v_tensor)
