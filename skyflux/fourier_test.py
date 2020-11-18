@@ -98,25 +98,24 @@ def picture_tensor(source):
     global ra
     global dec
     global lst
-    
-    print("Unix time upon function call:", str(time.time()))
 
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
     A = f_only(ra, dec, lst)
+    print("\nFinished building partial A tensor.\n")
+    
     r = rot.radec2lm(ra, dec, ra0=lst)
-
-    ants = ant.ant_pos.copy()
-
-    outer_ants = ants.copy()
-
     s_axis = []
     
     for ni in range(len(nu_axis)):
         nu = nu_axis[ni]
         I = vis.get_I(source, nu)
         s_axis.append(np.array([complex(I), 0, 0, 0])
-    
 
+    print("\nFinished building s-vector vector.\n")
+
+    ants = ant.ant_pos.copy()
+    outer_ants = ants.copy()
+    
     for outer_ant in outer_ants.keys():
         inner_ants = ants.copy()
         del inner_ants[num]
@@ -147,15 +146,22 @@ def wedge_tensor(source):
     global ra
     global dec
     global lst
-    
-    print("Unix time upon function call:", str(time.time()))
 
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
     t_axis = np.arange(0, 2 * np.pi, np.pi / 1440)
     
     A_full = A_tensor()
     print("\nFinished building A tensor.\n")
+
     r = rot.radec2lm(ra, dec, ra0=lst)
+        s_axis = []
+    
+    for ni in range(len(nu_axis)):
+        nu = nu_axis[ni]
+        I = vis.get_I(source, nu)
+        s_axis.append(np.array([complex(I), 0, 0, 0])
+
+    print("\nFinished building s-vector vector.\n")
 
     ants = ant.ant_pos.copy()
     outer_ants = ants.copy()
