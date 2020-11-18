@@ -1,5 +1,3 @@
-import math
-
 import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
@@ -20,12 +18,6 @@ from skyflux import demo
 # of passing by value
 nu_axis = None
 t_axis = None
-
-import time
-
-from skyflux import catalog
-from skyflux import ant
-from skyflux import visibility
 
 ### Hard coding, for speed
 source = catalog.obj_catalog[3871]
