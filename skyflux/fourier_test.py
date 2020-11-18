@@ -31,6 +31,7 @@ from skyflux import visibility
 source = catalog.obj_catalog[3871]
 ra = np.radians(source.ra_angle)
 dec = np.radians(source.dec_angle)
+lst = np.radians(source.ra_angle)
 
 def A_tensor(ra, dec):
     """
@@ -74,6 +75,7 @@ def f_only(ra, dec, lst):
     global nu_axis
     global ra
     global dec
+    global lst
     
     A_tensor = []
 
@@ -90,94 +92,50 @@ def f_only(ra, dec, lst):
 # Scan over all frequencies, for a single source, over all possible baselines
 def picture_tensor(source):
     global nu_axis
-
+    global source
+    global ra
+    global dec
+    global lst
+    
     print("Unix time upon function call:", str(time.time()))
 
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
     A = f_only(ra, dec, lst)
+    r = rot.radec2lm(ra, dec, ra0=lst)
 
     ants = ant.ant_pos.copy()
 
-    outer_ant = ants.copy()
+    outer_ants = ants.copy()
 
-    percent_interval = 100 / (end_index - start_index + 1)
-    percent = 0
-    
-    for num in outer_ant.keys():
-        inner_ant = ants.copy()
-        del inner_ant[num]
+    for outer_ant in outer_ants.keys():
+        inner_ants = ants.copy()
+        del inner_ants[num]
 
-        ant1pos
-    
-    
-    v_tensor = np.zeros((len(nu_axis), len(t_axis), 4), dtype=np.complex128)
-
-    while i < end_index and i < len(cleaned):    
-        next_vt = []
-        source = cleaned[i]
+        for inner_ant in inner_ants.keys():
         
-        AI = A_tensor(raI, decI)
-
-        for ni in range(len(nu_axis)):
-            nu = nu_axis[ni]
-            next_vt.append([])
-
-            I = vis.get_I(source, nu)
-            s = np.array([complex(I), 0, 0, 0])
-
-            A_n = AI[ni]
-            
-            for ti in range(len(t_axis)):
-                t = t_axis[ti]
-
-                A = A_n[ti]
-                r = rot.radec2lm(raI, decI, ra0=t)
-                phi = ant.phase_factor(ant1, ant2, r, nu)
-
-                next_vista = np.dot(np.dot(A, s), phi)
-                next_vt[len(next_vt) - 1].append(next_vista)
-
-        v_tensor += np.array(next_vt)
+            phi = ant.phase_factor(outer_ant, inner_ant, r, nu)
         
-        percent += percent_interval
-        percent_status = str(np.around(percent, 4))
-        print("Visibility tensor: " + percent_status + \
-              "% complete (finished i=" + str(i) + ").")
+            next_vt = []
+            for ni in range(len(nu_axis)):
+                nu = nu_axis[ni]
+                next_vt.append([])
 
-        unsaved_counter += 1
-        if unsaved_counter > save_interval:
-            np.savez("backup_" + label, na=nu_axis, ta=t_axis, vt=v_tensor,
-                     dying_index=np.array(i))
-            unsaved_counter = 0
+                I = vis.get_I(source, nu)
+                s = np.array([complex(I), 0, 0, 0])
 
-        i += 1
+                A_n = A[ni]
 
-    np.savez("backup_" + label, na=nu_axis, ta=t_axis, vt=v_tensor,
-                     dying_index=np.array(-1))    
-    
+                next_vista = np.dot(np.dot(A_n, s), phi)
+                next_vt.append(next_vista)
 
+            inner_pos = inner_ants[inner_ant]
+            inner_ants[inner_ant] = [inner_pos, next_vt]
 
+        outer_pos = outer_ants[outer_ant]
+        outer_ants[outer_ant] = [outer_pos, inner_ants]
 
-"""
-To-do:
-    1. Saving routine: let us say that it saves our work for every
-        frequency completed. That means that, if we crash,
-        we lose only 17.21 minutes of work.
-        > Laziness bonus: we do not need to work on recovery mechanisms
-            (e.g. getting this function to *start* at an arbitrary point)
-        Since the full tensor costs about 1.3 MB,
-            it will be reasonable to simply save the whole tensor
-            (rather than tracking exclusively new work),
-            strict upper bound of 336 MB worth of saves.
+    return outer_ants
 
-    two pairs of antannae
-        we will use: we want them to be in the same direction, but
-        one pair is 14m long and the other is 30m long.
-
-        Answer: 84->85 East to West
-                84->86 East to West
-            You should calculate the magnitudes of the distances involved.
-"""
 def cold_tensor(label, ant1, ant2,
                 start_index=0, end_index=3871, save_interval=4):
     """
