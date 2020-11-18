@@ -91,6 +91,14 @@ def f_only():
         
     return np.array(A_tensor)
 
+import pickle
+
+def pickle_dict(dict_, label):
+    with open(label + '.pickle', 'wb') as handle:
+        pickle.dump(dict_, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+# super_dict = picture_tensor()
+
 # Scan over all frequencies, for a single source, over all possible baselines
 def picture_tensor():
     global nu_axis
