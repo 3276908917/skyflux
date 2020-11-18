@@ -92,7 +92,7 @@ def f_only():
     return np.array(A_tensor)
 
 # Scan over all frequencies, for a single source, over all possible baselines
-def picture_tensor(source):
+def picture_tensor():
     global nu_axis
     global source
     global ra
@@ -109,7 +109,7 @@ def picture_tensor(source):
     for ni in range(len(nu_axis)):
         nu = nu_axis[ni]
         I = vis.get_I(source, nu)
-        s_axis.append(np.array([complex(I), 0, 0, 0])
+        s_axis.append(np.array([complex(I), 0, 0, 0]))
 
     print("\nFinished building s-vector vector.\n")
 
@@ -140,7 +140,7 @@ def picture_tensor(source):
 
     return outer_ants
 
-def wedge_tensor(source):
+def wedge_tensor():
     global nu_axis
     global source
     global ra
@@ -154,12 +154,12 @@ def wedge_tensor(source):
     print("\nFinished building A tensor.\n")
 
     r = rot.radec2lm(ra, dec, ra0=lst)
-        s_axis = []
+    s_axis = []
     
     for ni in range(len(nu_axis)):
         nu = nu_axis[ni]
         I = vis.get_I(source, nu)
-        s_axis.append(np.array([complex(I), 0, 0, 0])
+        s_axis.append(np.array([complex(I), 0, 0, 0]))
 
     print("\nFinished building s-vector vector.\n")
 
@@ -191,10 +191,16 @@ def wedge_tensor(source):
 
                     A = A_n[ti]
                     
-                    next_vista = np.dot(np.dot(A, s), phi)#####
+                    next_vista = np.dot(np.dot(A, s), phi)
+                    next_vt[len(next_vt) - 1].append(next_vista)
+                    
 
                 next_vista = np.dot(np.dot(A_n, s), phi)
                 next_vt.append(next_vista)
+
+            percent += percent_interval
+            percent_status = str(np.around(percent, 4))
+            print("Wedge tensor: " + percent_status + "% complete.")
 
             inner_pos = inner_ants[inner_ant]
             inner_ants[inner_ant] = [inner_pos, next_vt]
@@ -203,46 +209,6 @@ def wedge_tensor(source):
         outer_ants[outer_ant] = [outer_pos, inner_ants]
 
     return outer_ants
-
-def cold_tensor(label, ant1, ant2,
-                start_index=0, end_index=3871, save_interval=4):
-
-        for ni in range(len(nu_axis)):
-            nu = nu_axis[ni]
-            next_vt.append([])
-
-            I = vis.get_I(source, nu)
-            s = np.array([complex(I), 0, 0, 0])
-
-            A_n = AI[ni]
-            
-            for ti in range(len(t_axis)):
-                t = t_axis[ti]
-
-                A = A_n[ti]
-                r = rot.radec2lm(raI, decI, ra0=t)
-                phi = ant.phase_factor(ant1, ant2, r, nu)
-
-                next_vista = np.dot(np.dot(A, s), phi)
-                next_vt[len(next_vt) - 1].append(next_vista)
-
-        v_tensor += np.array(next_vt)
-        
-        percent += percent_interval
-        percent_status = str(np.around(percent, 4))
-        print("Visibility tensor: " + percent_status + \
-              "% complete (finished i=" + str(i) + ").")
-
-        unsaved_counter += 1
-        if unsaved_counter > save_interval:
-            np.savez("backup_" + label, na=nu_axis, ta=t_axis, vt=v_tensor,
-                     dying_index=np.array(i))
-            unsaved_counter = 0
-
-        i += 1
-
-    np.savez("backup_" + label, na=nu_axis, ta=t_axis, vt=v_tensor,
-                     dying_index=np.array(-1))    
 
 """
 Visualization:
