@@ -77,7 +77,7 @@ def f_only():
 
     for nu in nu_axis:
         J_source = stokes.create_J(az=az, alt=alt, nu=nu, radians=True)
-        stokes.create_A(J=J_source)
+        A_source = stokes.create_A(J=J_source)
 
         A_tensor.append(np.array(A_source))
         
@@ -100,7 +100,7 @@ def picture_tensor():
     global lst
 
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
-    A = f_only(ra, dec, lst)
+    A = f_only()
     print("\nFinished building partial A tensor.\n")
     
     r = rot.radec2lm(ra, dec, ra0=lst)
@@ -142,6 +142,7 @@ def picture_tensor():
 
 def wedge_tensor():
     global nu_axis
+    global t_axis
     global source
     global ra
     global dec
