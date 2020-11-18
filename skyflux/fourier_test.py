@@ -109,6 +109,14 @@ def picture_tensor(source):
 
     outer_ants = ants.copy()
 
+    s_axis = []
+    
+    for ni in range(len(nu_axis)):
+        nu = nu_axis[ni]
+        I = vis.get_I(source, nu)
+        s_axis.append(np.array([complex(I), 0, 0, 0])
+    
+
     for outer_ant in outer_ants.keys():
         inner_ants = ants.copy()
         del inner_ants[num]
@@ -119,11 +127,7 @@ def picture_tensor(source):
         
             next_vt = []
             for ni in range(len(nu_axis)):
-                nu = nu_axis[ni]
-
-                I = vis.get_I(source, nu)
-                s = np.array([complex(I), 0, 0, 0])
-
+                s = s_axis[ni]
                 A_n = A[ni]
 
                 next_vista = np.dot(np.dot(A_n, s), phi)
