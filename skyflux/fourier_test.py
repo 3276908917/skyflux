@@ -33,7 +33,7 @@ ra = np.radians(source.ra_angle)
 dec = np.radians(source.dec_angle)
 lst = np.radians(source.ra_angle)
 
-def A_tensor(ra, dec):
+def A_tensor():
     """
     Returned format: a |nu_axis| * |t_axis| * 4 * 4 matrix
     Contains every possible exact A matrix.
@@ -43,6 +43,8 @@ def A_tensor(ra, dec):
     """
     global nu_axis
     global t_axis
+    global ra
+    global dec
     
     A_tensor = []
 
@@ -63,7 +65,7 @@ def A_tensor(ra, dec):
         
     return np.array(A_tensor)
 
-def f_only(ra, dec, lst):
+def f_only():
     """
     I am only accepting lst in radians.
 
@@ -118,7 +120,6 @@ def picture_tensor(source):
             next_vt = []
             for ni in range(len(nu_axis)):
                 nu = nu_axis[ni]
-                next_vt.append([])
 
                 I = vis.get_I(source, nu)
                 s = np.array([complex(I), 0, 0, 0])
@@ -136,44 +137,65 @@ def picture_tensor(source):
 
     return outer_ants
 
-def cold_tensor(label, ant1, ant2,
-                start_index=0, end_index=3871, save_interval=4):
-    """
-    Returns a giant block of visibility sums. Specifications:
-        cold patch: 0 to 8 hours LST in 30 second increments
-        full frequency range: 50 to 250 MHz in 1 MHz increments.
-    The first return value is the x-axis, also known as the first index.
-        It describes the frequency used for that row.
-    The second return value is the y-axis, also known as the second index.
-        It describes the time used for that column.
-    The third return value is the z-axis, also known as the data block.
-        It describes the summed visibilities of all ~3000 catalog objects
-        for a given time and frequency.
-    """
+def wedge_tensor(source):
     global nu_axis
-    global t_axis
-    print("Unix time upon function call:", str(time.time()))
+    global source
+    global ra
+    global dec
+    global lst
     
+    print("Unix time upon function call:", str(time.time()))
+
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
-    t_axis = np.arange(0, 2 * np.pi / 3 + MACRO_EPSILON, np.pi / 1440)
+    t_axis = np.arange(0, 2 * np.pi, np.pi / 1440)
+    
+    A_full = A_tensor()
+    print("\nFinished building A tensor.\n")
+    r = rot.radec2lm(ra, dec, ra0=lst)
 
-    v_tensor = np.zeros((len(nu_axis), len(t_axis), 4), dtype=np.complex128)
+    ants = ant.ant_pos.copy()
+    outer_ants = ants.copy()
 
-    cleaned = demo.cleaned_list()
-
-    percent_interval = 100 / (end_index - start_index + 1)
+    percent_interval = 100 / (len(ants) * (len(ants) - 1))
     percent = 0
 
-    unsaved_counter = 0
-    i = start_index
-    
-    while i < end_index and i < len(cleaned):    
-        next_vt = []
-        source = cleaned[i]
+    for outer_ant in outer_ants.keys():
+        inner_ants = ants.copy()
+        del inner_ants[num]
+
+        for inner_ant in inner_ants.keys():
+            phi = ant.phase_factor(outer_ant, inner_ant, r, nu)
         
-        raI = np.radians(source.ra_angle)
-        decI = np.radians(source.dec_angle)
-        AI = A_tensor(raI, decI)
+            next_vt = []
+            for ni in range(len(nu_axis)):
+                nu = nu_axis[ni]
+                next_vt.append([])
+
+                I = vis.get_I(source, nu)
+                s = np.array([complex(I), 0, 0, 0])
+
+                A_n = A_full[ni]
+
+                for ti in range(len(t_axis)):
+                    t = t_axis[ti]
+
+                    A = A_n[ti]
+                    
+                    next_vista = np.dot(np.dot(A, s), phi)#####
+
+                next_vista = np.dot(np.dot(A_n, s), phi)
+                next_vt.append(next_vista)
+
+            inner_pos = inner_ants[inner_ant]
+            inner_ants[inner_ant] = [inner_pos, next_vt]
+
+        outer_pos = outer_ants[outer_ant]
+        outer_ants[outer_ant] = [outer_pos, inner_ants]
+
+    return outer_ants
+
+def cold_tensor(label, ant1, ant2,
+                start_index=0, end_index=3871, save_interval=4):
 
         for ni in range(len(nu_axis)):
             nu = nu_axis[ni]
