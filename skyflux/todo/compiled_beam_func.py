@@ -24,8 +24,8 @@ beam_frqs = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
 # It is imperative that the name here line up with that used in
 # generate_model.py (a file NOT included in the installation, but
 # included in the Git repository!)
-beam_origin = os.path.dirname(os.path.abspath(__file__)) + \
-              "/HERA_spin1_harmonics.h5"
+sbfps_origin = os.path.dirname(os.path.abspath(__file__)) + \
+              "/sbf_params.npz"
 
 # My understanding of the documentation is that
 # alt, az are both in radians
@@ -48,9 +48,9 @@ nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs = beam_models.model_data_to_spline_
 #! This file is 840 MB. There's no way that's going to fly.
 # At the same time, there is no denying that we have shaved a couple of
 # seconds off of the import time...
-sbfps = utils.load_saves('sbf_params')['arr_0']
+sbfps = utils.load_saves(sbfps_origin)['arr_0']
 
-spline_beam_func = construct_spline_beam_func(
+spline_beam_func = beam_models.construct_spline_beam_func(
     sbfps[0], sbfps[1], sbfps[2], sbfps[3],
     sbfps[4], sbfps[5], sbfps[6])
 

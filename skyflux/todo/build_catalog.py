@@ -18,11 +18,11 @@ import os
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 try:
-    f = open(data_prefix + "gleam_with_alpha.txt", "r")
+    f = open(data_prefix + "../gleam_with_alpha.txt", "r")
     obj_catalog = []
     # For each line in f, the delimiter is |
     for line in f:
-        obj_catalog.append(GLEAM_entry(line[1:]))
+        obj_catalog.append(catalog.GLEAM_entry(line[1:]))
     f.close()
     np.save(data_prefix + '../catalog.npy', obj_catalog, allow_pickle=True)
 except FileNotFoundError:

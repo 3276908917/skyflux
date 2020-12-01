@@ -14,7 +14,7 @@ setup(
     # the very first version was 1!1.1a1
     # I will always start with ones and end with nines because I think
         # that is cleaner than using zeros
-    version='1!1.2b6',
+    version='1!1.2b7',
     # additionally, remember that we change versions in the following order
         # increase the last digit to nine, reset to 1
         # cycle between a, b, and finally rc
@@ -27,7 +27,7 @@ setup(
     url='https://github.com/3276908917/HERA',
     packages=find_packages(),
     package_data={'': [
-        'gleam_with_alpha.txt',
+        'catalog.py',
         'ant_dict.pk',
         'todo/sbf_params.npz'
     ]},

@@ -5,12 +5,12 @@ the contents of demo.py
 
 import numpy as np
 
-def load_saves(filename):
+def load_saves(filepath):
     """
     Return a dictionary containing the arrays saved to
     the .npz file at @filename
 
     Do not include the file ending in the argument.
     """
-    a = np.load(filename + '.npz', allow_pickle=True)
+    a = np.load(filepath, allow_pickle=True)
     return dict(zip(("{}".format(k) for k in a), (a[k] for k in a)))
