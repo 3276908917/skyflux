@@ -141,6 +141,25 @@ def picture_tensor():
     return outer_ants
 
 def wedge_tensor():
+    """
+    This function is no good. RAM usage skyrocketed to 11 GB compressed
+    within 2% completion of final goal.
+
+    I plan to return to this function eventually. For now,
+    we will use the picture tensor as an extremely-coarse approximation
+    (i.e. one LST is the approximation for 960 values)
+
+    Things to remember when coming back to this:
+        1. LST range should be only two hours for a single source
+            (reduces result size by 4x)
+        2. LST resolution should be 4 minutes, not 30 seconds
+            (reduces result size by 8x)
+        3. Frequency resolution should be 4 MHz, not 1 MHz
+            (reduces result size by 4x + 1)
+    Rough estimation: 11 GB at 2% means a total of 550 GB
+    We plan to reduce by 1/3 * 1/4 * 1/8 * 1/4
+    Should leave a total of 1.43 GB
+    """
     global nu_axis
     global t_axis
     global source
@@ -149,7 +168,7 @@ def wedge_tensor():
     global lst
 
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
-    t_axis = np.arange(0, 2 * np.pi, np.pi / 1440)
+    t_axis = np.arange(0, 2 * np.pi / 3, np.pi / 1440)
     
     A_full = A_tensor()
     print("\nFinished building A tensor.\n")
