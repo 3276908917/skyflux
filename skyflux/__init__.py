@@ -1,5 +1,6 @@
 import skyflux.utils
 import skyflux.todo.compiled_beam_func
+import skyflux.todo.build_catalog
 
 import skyflux.rot
 import skyflux.catalog

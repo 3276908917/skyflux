@@ -1,11 +1,15 @@
-import os
 import numpy as np
 
 from skyflux import rot
 
 import warnings as w
-
+import os
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
+
+try:
+    obj_catalog = np.load('catalog.npy', allow_pickle=True)
+except FileNotFoundError:
+    print("Failure to load GLEAM object array.")
 
 # The following section is hard-coded to the GLEAMEGCAT format,
 # as downloaded by myself.
@@ -123,13 +127,3 @@ class GLEAM_entry:
     
     # we will probably want a __repr__ function so that we can see
     # ALL fluxes associated with the object.
-
-try:
-    f = open(data_prefix + "gleam_with_alpha.txt", "r")
-    obj_catalog = []
-    # For each line in f, the delimiter is |
-    for line in f:
-        obj_catalog.append(GLEAM_entry(line[1:]))
-    f.close()
-except FileNotFoundError:
-    print("Failure to load gleam catalog.")

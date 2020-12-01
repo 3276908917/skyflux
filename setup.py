@@ -29,7 +29,7 @@ setup(
     package_data={'': [
         'gleam_with_alpha.txt',
         'ant_dict.pk',
-        'HERA_spin1_harmonics.h5'
+        'todo/sbf_params.npz'
     ]},
     include_package_data=True,
     # until RIMEz updates its numba references:

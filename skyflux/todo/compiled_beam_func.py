@@ -45,6 +45,9 @@ nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs = beam_models.model_data_to_spline_
 )
 """
 
+#! This file is 840 MB. There's no way that's going to fly.
+# At the same time, there is no denying that we have shaved a couple of
+# seconds off of the import time...
 sbfps = utils.load_saves('sbf_params')['arr_0']
 
 spline_beam_func = construct_spline_beam_func(
@@ -52,12 +55,11 @@ spline_beam_func = construct_spline_beam_func(
     sbfps[4], sbfps[5], sbfps[6])
 
 """
-Example of fast recovery:
 
-sbf = construct_spline_beam_func(nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs)
+I forgot what I was doing and accidentally wrote the wrong script!!
 
-If this works, see if we can write
-    nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs
-to a file.
+The whole point of THIS script was to run ONCE. But I have
+simply offloaded that part of stokes.py which was supposed to run EVERY
+time skyflux gets imported! 
 
 """
