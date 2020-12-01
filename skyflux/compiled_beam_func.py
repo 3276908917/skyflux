@@ -30,9 +30,27 @@ beam_origin = os.path.dirname(os.path.abspath(__file__)) + \
 
 # My understanding of the documentation is that
 # alt, az are both in radians
+"""
 spline_beam_func = beam_models.model_data_to_spline_beam_func(
     beam_origin,
     # Like in generate_model.py, we have some hard-coded frequencies
     # which we want to re-evaluate in the future.
     beam_frqs
 )
+"""
+
+nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs = beam_models.model_data_to_spline_params(
+    beam_origin,
+    beam_frqs
+)
+
+"""
+Example of fast recovery:
+
+sbf = construct_spline_beam_func(nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs)
+
+If this works, see if we can write
+    nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs
+to a file.
+
+"""

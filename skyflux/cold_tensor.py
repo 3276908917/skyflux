@@ -167,10 +167,34 @@ def cold_tensor(label, ant1, ant2,
     np.savez("backup_" + label, na=nu_axis, ta=t_axis, vt=v_tensor,
                      dying_index=np.array(-1))    
 
-"""
-Visualization:
-plt.imshow(np.abs(vt[:, :, 0].T), extent=[50, 250, 8 * 60, 0])
-plt.xlabel('Beam Frequency [MHz]')
-plt.ylabel('LST [minutes]')
-plt.show()
-"""
+
+### Want to write a block that iterates over all possible baselines;
+    # ignore duplicates?
+    # Create power spectrum and wedge;
+        # we don't need to implement the wedge completely;
+        # we have HERA pSpec on GitHub
+# want a loop over all baselines, over all frequencies,
+    # we can use arbitrary fixed LST (within view), and a single source.
+# for the wedge, we will want to allow LST to vary over the whole day
+
+def baseline_block(source, LST=None):
+    """
+    LST none
+    """
+
+def load_saves(filename):
+    """
+    Return a dictionary containing the arrays saved to
+    the .npz file at @filename
+    """
+    a = np.load(filename, allow_pickle=True)
+    return dict(zip(("{}".format(k) for k in a), (a[k] for k in a)))
+
+# useful for plotting, since I cannot simply pass in op=np.log(np.abs)
+logAbs = lambda x: np.log(np.abs(x))
+
+def show(v, op=np.abs):
+    plt.imshow(op(v[:, :, 0].T), extent=[50, 250, 8 * 60, 0])
+    plt.xlabel('Beam Frequency [MHz]')
+    plt.ylabel('LST [minutes]')
+    plt.show()

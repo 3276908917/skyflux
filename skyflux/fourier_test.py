@@ -118,7 +118,7 @@ def picture_tensor():
     
     for outer_ant in outer_ants.keys():
         inner_ants = ants.copy()
-        del inner_ants[num]
+        del inner_ants[outer_ant]
 
         for inner_ant in inner_ants.keys():
         
@@ -133,10 +133,10 @@ def picture_tensor():
                 next_vt.append(next_vista)
 
             inner_pos = inner_ants[inner_ant]
-            inner_ants[inner_ant] = [inner_pos, next_vt]
+            inner_ants[inner_ant] = next_vt
 
         outer_pos = outer_ants[outer_ant]
-        outer_ants[outer_ant] = [outer_pos, inner_ants]
+        outer_ants[outer_ant] = inner_ants
 
     return outer_ants
 
@@ -162,7 +162,7 @@ def wedge_tensor():
         I = vis.get_I(source, nu)
         s_axis.append(np.array([complex(I), 0, 0, 0]))
 
-    print("\nFinished building s-vector vector.\n")
+    print("Finished building s-vector vector.\n")
 
     ants = ant.ant_pos.copy()
     outer_ants = ants.copy()
@@ -172,7 +172,7 @@ def wedge_tensor():
 
     for outer_ant in outer_ants.keys():
         inner_ants = ants.copy()
-        del inner_ants[num]
+        del inner_ants[outer_ant]
 
         for inner_ant in inner_ants.keys():
             phi = ant.phase_factor(outer_ant, inner_ant, r, nu)
@@ -201,7 +201,7 @@ def wedge_tensor():
 
             percent += percent_interval
             percent_status = str(np.around(percent, 4))
-            print("Wedge tensor: " + percent_status + "% complete.")
+            print("\nWedge tensor: " + percent_status + "% complete.")
 
             inner_pos = inner_ants[inner_ant]
             inner_ants[inner_ant] = [inner_pos, next_vt]
