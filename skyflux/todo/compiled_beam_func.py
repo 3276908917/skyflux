@@ -39,10 +39,14 @@ spline_beam_func = beam_models.model_data_to_spline_beam_func(
 )
 """
 
+"""
 nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs = beam_models.model_data_to_spline_params(
     beam_origin,
     beam_frqs
 )
+"""
+
+
 
 """
 Example of fast recovery:

@@ -3,8 +3,8 @@ import healpy as hp
 
 from skyflux import rot
 
-from skyflux.compiled_beam_func import spline_beam_func
-from skyflux.compiled_beam_func import beam_frqs
+from skyflux.todo.compiled_beam_func import spline_beam_func
+from skyflux.todo.compiled_beam_func import beam_frqs
 
 # disgusting hack
 MACRO_EPSILON = 0.001

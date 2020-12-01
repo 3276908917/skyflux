@@ -1,3 +1,5 @@
+import skyflux.todo.compiled_beam_func
+
 import skyflux.rot
 import skyflux.catalog
 import skyflux.ant
