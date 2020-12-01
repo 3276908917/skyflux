@@ -1,7 +1,5 @@
 """
-This is currently just a placeholder script.
-
-What do I want it to do?
+This script's original raison d'etre:
 
 I want to run it once, based on whatever spin 1 harmonics I happen to have
 in the repository at the time of running.
@@ -14,6 +12,7 @@ When I import skyflux, it should unpickle the function,
 import numpy as np
 import os
 from RIMEz import beam_models
+from skyflux import utils
 
 # disgusting hack
 MACRO_EPSILON = 0.001
@@ -46,7 +45,11 @@ nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs = beam_models.model_data_to_spline_
 )
 """
 
+sbfps = utils.load_saves('sbf_params')['arr_0']
 
+spline_beam_func = construct_spline_beam_func(
+    sbfps[0], sbfps[1], sbfps[2], sbfps[3],
+    sbfps[4], sbfps[5], sbfps[6])
 
 """
 Example of fast recovery:

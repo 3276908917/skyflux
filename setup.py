@@ -14,7 +14,7 @@ setup(
     # the very first version was 1!1.1a1
     # I will always start with ones and end with nines because I think
         # that is cleaner than using zeros
-    version='1!1.2b5',
+    version='1!1.2b6',
     # additionally, remember that we change versions in the following order
         # increase the last digit to nine, reset to 1
         # cycle between a, b, and finally rc
@@ -32,6 +32,6 @@ setup(
         'HERA_spin1_harmonics.h5'
     ]},
     include_package_data=True,
-    # until RIMEz updates its rumba references:
+    # until RIMEz updates its numba references:
     install_requires=[''], #I definitely need to come back and fix this
 )
