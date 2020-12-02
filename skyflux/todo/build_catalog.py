@@ -18,7 +18,7 @@ import os
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 try:
-    f = open(data_prefix + "../gleam_with_alpha.txt", "r")
+    f = open(data_prefix + "gleam_with_alpha.txt", "r")
     obj_catalog = []
     # For each line in f, the delimiter is |
     for line in f:

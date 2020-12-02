@@ -26,7 +26,7 @@ here = os.path.dirname(os.path.abspath(__file__)) + "/"
 # included in the Git repository!)
 beam_origin = here + "HERA_spin1_harmonics.h5"
 frqs_origin = "HERA_beam_frqs.npy"
-output_name = "sbf_params"
+output_name = "../sbf_params"
 
 beam_frqs = np.load(here + frqs_origin)
 

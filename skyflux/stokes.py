@@ -3,9 +3,6 @@ import healpy as hp
 
 from skyflux import rot
 
-from skyflux.todo.compiled_beam_func import spline_beam_func
-from skyflux.todo.compiled_beam_func import beam_frqs
-
 """!
 This file is 840 MB. There's no way that's going to fly.
 At the same time, there is no denying that we have shaved a couple of
@@ -21,6 +18,8 @@ beam_frqs = sbfps[0]
 spline_beam_func = beam_models.construct_spline_beam_func(
     beam_frqs, sbfps[1], sbfps[2], sbfps[3],
     sbfps[4], sbfps[5], sbfps[6])
+
+### end of importing/loading ###
 
 def format_J(J_RIMEz):
     """
