@@ -26,6 +26,7 @@ here = os.path.dirname(os.path.abspath(__file__)) + "/"
 # included in the Git repository!)
 beam_origin = here + "HERA_spin1_harmonics.h5"
 frqs_origin = "HERA_beam_frqs.npy"
+output_name = "sbf_params"
 
 beam_frqs = np.load(here + frqs_origin)
 
@@ -41,4 +42,4 @@ print("\nParams computed. Storing full results...")
 
 sbf_storage = np.array([nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs])
 
-np.save(here + "sbf_params.npz", sbf_storage, allow_pickle=True)
+np.save(here + output_name, sbf_storage, allow_pickle=True)

@@ -11,10 +11,13 @@ with open("README.md", "r") as fh:
 
 setup(
     name='skyflux',
+    # Yes, I know the following ramble about version numbers is
+    # a serious abuse of PEP regulations. Something something Ruby philosophy.
+    #
     # the very first version was 1!1.1a1
     # I will always start with ones and end with nines because I think
         # that is cleaner than using zeros
-    version='1!1.2b7',
+    version='1!1.2b8',
     # additionally, remember that we change versions in the following order
         # increase the last digit to nine, reset to 1
         # cycle between a, b, and finally rc
