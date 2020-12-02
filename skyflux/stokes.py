@@ -6,18 +6,20 @@ from skyflux import rot
 from skyflux.todo.compiled_beam_func import spline_beam_func
 from skyflux.todo.compiled_beam_func import beam_frqs
 
-# disgusting hack
-MACRO_EPSILON = 0.001
-
 """!
 This file is 840 MB. There's no way that's going to fly.
 At the same time, there is no denying that we have shaved a couple of
 seconds off of the import time...
 !"""
+sbfps_origin = os.path.dirname(os.path.abspath(__file__)) + \
+              "/sbf_params.npz"
+
 sbfps = utils.load_saves(sbfps_origin)['arr_0']
 
+beam_frqs = sbfps[0]
+
 spline_beam_func = beam_models.construct_spline_beam_func(
-    sbfps[0], sbfps[1], sbfps[2], sbfps[3],
+    beam_frqs, sbfps[1], sbfps[2], sbfps[3],
     sbfps[4], sbfps[5], sbfps[6])
 
 def format_J(J_RIMEz):

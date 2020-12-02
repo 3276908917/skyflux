@@ -12,39 +12,30 @@ Originally, I wanted to store the function itself somewhere, but this
 (dill was certainly unable to pickle the spline beam function).
 """
 
-nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs = beam_models.model_data_to_spline_params(
-    beam_origin,
-    beam_frqs
-)
-
-sbf_storage = np.array([nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs])
+print("\nStarting script to generate spline beam function " + \
+      "parameters according to the spin-1 harmonics in this directory.")
 
 import numpy as np
 import os
 from RIMEz import beam_models
-from skyflux import utils
 
-# disgusting hack
-MACRO_EPSILON = 0.001
-
-#! I guess, to stay on the safe side, we will want to pickle
-    # the beam_frequencies separately from the spline_beam_func. 
-beam_frqs = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
+here = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 # It is imperative that the name here line up with that used in
 # generate_model.py (a file NOT included in the installation, but
 # included in the Git repository!)
-sbfps_origin = os.path.dirname(os.path.abspath(__file__)) + \
-              "/sbf_params.npz"
+beam_origin = here + "HERA_spin1_harmonics.h5"
 
+print("\nAll header variables processed. Computing SBF params...")
 
+nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs = \
+    beam_models.model_data_to_spline_params(
+        beam_origin,
+        beam_frqs
+    )
 
-"""
+print("\nParams computed. Storing full results...")
 
-I forgot what I was doing and accidentally wrote the wrong script!!
+sbf_storage = np.array([nu_axis, tx, ty, kx, ky, E_coeffs, rE_coeffs])
 
-The whole point of THIS script was to run ONCE. But I have
-simply offloaded that part of stokes.py which was supposed to run EVERY
-time skyflux gets imported! 
-
-"""
+np.save(here + "sbf_params.npz", sbf_storage, allow_pickle=True)
