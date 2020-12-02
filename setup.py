@@ -30,9 +30,9 @@ setup(
     url='https://github.com/3276908917/HERA',
     packages=find_packages(),
     package_data={'': [
-        'catalog.py',
+        'catalog.npy',
         'ant_dict.pk',
-        'todo/sbf_params.npz'
+        'sbf_params.npy'
     ]},
     include_package_data=True,
     # until RIMEz updates its numba references:

@@ -7,7 +7,7 @@ import os
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 try:
-    obj_catalog = np.load('catalog.npy', allow_pickle=True)
+    obj_catalog = np.load(data_prefix + 'catalog.npy', allow_pickle=True)
 except FileNotFoundError:
     print("Failure to load GLEAM object array.")
 
