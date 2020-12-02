@@ -14,11 +14,12 @@ frqs = []
 here = os.path.dirname(os.path.abspath(__file__)) + "/"
 data_dir = here + "patterns"
 output_model_name = "HERA_spin1_harmonics"
+output_frqs_name = "HERA_beam_frqs"
 
 # Some files have a space after the last underscore in what I guess is
 # a representation of a zero in the hundreds place. Fortunately, this
 # implementation correctly ignores white space in casting the string.
-file_prefix = "/HERA_4.9m_E-pattern_"
+file_prefix = "HERA_4.9m_E-pattern_"
 file_suffix = "MHz.txt"
 common_unit = 1e6 # one MHz
 
@@ -55,4 +56,7 @@ processor.write_model_data("", here + output_model_name)
 
 print("\nSuccessfully wrote spin harmonics to disk." + \
       "\nFound the following frequencies (MHz):")
+
+frqs = np.sort(np.array(frqs))
+np.save(here + output_frqs_name, frqs, allow_pickle=True)
 print(frqs)

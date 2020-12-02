@@ -21,10 +21,13 @@ from RIMEz import beam_models
 
 here = os.path.dirname(os.path.abspath(__file__)) + "/"
 
-# It is imperative that the name here line up with that used in
+# It is imperative that the names here line up with those used in
 # generate_model.py (a file NOT included in the installation, but
 # included in the Git repository!)
 beam_origin = here + "HERA_spin1_harmonics.h5"
+frqs_origin = "HERA_beam_frqs.npy"
+
+beam_frqs = np.load(here + frqs_origin)
 
 print("\nAll header variables processed. Computing SBF params...")
 
