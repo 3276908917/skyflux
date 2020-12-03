@@ -3,6 +3,8 @@ import os
 import numpy as np
 import healpy as hp
 
+from RIMEz import beam_models
+
 from skyflux import utils
 from skyflux import rot
 
@@ -12,9 +14,9 @@ At the same time, there is no denying that we have shaved a couple of
 seconds off of the import time...
 !"""
 sbfps_origin = os.path.dirname(os.path.abspath(__file__)) + \
-              "/sbf_params.npz"
+              "/sbf_params.npy"
 
-sbfps = utils.load_saves(sbfps_origin)['arr_0']
+sbfps = np.load(sbfps_origin, allow_pickle=True)
 
 beam_frqs = sbfps[0]
 
