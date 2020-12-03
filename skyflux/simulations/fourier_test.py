@@ -1,3 +1,12 @@
+"""
+hera_pspec:
+    spectral window can be [(145 MHz, 155 MHz)]
+
+    First channel is 50 MHz which corresponds to index 0
+        like, ch = np.arange(201)
+    indices into frequency array
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
@@ -19,7 +28,7 @@ from skyflux import demo
 nu_axis = None
 t_axis = None
 
-### Hard coding, for speed
+### Hard coding, for speed ###
 source = catalog.obj_catalog[3871]
 ra = np.radians(source.ra_angle)
 dec = np.radians(source.dec_angle)
