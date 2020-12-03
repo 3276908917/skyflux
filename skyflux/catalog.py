@@ -4,12 +4,6 @@ from skyflux import rot
 
 import warnings as w
 import os
-data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
-
-try:
-    obj_catalog = np.load(data_prefix + 'catalog.npy', allow_pickle=True)
-except FileNotFoundError:
-    print("Failure to load GLEAM object array.")
 
 # The following section is hard-coded to the GLEAMEGCAT format,
 # as downloaded by myself.
@@ -20,11 +14,6 @@ expected_frequencies = [76, 84, 92, 99, 107, 115, 122, 130,
                     143, 151, 158, 166, 174, 181, 189,
                     197, 204, 212, 220, 227]
 
-#! It is technically completely wasteful to regenerate this catalog
-# every time that we import skyflux.
-# Unfortunately, such an improvement would not be very meaningful at this
-# stage of development, because the import time is by far dominated by the
-# spline_beam_func generation
 class GLEAM_entry:
     def __init__(self, line):
         """
@@ -127,3 +116,10 @@ class GLEAM_entry:
     
     # we will probably want a __repr__ function so that we can see
     # ALL fluxes associated with the object.
+
+data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
+
+try:
+    obj_catalog = np.load(data_prefix + 'catalog.npy', allow_pickle=True)
+except FileNotFoundError:
+    print("Failure to load GLEAM object array.")

@@ -3,6 +3,7 @@ import os
 import numpy as np
 import healpy as hp
 
+from skyflux import utils
 from skyflux import rot
 
 """!
