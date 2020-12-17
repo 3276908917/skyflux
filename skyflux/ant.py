@@ -30,6 +30,7 @@ try:
             assume that w is of insignificant magnitude.
         """
         b = baseline(ant1, ant2)[0:2] # kill w
+
         br = np.dot(b, r)
         return np.exp(-2j * np.pi * nu * br / c)
     

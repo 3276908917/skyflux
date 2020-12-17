@@ -1,6 +1,12 @@
 # Package/code maintenance, rather than theory / specific simulation tasks
 
 
+0.9 eliminate redundant columns from the GLEAMEGCAT file:
+	we are using just three columns:
+	1. name
+	2. flux at 151 MHz
+	3. spectral index
+
 1. Test gal_to_topo to make sure it still works
 
 2. Test ha_to_topo to verify the docstring has the correct ordering of

@@ -18,11 +18,15 @@ sbfps_origin = os.path.dirname(os.path.abspath(__file__)) + \
 
 sbfps = np.load(sbfps_origin, allow_pickle=True)
 
-beam_frqs = sbfps[0]
+beam_frqs = sbfps[0].copy()
 
 spline_beam_func = beam_models.construct_spline_beam_func(
     beam_frqs, sbfps[1], sbfps[2], sbfps[3],
     sbfps[4], sbfps[5], sbfps[6])
+
+del sbfps
+    # I do not know how to clear the ~840 MB out of RAM
+    # It appears that spline_beam_func takes up that amount of space in RAM)
 
 ### end of importing/loading ###
 
