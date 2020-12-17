@@ -16,6 +16,12 @@ as of 9/9/20:
 		but we do not care about phase just yet.
 * Clean up old notebooks with contemporary commentary
 
+Spiritual goals:
+* There has to be a better way than a 1 GB SBF params file.
+	* How do we quickly produce a beam function that
+		operates efficiently without any external baggage
+		(like monstrous RAM / disk usage)
+
 ----------
 
 Query Ridhima about the strange phase shift in my source_over_time function (it employs the beam rotation approach)

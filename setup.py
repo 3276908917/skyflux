@@ -1,5 +1,8 @@
 from setuptools import setup, find_packages
 
+#! reinstalling a new edition has to be a pain, right?
+# because sbf_params.npy (1 GB!) gets copied up each time
+
 # this whole file could benefit from bells and whistles,
     # once the package reaches a less sorry state,
     # regarding functionality and utility
