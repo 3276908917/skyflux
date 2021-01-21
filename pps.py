@@ -267,13 +267,14 @@ for ant1 in pic.keys():
             you can take the norm squared of those single LSTs,
             but in the real world that would bring on heaps of noise.
         """
-        for nu in frq:
+        for nu_idx in range(len(pic[ant1][ant2])):
             # this is a proportionality.
             # The real deal uses the power equation 6
                 # from Nunhokee et al.
+            nu = frq[nu_idx]
             power_prop = np.vdot(
-                pic[ant1][ant2][nu],
-                pic[ant1][ant2][nu]
+                pic[ant1][ant2][nu_idx],
+                pic[ant1][ant2][nu_idx]
             )
             z = fq2z(nu) #ref
 
