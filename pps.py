@@ -286,6 +286,16 @@ for ant1 in pic.keys():
 		
 # Now start plotting
 
+k_orth = wedge_data[:, 0]
+k_parr = wedge_data[:, 1]
+p_p = wedge_data[:, 2]
+
+scaled_pow = (p_p - p_p.min()) / p_p.ptp()
+colors = plt.cm.viridis(scaled_pow)
+
+plt.scatter(x, y, marker='+', c=colors, s=150, linewidths=4)
+plt.show()
+
 """
 Begin scratchpad
 
