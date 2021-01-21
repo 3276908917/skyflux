@@ -107,7 +107,6 @@ def horizon_limit(z):
 import numpy as np
 import optparse
 import scipy.constants as CNST1
-import COSMO_constants as CNST2
 import os,sys
 import aipy as a
 
@@ -247,6 +246,7 @@ meta = pickle.load(picture_file)
 
 frq = meta['frequencies']
 etas = np.fft.fftshift(f2etas(frq))
+nu_idxs = range(len(frq))
 
 ap = meta['ant_pos']
 pic = meta['picture']
@@ -267,7 +267,7 @@ for ant1 in pic.keys():
             you can take the norm squared of those single LSTs,
             but in the real world that would bring on heaps of noise.
         """
-        for nu_idx in range(len(pic[ant1][ant2])):
+        for nu_idx in nu_idxs:
             # this is a proportionality.
             # The real deal uses the power equation 6
                 # from Nunhokee et al.
@@ -278,13 +278,23 @@ for ant1 in pic.keys():
             )
             z = fq2z(nu) #ref
 
-            wedge_data.append((
+            print()
+            print(k_perp(z))
+            print(k_parallel(etas, z))
+            print(float(power_prop))
+            print()
+
+            wedge_datum = np.array([
                 k_perp(z),
                 k_parallel(etas, z),
-                power_prop
-            ))
+                float(power_prop)
+            ])
+
+            wedge_data.append(wedge_datum)
 		
 # Now start plotting
+
+wedge_data = np.array(wedge_data)
 
 k_orth = wedge_data[:, 0]
 k_parr = wedge_data[:, 1]
