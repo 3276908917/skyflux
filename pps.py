@@ -243,14 +243,14 @@ meta = pickle.load(picture_file)
 
 frq = meta['frequencies']
 etas = f2etas(frq)
-k_par = k_parallel(delay, z)
-
-k_starter = k_perp(z)
-
-nu_idxs = range(len(frq))
-
 # we are ranging from 50 to 250 MHz
 z = fq2z(150e6)
+
+k_par = k_parallel(etas, z)
+k_starter = k_perp(z) # this will need to be multiplied on
+# a per-baseline basis
+
+nu_idxs = range(len(frq))
 
 ap = meta['ant_pos']
 pic = meta['picture']
@@ -280,7 +280,7 @@ for ant1 in pic.keys():
                 pic[ant1][ant2][nu_idx]
             )
             
-            k_orth = k_starter * ant.baselength(ant1, ant2)
+            k_orth = k_starter * sf.ant.baselength(ant1, ant2)
             
             # based on the paper, we still need a factor of
             # $1 / \lambda$
@@ -304,7 +304,8 @@ p_p = wedge_data[:, 2]
 scaled_pow = (p_p - p_p.min()) / p_p.ptp()
 colors = plt.cm.viridis(scaled_pow)
 
-plt.scatter(x, y, marker='+', c=colors, s=150, linewidths=4)
+plt.scatter(k_orth, k_parr,
+    marker='+', c=colors, s=150, linewidths=4)
 plt.show()
 
 """
