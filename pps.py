@@ -304,19 +304,3 @@ colors = plt.cm.viridis(scaled_pow)
 plt.scatter(k_orth, k_parr, marker='.', c=colors)
 plt.show()
 
-"""
-Begin scratchpad
-
-Effective baseline is 200 MHz? Since I am running from 50-250 MHz.
-
-We are trying to build a wedge plot. For each power, we
-calculate the k proxies...
-
-Game plan: let us have some universal array
-	wedge_data
-and dump triples (k_orth, k_parr, p_p) into it,
-	then we can use matplotlib to get a visual
-
-"""
-
-
