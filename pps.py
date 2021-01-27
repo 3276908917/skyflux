@@ -73,8 +73,7 @@ def k_parallel(delays, z):
    Input(s):
       z : [scalar] redshift
    '''
-   k_pllel = dkprll_deta(z) * delays
-   return k_pllel
+   return dkprll_deta(z) * delays
 
 def k_perp(z):
    '''
@@ -151,7 +150,7 @@ def f2etas(freqs):
     -freqs: Frequencies in GHz; type:numpy.ndarray
     """
     df = freqs[1] - freqs[0]
-    etas = np.fft.fftfreq(freqs.size,df)
+    etas = np.fft.fftfreq(freqs.size, df)
     return etas
 
 #=============================================================== 
@@ -245,8 +244,15 @@ picture_file = open("picture_dict.pickle", "rb")
 meta = pickle.load(picture_file)
 
 frq = meta['frequencies']
-etas = np.fft.fftshift(f2etas(frq))
+etas = f2etas(frq)
+k_par = k_parallel(delay, z)
+
+k_starter = k_perp(z)
+
 nu_idxs = range(len(frq))
+
+# we are ranging from 50 to 250 MHz
+z = fq2z(150e6)
 
 ap = meta['ant_pos']
 pic = meta['picture']
@@ -276,17 +282,12 @@ for ant1 in pic.keys():
                 pic[ant1][ant2][nu_idx],
                 pic[ant1][ant2][nu_idx]
             )
-            z = fq2z(nu) #ref
-
-            print()
-            print(k_perp(z))
-            print(k_parallel(etas, z))
-            print(float(power_prop))
-            print()
-
+            
+            k_orth = k_starter * #the thingy
+            
             wedge_datum = np.array([
-                k_perp(z),
-                k_parallel(etas, z),
+                k_orth,
+                k_par[nu_idx],
                 float(power_prop)
             ])
 
