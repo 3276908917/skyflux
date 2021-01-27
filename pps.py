@@ -233,7 +233,6 @@ import skyflux as sf
 
 import matplotlib.pyplot as plt
 import numpy as np
-import healpy as hp
 
 import pickle
 
@@ -247,16 +246,14 @@ etas = f2etas(frq)
 z = fq2z(150e6)
 
 k_par = k_parallel(etas, z)
-k_starter = k_perp(z) # this will need to be multiplied on
+lambda_ = C / 150e6
+k_starter = k_perp(z) / lambda_ # this will need to be multiplied on
 # a per-baseline basis
 
 nu_idxs = range(len(frq))
 
-ap = meta['ant_pos']
+# ap = meta['ant_pos']
 pic = meta['picture']
-
-import copy
-avg_pic = pic.copy() # terrible on RAM, but automatically provides a skeleton
 
 wedge_data = []
 
@@ -285,9 +282,6 @@ for ant1 in pic.keys():
             
             k_orth = k_starter * sf.ant.baselength(ant1, ant2)
             
-            # based on the paper, we still need a factor of
-            # $1 / \lambda$
-            
             wedge_datum = np.array([
                 k_orth,
                 k_par[nu_idx],
@@ -307,8 +301,7 @@ p_p = wedge_data[:, 2]
 scaled_pow = (p_p - p_p.min()) / p_p.ptp()
 colors = plt.cm.viridis(scaled_pow)
 
-plt.scatter(k_orth, k_parr,
-    marker='+', c=colors, s=150, linewidths=4)
+plt.scatter(k_orth, k_parr, marker='.', c=colors)
 plt.show()
 
 """
