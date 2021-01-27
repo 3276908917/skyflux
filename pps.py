@@ -275,10 +275,13 @@ for ant1 in pic.keys():
             # this is a proportionality.
             # The real deal uses the power equation 6
                 # from Nunhokee et al.
-            power_prop = np.vdot(
-                pic[ant1][ant2][nu_idx],
-                pic[ant1][ant2][nu_idx]
-            )
+                
+            brightness = pic[ant1][ant2][nu_idx]
+                
+            power_prop = np.log10(np.vdot(
+                brightness,
+                brightness
+            ))
             
             k_orth = k_starter * sf.ant.baselength(ant1, ant2)
             
