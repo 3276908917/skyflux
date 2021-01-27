@@ -62,8 +62,6 @@ def dkprll_deta(z):
    Input(s)
       z :  [scalar] redshift
    '''
-   #omega_m = 0.27
-   #return 2*np.pi/((1.7 / 0.1) * ((1+z) / 10.)**.5 * (omega_m/0.15)**-0.5 * 1e3)
    return 2 * np.pi * COSMO.H0.value * F21 * COSMO.efunc(z) / C /  (1+z)**2 * 1e3
 
 def k_parallel(delays, z):
@@ -277,13 +275,15 @@ for ant1 in pic.keys():
             # this is a proportionality.
             # The real deal uses the power equation 6
                 # from Nunhokee et al.
-            nu = frq[nu_idx]
             power_prop = np.vdot(
                 pic[ant1][ant2][nu_idx],
                 pic[ant1][ant2][nu_idx]
             )
             
-            k_orth = k_starter * #the thingy
+            k_orth = k_starter * ant.baselength(ant1, ant2)
+            
+            # based on the paper, we still need a factor of
+            # $1 / \lambda$
             
             wedge_datum = np.array([
                 k_orth,

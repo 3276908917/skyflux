@@ -13,6 +13,14 @@ data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 try:
     ant_pos = dict(pickle.load(open(data_prefix + "ant_dict.pk", "rb")))
 
+    def baselength(ant_ID1, ant_ID2):
+        """
+        (Convenience function)
+        Return the norm of the baseline between antennae
+            # @ant_ID1 and @ant_ID2
+        """
+        return np.linalg.norm(baseline(ant_ID1, ant_ID2))
+
     def baseline(ant_ID1, ant_ID2):
         """
         Calculate the baseline between antennae # @ant_ID1 and @ant_ID2
