@@ -236,71 +236,79 @@ import numpy as np
 
 import pickle
 
-picture_file = open("picture_dict.pickle", "rb")
+k_par = []
+k_starter = []
+nu_idxs = []
 
-meta = pickle.load(picture_file)
+def load_sim(fname):
+    global k_par
+    global k_starter
+    global nu_idxs
 
-frq = meta['frequencies']
-etas = f2etas(frq)
-# we are ranging from 50 to 250 MHz
-z = fq2z(150e6)
+    sim_file = open(fname, "rb")
 
-k_par = k_parallel(etas, z)
-lambda_ = C / 150e6
-k_starter = k_perp(z) / lambda_ # this will need to be multiplied on
-# a per-baseline basis
+    meta = pickle.load(sim_file)
 
-nu_idxs = range(len(frq))
+    frq = meta['frequencies'] #! I don't remember where this
+       # naming scheme is in the code
+    etas = f2etas(frq)
+    
+    # we are ranging from 50 to 250 MHz
+    center_f = np.average(frq)
+    z = fq2z(center_f)
+    lambda_ = C / center_f
 
-# ap = meta['ant_pos']
-pic = meta['picture']
+    k_par = k_parallel(etas, z)
+    k_starter = k_perp(z) / lambda_ # this will need to be
+    # multiplied on a per-baseline basis
 
-wedge_data = []
+    nu_idxs = range(len(frq))
 
-for ant1 in pic.keys():
-    for ant2 in pic[ant1].keys():
-        """
-        Since we only used one LST,
-        we do not need to do any averaging
-            (averaging is supposed to happen over LSTs, not frequency)
+    return meta['picture']
 
-        If you wanted to stick with your current data,
-            you can take the norm squared of those single LSTs,
-            but in the real world that would bring on heaps of noise.
-        """
-        for nu_idx in nu_idxs:
-            # this is a proportionality.
-            # The real deal uses the power equation 6
-                # from Nunhokee et al.
+def static_visual(sim):
+    wedge_data = []
+
+    for ant1 in sim.keys():
+        for ant2 in sim[ant1].keys():
+            """
+            Since we only used one LST,
+            we do not need to do any averaging
+                (averaging is supposed to happen over LSTs,
+                    not frequency)
+            """
+            for nu_idx in nu_idxs:
+                # this is a proportionality.
+                # The real deal uses the power equation 6
+                    # from Nunhokee et al.
+                    
+                brightness = sim[ant1][ant2][nu_idx]
+                    
+                power_prop = np.log10(np.vdot(
+                    brightness,
+                    brightness
+                ))
                 
-            brightness = pic[ant1][ant2][nu_idx]
+                k_orth = k_starter * sf.ant.baselength(ant1, ant2)
                 
-            power_prop = np.log10(np.vdot(
-                brightness,
-                brightness
-            ))
-            
-            k_orth = k_starter * sf.ant.baselength(ant1, ant2)
-            
-            wedge_datum = np.array([
-                k_orth,
-                k_par[nu_idx],
-                float(power_prop)
-            ])
+                wedge_datum = np.array([
+                    k_orth,
+                    k_par[nu_idx],
+                    float(power_prop)
+                ])
 
-            wedge_data.append(wedge_datum)
-		
-# Now start plotting
+                wedge_data.append(wedge_datum)
+                
+    return np.array(wedge_data)
 
-wedge_data = np.array(wedge_data)
+def open_visual(wedge):
+    k_orth = wedge[:, 0]
+    k_parr = wedge[:, 1]
+    p_p = wedge[:, 2]
 
-k_orth = wedge_data[:, 0]
-k_parr = wedge_data[:, 1]
-p_p = wedge_data[:, 2]
+    scaled_pow = (p_p - p_p.min()) / p_p.ptp()
+    colors = plt.cm.viridis(scaled_pow)
 
-scaled_pow = (p_p - p_p.min()) / p_p.ptp()
-colors = plt.cm.viridis(scaled_pow)
-
-plt.scatter(k_orth, k_parr, marker='.', c=colors)
-plt.show()
+    plt.scatter(k_orth, k_parr, marker='.', c=colors)
+    plt.show()
 

@@ -34,6 +34,10 @@ ra = np.radians(source.ra_angle)
 dec = np.radians(source.dec_angle)
 lst = np.radians(source.ra_angle)
 
+# constants
+hour = 2 * np.pi / 24
+minute = hour / 60
+
 def A_tensor():
     """
     Returned format: a |nu_axis| * |t_axis| * 4 * 4 matrix
@@ -69,6 +73,9 @@ def A_tensor():
 def f_only():
     """
     I am only accepting lst in radians.
+
+    Counterpart to above function, but used when only a single
+        LST is of concern.
 
     Returned format: a |nu_axis| * 4 * 4 matrix
     Contains every possible frequency A matrix. When performing calculations
@@ -176,8 +183,8 @@ def wedge_tensor():
     global dec
     global lst
 
-    nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
-    t_axis = np.arange(0, 2 * np.pi / 3, np.pi / 1440)
+    nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
+    t_axis = np.arange(ra - hour, ra + hour, 4 * minute)
     
     A_full = A_tensor()
     print("\nFinished building A tensor.\n")
