@@ -38,7 +38,7 @@ nu_rl = range(len(nu_axis))
 t_axis = np.arange(lst0 - hour, lst0 + hour, 4 * minute)
 t_rl = range(len(t_axis))
 
-def A_tensor():
+def A_tensor(ra, dec):
     """
     Returned format: a |nu_axis| * |t_axis| * 4 * 4 matrix
     Contains every possible exact A matrix.
@@ -46,19 +46,14 @@ def A_tensor():
     with time index t and frequency index f, we say
         this_A = A_tensor[f][t]
     """
-    global nu_axis
-    global t_axis
-    global ra
-    global dec
-    
     A_tensor = []
 
     azs = []
     alts = []
     
-    for lst in t_axis:
+    for t in t_axis:
         #! We should definitely vectorize this
-        az, alt = rot.eq_to_topo(ra, dec, lst=lst, radians=True)
+        az, alt = rot.eq_to_topo(ra, dec, lst=t, radians=True)
         alts.append(alt)
         azs.append(az)
 
@@ -82,14 +77,9 @@ def f_only():
     frequency index f, we say
         this_A = A_tensor[f]
     """
-    global nu_axis
-    global ra
-    global dec
-    global lst
-    
     A_tensor = []
 
-    az, alt = rot.eq_to_topo(ra, dec, lst=lst, radians=True)
+    az, alt = rot.eq_to_topo(ra, dec, lst=lst0, radians=True)
 
     for nu in nu_axis:
         J_source = stokes.create_J(az=az, alt=alt, nu=nu, radians=True)
@@ -111,17 +101,11 @@ def pickle_dict(dict_, label):
 def picture_tensor():
     raise NotImplementedError("Still processes just one source.")
 
-    global nu_axis
-    global source
-    global ra
-    global dec
-    global lst
-
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
     A = f_only()
     print("\nFinished building partial A-tensor.\n")
     
-    r = rot.radec2lm(ra, dec, ra0=lst)
+    r = rot.radec2lm(ra, dec, ra0=lst0)
     s_axis = []
     
     for ni in range(len(nu_axis)):
@@ -165,10 +149,11 @@ def merge_wedges(wedge1, wedge2):
 
     for ant1 in wedge1.keys():
         for ant2 in wedge1[ant1].keys():
-            for nu_idx in range(len(wedge1[ant1][ant2])):
+            for nu_idx in nu_rl:
                 system = wedge1[ant1][ant2]
-                for t_idx in range(len(system)):
-                    system[t_idx] += wedge2[ant1][ant2][nu_idx][t_idx]
+                for t_idx in t_rl:
+                    visibility2 = wedge2[ant1][ant2][nu_idx][t_idx]
+                    system[t_idx] += visibility2
                    
 
 def tick(percent):
@@ -198,40 +183,18 @@ def full_wedge():
 outer_ants = ant.ant_pos.copy()
 
 def single_wedge(source):
-    """
-    This function is no good. RAM usage skyrocketed to 11 GB compressed
-    within 2% completion of final goal.
-
-    I plan to return to this function eventually. For now,
-    we will use the picture tensor as an extremely-coarse approximation
-    (i.e. one LST is the approximation for 960 values)
-
-    Things to remember when coming back to this:
-        1. LST range should be only two hours for a single source
-            (reduces result size by 4x)
-        2. LST resolution should be 4 minutes, not 30 seconds
-            (reduces result size by 8x)
-        3. Frequency resolution should be 4 MHz, not 1 MHz
-            (reduces result size by 4x + 1)
-    Rough estimation: 11 GB at 2% means a total of 550 GB
-    We plan to reduce by 1/3 * 1/4 * 1/8 * 1/4
-    Should leave a total of 1.43 GB
-    """
-    
     # note
     # it does not really make sense to do a two-hour interval
     # with a full sky,
     # but I do not want to risk large file sizes,
     # so the simulation will be deliberately truncated...
     
-    global lst
-    
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
     
-    A_full = A_tensor()
+    A_full = A_tensor(ra, dec)
 
-    r = rot.radec2lm(ra, dec, ra0=lst)
+    r = rot.radec2lm(ra, dec, ra0=lst0)
     s_axis = []
     
     for ni in nu_rl:
@@ -240,7 +203,7 @@ def single_wedge(source):
         s_axis.append(np.array([complex(I), 0, 0, 0]))
    
     for outer_ant in outer_ants.keys():
-        inner_ants = ants.copy()
+        inner_ants = outer_ants.copy()
         del inner_ants[outer_ant]
 
         for inner_ant in inner_ants.keys():
@@ -269,10 +232,3 @@ def single_wedge(source):
 
     return outer_ants
 
-"""
-Visualization:
-plt.imshow(np.abs(vt[:, :, 0].T), extent=[50, 250, 8 * 60, 0])
-plt.xlabel('Beam Frequency [MHz]')
-plt.ylabel('LST [minutes]')
-plt.show()
-"""
