@@ -23,7 +23,8 @@ try:
 
     def baseline(ant_ID1, ant_ID2):
         """
-        Calculate the baseline between antennae # @ant_ID1 and @ant_ID2
+        Calculate the baseline between antennae
+            # @ant_ID1 and @ant_ID2
         by a simple difference of their coordinates.
         """
         return ant_pos[ant_ID2] - ant_pos[ant_ID1]

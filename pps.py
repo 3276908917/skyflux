@@ -305,8 +305,15 @@ def static_visual(sim_dict):
                 
     return np.array(wedge_data)
     
-def dynamic_visual(sim):
+def dynamic_visual(sim_dict):
     wedge_data = []
+    
+    ### aliasing ###
+    nu_idxs = sim_dict['fs']
+    k_par = sim_dict['kp']
+    k_starter = sim_dict['ks']
+    sim = sim_dict['sim']
+
 
     for ant1 in sim.keys():
         for ant2 in sim[ant1].keys():
