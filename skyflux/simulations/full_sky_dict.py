@@ -22,20 +22,21 @@ from skyflux import demo
 
 MACRO_EPSILON = 0.001
 
-# we keep these as global parameters to avoid the potential overhead
-# of passing by value
-nu_axis = None
-t_axis = None
-
-### Hard coding, for speed ###
-source = catalog.obj_catalog[3871]
-ra = np.radians(source.ra_angle)
-dec = np.radians(source.dec_angle)
-lst = np.radians(source.ra_angle)
-
 # constants
 hour = 2 * np.pi / 24
 minute = hour / 60
+
+### Hard coding, for speed ###
+source = catalog.obj_catalog[3871]
+lst0 = np.radians(source.ra_angle)
+
+# we keep these as global parameters to avoid the potential overhead
+# of passing by value
+nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
+nu_rl = range(len(nu_axis))
+
+t_axis = np.arange(lst0 - hour, lst0 + hour, 4 * minute)
+t_rl = range(len(t_axis))
 
 def A_tensor():
     """
@@ -108,6 +109,8 @@ def pickle_dict(dict_, label):
 
 # Scan over all frequencies, for a single source, over all possible baselines
 def picture_tensor():
+    raise NotImplementedError("Still processes just one source.")
+
     global nu_axis
     global source
     global ra
@@ -161,11 +164,11 @@ def merge_wedges(wedge1, wedge2):
         To conserve memory, we modify the wedge2 parameter."""
 
     for ant1 in wedge1.keys():
-        for ant2 in wedge1.keys():
+        for ant2 in wedge1[ant1].keys():
             for nu_idx in range(len(wedge1[ant1][ant2])):
                 system = wedge1[ant1][ant2]
                 for t_idx in range(len(system)):
-                    system[t_idx} += wedge2[ant1][ant2][nu_idx][t_idx]
+                    system[t_idx] += wedge2[ant1][ant2][nu_idx][t_idx]
                    
 
 def tick(percent):
@@ -191,6 +194,8 @@ def full_wedge():
         tick(percent)
         
     return wedge
+
+outer_ants = ant.ant_pos.copy()
 
 def single_wedge(source):
     """
@@ -219,34 +224,21 @@ def single_wedge(source):
     # but I do not want to risk large file sizes,
     # so the simulation will be deliberately truncated...
     
-    global nu_axis
-    global t_axis
-    
-    global ra
-    global dec
+    global lst
     
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
-
-    nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
-    t_axis = np.arange(ra - hour, ra + hour, 4 * minute)
     
     A_full = A_tensor()
-    print("\nFinished building A-tensor.\n")
 
-    r = rot.radec2lm(ra, dec, ra0=ra)
+    r = rot.radec2lm(ra, dec, ra0=lst)
     s_axis = []
     
-    for ni in range(len(nu_axis)):
+    for ni in nu_rl:
         nu = nu_axis[ni]
         I = vis.get_I(source, nu)
         s_axis.append(np.array([complex(I), 0, 0, 0]))
-
-    print("\nFinished building s-vector vector.\n")
-
-    ants = ant.ant_pos.copy()
-    outer_ants = ants.copy()
-
+   
     for outer_ant in outer_ants.keys():
         inner_ants = ants.copy()
         del inner_ants[outer_ant]
@@ -256,17 +248,12 @@ def single_wedge(source):
             phi = ant.phase_factor(outer_ant, inner_ant, r, nu)
         
             f_layer = []
-            for ni in range(len(nu_axis)):
-                #nu = nu_axis[ni]
-                #next_vt.append([])
-                #I = vis.get_I(source, nu)
-                #s = np.array([complex(I), 0, 0, 0])
-
+            for ni in nu_rl:
                 s = s_axis[ni]
                 A_n = A_full[ni]
 
                 t_layer = []
-                for ti in range(len(t_axis)):
+                for ti in t_rl:
                     t = t_axis[ti]
 
                     A_t = A_n[ti]
