@@ -1,12 +1,3 @@
-"""
-hera_pspec:
-    spectral window can be [(145 MHz, 155 MHz)]
-
-    First channel is 50 MHz which corresponds to index 0
-        like, ch = np.arange(201)
-    indices into frequency array
-"""
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle
@@ -19,7 +10,6 @@ from skyflux import rot
 from skyflux import demo
 
 # disgustingly hacky
-
 MACRO_EPSILON = 0.001
 
 # constants
@@ -149,7 +139,6 @@ def merge_wedges(wedge1, wedge2):
                     #print("\n" + str(type(visibility2)) + "\n")
                     system[t_idx] += visibility2
                    
-
 def tick(percent):
     """ Give the user a progress update."""
     percent_status = str(np.around(percent, 4))
@@ -169,6 +158,7 @@ def full_wedge(num_sources, start_idx):
     for next_obj in catalog.obj_catalog[start:end]:
         next_wedge = single_wedge(next_obj)
         merge_wedges(wedge, next_wedge)
+        print(wedge[136][140])
 
         percent += percent_interval
         tick(percent)
