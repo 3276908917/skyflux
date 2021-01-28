@@ -236,6 +236,14 @@ import numpy as np
 
 import pickle
 
+def auto_show(fname, static=False):
+    sim_dict = load_sim(fname)
+    if static:
+        wedge = static_visual(sim_dict)
+    else:
+        wedge = dynamic_visual(sim_dict) 
+    open_visual(wedge)
+
 def load_sim(fname):
     global k_par
     global k_starter
