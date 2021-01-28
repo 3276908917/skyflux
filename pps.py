@@ -236,10 +236,6 @@ import numpy as np
 
 import pickle
 
-k_par = []
-k_starter = []
-nu_idxs = []
-
 def load_sim(fname):
     global k_par
     global k_starter
@@ -264,10 +260,19 @@ def load_sim(fname):
 
     nu_idxs = range(len(frq))
 
-    return meta['picture']
+    return {"fs": nu_idxs,
+            "kp": k_par,
+            "ks": k_starter,
+            "sim": meta['picture']}
 
-def static_visual(sim):
+def static_visual(sim_dict):
     wedge_data = []
+    
+    ### aliasing ###
+    nu_idxs = sim_dict['fs']
+    k_par = sim_dict['kp']
+    k_starter = sim_dict['ks']
+    sim = sim_dict['sim']
 
     for ant1 in sim.keys():
         for ant2 in sim[ant1].keys():
@@ -309,7 +314,7 @@ def dynamic_visual(sim):
             
             for nu_idx in nu_idxs:
                 system = sim[ant1][ant2][nu_idx]
-                powers = []
+                powers_prop = []
                 
                 for t_idx in range(len(system) - 1):
                     this_instant = system[t_idx]
@@ -317,7 +322,7 @@ def dynamic_visual(sim):
                     # this is a proportionality.
                     # The real deal uses the power equation 6
                     # from Nunhokee et al.
-                    powers.append(np.vdot(
+                    powers_prop.append(np.vdot(
                         this_instant,
                         next_instant
                     ))
@@ -328,7 +333,7 @@ def dynamic_visual(sim):
                     float(
                         np.log10(
                             np.average(
-                                np.array(power_prop)
+                                np.array(powers_prop)
                             )
                         )
                     )
