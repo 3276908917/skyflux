@@ -117,7 +117,7 @@ def picture_tensor():
 
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
     A = f_only()
-    print("\nFinished building partial A tensor.\n")
+    print("\nFinished building partial A-tensor.\n")
     
     r = rot.radec2lm(ra, dec, ra0=lst)
     s_axis = []
@@ -148,10 +148,8 @@ def picture_tensor():
                 next_vista = np.dot(np.dot(A_n, s), phi)
                 next_vt.append(next_vista)
 
-            inner_pos = inner_ants[inner_ant]
             inner_ants[inner_ant] = next_vt
 
-        outer_pos = outer_ants[outer_ant]
         outer_ants[outer_ant] = inner_ants
 
     return outer_ants
@@ -181,15 +179,14 @@ def wedge_tensor():
     global source
     global ra
     global dec
-    global lst
 
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
     t_axis = np.arange(ra - hour, ra + hour, 4 * minute)
     
     A_full = A_tensor()
-    print("\nFinished building A tensor.\n")
+    print("\nFinished building A-tensor.\n")
 
-    r = rot.radec2lm(ra, dec, ra0=lst)
+    r = rot.radec2lm(ra, dec, ra0=ra)
     s_axis = []
     
     for ni in range(len(nu_axis)):
@@ -197,7 +194,7 @@ def wedge_tensor():
         I = vis.get_I(source, nu)
         s_axis.append(np.array([complex(I), 0, 0, 0]))
 
-    print("Finished building s-vector vector.\n")
+    print("\nFinished building s-vector vector.\n")
 
     ants = ant.ant_pos.copy()
     outer_ants = ants.copy()
@@ -210,39 +207,37 @@ def wedge_tensor():
         del inner_ants[outer_ant]
 
         for inner_ant in inner_ants.keys():
+        
             phi = ant.phase_factor(outer_ant, inner_ant, r, nu)
         
-            next_vt = []
+            f_layer = []
             for ni in range(len(nu_axis)):
-                nu = nu_axis[ni]
-                next_vt.append([])
+                #nu = nu_axis[ni]
+                #next_vt.append([])
+                #I = vis.get_I(source, nu)
+                #s = np.array([complex(I), 0, 0, 0])
 
-                I = vis.get_I(source, nu)
-                s = np.array([complex(I), 0, 0, 0])
-
+                s = s_axis[ni]
                 A_n = A_full[ni]
 
+                t_layer = []
                 for ti in range(len(t_axis)):
                     t = t_axis[ti]
 
-                    A = A_n[ti]
+                    A_t = A_n[ti]
                     
-                    next_vista = np.dot(np.dot(A, s), phi)
-                    next_vt[len(next_vt) - 1].append(next_vista)
-                    
-
-                next_vista = np.dot(np.dot(A_n, s), phi)
-                next_vt.append(next_vista)
+                    next_vista = np.dot(np.dot(A_t, s), phi)
+                    t_layer.append(next_vista)
+          
+                f_layer.append(t_layer)
 
             percent += percent_interval
             percent_status = str(np.around(percent, 4))
             print("\nWedge tensor: " + percent_status + "% complete.")
 
-            inner_pos = inner_ants[inner_ant]
-            inner_ants[inner_ant] = [inner_pos, next_vt]
+            inner_ants[inner_ant] = f_layer
 
-        outer_pos = outer_ants[outer_ant]
-        outer_ants[outer_ant] = [outer_pos, inner_ants]
+        outer_ants[outer_ant] = inner_ants
 
     return outer_ants
 
