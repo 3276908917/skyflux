@@ -145,6 +145,7 @@ def merge_wedges(wedge1, wedge2):
                 system = wedge1[ant1][ant2][nu_idx]
                 for t_idx in t_rl:
                     visibility2 = wedge2[ant1][ant2][nu_idx][t_idx]
+                    #print("\n" + type(visibility2) + "\n")
                     system[t_idx] += visibility2
                    
 
@@ -162,7 +163,9 @@ def full_wedge(num_sources, start_idx):
     percent += percent_interval
     tick(percent)
     
-    for next_obj in catalog.obj_catalog[(start_idx + 1):num_sources]:
+    start = start_idx + 1
+    end = start_idx + num_sources
+    for next_obj in catalog.obj_catalog[start:end]:
         next_wedge = single_wedge(next_obj)
         merge_wedges(wedge, next_wedge)
 

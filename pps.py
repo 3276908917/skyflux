@@ -346,8 +346,10 @@ def dynamic_visual(sim_dict):
                     k_orth,
                     k_par[nu_idx],
                     float(
-                        np.average(
-                            np.array(powers_prop)
+                        np.log10(
+                            np.average(
+                                np.array(powers_prop)
+                            )
                         )
                     )
                 ])
