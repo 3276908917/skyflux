@@ -9,7 +9,7 @@ hera_pspec:
 
 import matplotlib.pyplot as plt
 import numpy as np
-import healpy as hp
+import pickle
 
 from skyflux import catalog
 from skyflux import ant
@@ -66,6 +66,7 @@ def A_tensor(ra, dec):
     return np.array(A_tensor)
 
 def f_only():
+    raise NotImplementedError("Still processes just one source.")
     """
     I am only accepting lst in radians.
 
@@ -145,7 +146,7 @@ def merge_wedges(wedge1, wedge2):
                 system = wedge1[ant1][ant2][nu_idx]
                 for t_idx in t_rl:
                     visibility2 = wedge2[ant1][ant2][nu_idx][t_idx]
-                    #print("\n" + type(visibility2) + "\n")
+                    #print("\n" + str(type(visibility2)) + "\n")
                     system[t_idx] += visibility2
                    
 
@@ -218,9 +219,9 @@ def single_wedge(source):
                     next_vista = np.dot(np.dot(A_t, s), phi)
                     t_layer.append(next_vista)
           
-                f_layer.append(t_layer)
+                f_layer.append(np.array(t_layer))
 
-            inner_ants[inner_ant] = f_layer
+            inner_ants[inner_ant] = np.array(f_layer)
 
         outer_ants[outer_ant] = inner_ants
 
@@ -236,8 +237,6 @@ def package_wedge(wedge):
     return {'frequencies' : nu_axis,
             'times' : t_axis,
             'picture' : wedge}
-
-import pickle
 
 def pickle_dict(dict_, label):
     """
