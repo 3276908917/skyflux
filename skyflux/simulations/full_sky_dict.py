@@ -14,14 +14,13 @@ import healpy as hp
 from skyflux import catalog
 from skyflux import ant
 from skyflux import vis
+from skyflux import stokes
+from skyflux import rot
+from skyflux import demo
 
 # disgustingly hacky
 
 MACRO_EPSILON = 0.001
-
-from skyflux import stokes
-from skyflux import rot
-from skyflux import demo
 
 # we keep these as global parameters to avoid the potential overhead
 # of passing by value
@@ -154,7 +153,46 @@ def picture_tensor():
 
     return outer_ants
 
-def wedge_tensor():
+def merge_wedges(wedge1, wedge2):
+    """ We assume that both wedges have the same format:
+        ant1, ant2, nu, t hierarchies are exactly the same.
+        
+        WARNING: this is not write-safe!
+        To conserve memory, we modify the wedge2 parameter."""
+
+    for ant1 in wedge1.keys():
+        for ant2 in wedge1.keys():
+            for nu_idx in range(len(wedge1[ant1][ant2])):
+                system = wedge1[ant1][ant2]
+                for t_idx in range(len(system)):
+                    system[t_idx} += wedge2[ant1][ant2][nu_idx][t_idx]
+                   
+
+def tick(percent):
+    """ Give the user a progress update."""
+    percent_status = str(np.around(percent, 4))
+    print("\nWedge tensor: " + percent_status + "% complete.")
+
+def full_wedge():
+    
+    percent_interval = 100 / len(catalog.obj_catalog)
+    percent = 0
+    
+    wedge = single_wedge(catalog.obj_catalog[0])
+    
+    percent += percent_interval
+    tick(percent)
+    
+    for next_obj in catalog.obj_catalog[1:]:
+        next_wedge = single_wedge(next_obj)
+        merge_wedges(wedge, next_wedge)
+
+        percent += percent_interval
+        tick(percent)
+        
+    return wedge
+
+def single_wedge(source):
     """
     This function is no good. RAM usage skyrocketed to 11 GB compressed
     within 2% completion of final goal.
@@ -174,11 +212,21 @@ def wedge_tensor():
     We plan to reduce by 1/3 * 1/4 * 1/8 * 1/4
     Should leave a total of 1.43 GB
     """
+    
+    # note
+    # it does not really make sense to do a two-hour interval
+    # with a full sky,
+    # but I do not want to risk large file sizes,
+    # so the simulation will be deliberately truncated...
+    
     global nu_axis
     global t_axis
-    global source
+    
     global ra
     global dec
+    
+    ra = np.radians(source.ra_angle)
+    dec = np.radians(source.dec_angle)
 
     nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
     t_axis = np.arange(ra - hour, ra + hour, 4 * minute)
@@ -198,9 +246,6 @@ def wedge_tensor():
 
     ants = ant.ant_pos.copy()
     outer_ants = ants.copy()
-
-    percent_interval = 100 / (len(ants) * (len(ants) - 1))
-    percent = 0
 
     for outer_ant in outer_ants.keys():
         inner_ants = ants.copy()
@@ -230,10 +275,6 @@ def wedge_tensor():
                     t_layer.append(next_vista)
           
                 f_layer.append(t_layer)
-
-            percent += percent_interval
-            percent_status = str(np.around(percent, 4))
-            print("\nWedge tensor: " + percent_status + "% complete.")
 
             inner_ants[inner_ant] = f_layer
 
