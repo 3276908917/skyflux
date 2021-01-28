@@ -6,13 +6,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import pickle
-picture_file = open("picture_dict.pickle", "rb")
+picture_file = open("67_src_wedge.pickle", "rb")
 meta = pickle.load(picture_file)
 pic = meta['picture']
 
 for ant1 in pic.keys():
     for ant2 in pic[ant1].keys():
-        next_plot = np.array(pic[ant1][ant2])
-        plt.plot(np.abs(next_plot[:, 0]))
-        plt.show()
+        for nu_idx in range(len(pic[ant1][ant2])):
+            next_plot = np.array(pic[ant1][ant2][nu_idx])
+            plt.plot(np.abs(next_plot[:, 0]))
+            plt.show()
 

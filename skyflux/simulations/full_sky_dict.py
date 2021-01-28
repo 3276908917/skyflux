@@ -142,7 +142,7 @@ def merge_wedges(wedge1, wedge2):
     for ant1 in wedge1.keys():
         for ant2 in wedge1[ant1].keys():
             for nu_idx in nu_rl:
-                system = wedge1[ant1][ant2]
+                system = wedge1[ant1][ant2][nu_idx]
                 for t_idx in t_rl:
                     visibility2 = wedge2[ant1][ant2][nu_idx][t_idx]
                     system[t_idx] += visibility2
@@ -153,23 +153,16 @@ def tick(percent):
     percent_status = str(np.around(percent, 4))
     print("\nWedge tensor: " + percent_status + "% complete.")
 
-def full_wedge(num_sources):
-    """
-    Current implementation does not allow the user to define a range.
-    Instead, the routine automatically interprets the
-        @num_sources
-    parameter solely to determine the end index.
-    """
-    
+def full_wedge(num_sources, start_idx):
     percent_interval = 100 / num_sources
     percent = 0
     
-    wedge = single_wedge(catalog.obj_catalog[0])
+    wedge = single_wedge(catalog.obj_catalog[start_idx])
     
     percent += percent_interval
     tick(percent)
     
-    for next_obj in catalog.obj_catalog[1:num_sources]:
+    for next_obj in catalog.obj_catalog[(start_idx + 1):num_sources]:
         next_wedge = single_wedge(next_obj)
         merge_wedges(wedge, next_wedge)
 
