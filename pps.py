@@ -277,6 +277,7 @@ def static_visual(sim):
                 (averaging is supposed to happen over LSTs,
                     not frequency)
             """
+            k_orth = k_starter * sf.ant.baselength(ant1, ant2)
             for nu_idx in nu_idxs:
                 # this is a proportionality.
                 # The real deal uses the power equation 6
@@ -289,12 +290,48 @@ def static_visual(sim):
                     brightness
                 ))
                 
-                k_orth = k_starter * sf.ant.baselength(ant1, ant2)
-                
                 wedge_datum = np.array([
                     k_orth,
                     k_par[nu_idx],
                     float(power_prop)
+                ])
+
+                wedge_data.append(wedge_datum)
+                
+    return np.array(wedge_data)
+    
+def dynamic_visual(sim):
+    wedge_data = []
+
+    for ant1 in sim.keys():
+        for ant2 in sim[ant1].keys():
+            k_orth = k_starter * sf.ant.baselength(ant1, ant2)
+            
+            for nu_idx in nu_idxs:
+                system = sim[ant1][ant2][nu_idx]
+                powers = []
+                
+                for t_idx in range(len(system) - 1):
+                    this_instant = system[t_idx]
+                    next_instant = system[t_idx + 1]
+                    # this is a proportionality.
+                    # The real deal uses the power equation 6
+                    # from Nunhokee et al.
+                    powers.append(np.vdot(
+                        this_instant,
+                        next_instant
+                    ))
+
+                wedge_datum = np.array([
+                    k_orth,
+                    k_par[nu_idx],
+                    float(
+                        np.log10(
+                            np.average(
+                                np.array(power_prop)
+                            )
+                        )
+                    )
                 ])
 
                 wedge_data.append(wedge_datum)
