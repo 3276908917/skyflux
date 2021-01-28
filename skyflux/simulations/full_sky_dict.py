@@ -89,14 +89,6 @@ def f_only():
         
     return np.array(A_tensor)
 
-import pickle
-
-def pickle_dict(dict_, label):
-    with open(label + '.pickle', 'wb') as handle:
-        pickle.dump(dict_, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-# super_dict = picture_tensor()
-
 # Scan over all frequencies, for a single source, over all possible baselines
 def picture_tensor():
     raise NotImplementedError("Still processes just one source.")
@@ -161,9 +153,15 @@ def tick(percent):
     percent_status = str(np.around(percent, 4))
     print("\nWedge tensor: " + percent_status + "% complete.")
 
-def full_wedge():
+def full_wedge(num_sources):
+    """
+    Current implementation does not allow the user to define a range.
+    Instead, the routine automatically interprets the
+        @num_sources
+    parameter solely to determine the end index.
+    """
     
-    percent_interval = 100 / len(catalog.obj_catalog)
+    percent_interval = 100 / num_sources
     percent = 0
     
     wedge = single_wedge(catalog.obj_catalog[0])
@@ -171,7 +169,7 @@ def full_wedge():
     percent += percent_interval
     tick(percent)
     
-    for next_obj in catalog.obj_catalog[1:]:
+    for next_obj in catalog.obj_catalog[1:num_sources]:
         next_wedge = single_wedge(next_obj)
         merge_wedges(wedge, next_wedge)
 
@@ -231,4 +229,27 @@ def single_wedge(source):
         outer_ants[outer_ant] = inner_ants
 
     return outer_ants
+    
+def package_wedge(wedge):
+    """
+    Returns a print-ready wedge dictionary,
+        particularly for use with the pps.py routines.
+        
+    Use pickle_dict to save to disk.
+    """
+    return {'frequencies' : nu_axis,
+            'times' : t_axis,
+            'picture' : wedge}
+
+import pickle
+
+def pickle_dict(dict_, label):
+    """
+    Pickles @dict_ with a file name based on @label.
+    While this is a generic routine and will pickle any dictionary,
+        the intent is solely for use in conjunction with the
+        package_wedge routine.
+    """
+    with open(label + '.pickle', 'wb') as handle:
+        pickle.dump(dict_, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
