@@ -255,7 +255,9 @@ def load_sim(fname):
 
     frq = meta['frequencies'] #! I don't remember where this
        # naming scheme is in the code
-    etas = f2etas(frq)
+
+    # f2etas accepts frequencies in GHz
+    etas = f2etas(frq / 1e9)
     
     # we are ranging from 50 to 250 MHz
     center_f = np.average(frq)
