@@ -256,7 +256,8 @@ def load_sim(fname):
     frq = meta['frequencies'] #! I don't remember where this
        # naming scheme is in the code
 
-    # f2etas accepts frequencies in GHz
+    # f2etas claims to accept frequencies in GHz,
+    # but the axes come out strangely
     etas = f2etas(frq / 1e9)
     
     # we are ranging from 50 to 250 MHz
@@ -324,7 +325,6 @@ def dynamic_visual(sim_dict):
     k_starter = sim_dict['ks']
     sim = sim_dict['sim']
 
-
     for ant1 in sim.keys():
         for ant2 in sim[ant1].keys():
             k_orth = k_starter * sf.ant.baselength(ant1, ant2)
@@ -344,6 +344,9 @@ def dynamic_visual(sim_dict):
                         next_instant
                     ))
 
+                    # Does v have units of brightness or square of brightness?
+                    # We want a delay transform delay_transform(data, fqs)
+
                 wedge_datum = np.array([
                     k_orth,
                     k_par[nu_idx],
@@ -356,9 +359,37 @@ def dynamic_visual(sim_dict):
                     )
                 ])
 
-                wedge_data.append(wedge_datum)
-                
-    return np.array(wedge_data)
+                wedge_data.append(wedge_datum)   
+
+    ### begin prototyping section
+
+    wedge_data = np.array(wedge_data)
+
+    """
+       The structure of wedge_data is a collection of triplets
+       (k_orth, k_parr, some squared brightness)
+
+       Based on the order in which I added data, I think that each consecutive
+       len(nu_idxs) should have the same value of k_orth, right?
+    """
+
+    nu_rl = len(nu_idxs)
+
+    wedge_final = wedge_data.copy()
+
+    for i in range(len(wedge_data) / nu_rl - 1):
+        start = i * nu_rl
+        end = (i + 1) * nu_rl
+        vis_over_f = wedge_data[start:end]
+        dt = delay_transform(vis_over_f[:, 2], frq / 1e9)
+        # now copy that into wedge_final somehow
+        for j in range(len(vis_over_f)):
+            wedge_final[j + start][2] = vis_over_f[j]
+       
+    ### terminate prototyping section  
+   
+    # return np.array(wedge_data)
+    
 
 def open_visual(wedge):
     k_orth = wedge[:, 0]
