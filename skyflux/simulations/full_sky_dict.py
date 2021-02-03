@@ -128,8 +128,43 @@ def merge_wedges(wedge1, wedge2):
         ant1, ant2, nu, t hierarchies are exactly the same.
         
         WARNING: this is not write-safe!
-        To conserve memory, we modify the wedge2 parameter."""
+        To conserve memory, we modify the wedge1 parameter."""
 
+
+    sum_ = {}
+    for ant1 in wedge1.keys():
+        sum_[ant1] = {}
+        for ant2 in wedge1[ant1].keys():
+            sum_[ant1][ant2] = np.zeros(
+                (len(nu_rl), len(t_rl), 4), dtype=np.complex128
+            )
+            for nu_idx in nu_rl:
+                for t_idx in t_rl:
+                    vis1 = wedge1[ant1][ant2][nu_idx][t_idx]
+                    vis2 = wedge2[ant1][ant2][nu_idx][t_idx]
+                    
+                    """ Debugging block
+                    print(vis1)
+                    print()
+                    print(vis2)
+                    print()
+                    print(sum_[ant1][ant2][nu_idx][t_idx])
+                    """
+                    
+                    sum_[ant1][ant2][nu_idx][t_idx] = \
+                        np.add(vis1, vis2)
+                    if np.array_equal(
+                        sum_[ant1][ant2][nu_idx][t_idx],
+                        np.zeros(4)
+                    ):
+                        print("\nZero encountered!")
+                        print(vis1)
+                        print(vis2)
+                        print()
+                
+    return sum_
+                
+    """
     for ant1 in wedge1.keys():
         for ant2 in wedge1[ant1].keys():
             for nu_idx in nu_rl:
@@ -137,12 +172,22 @@ def merge_wedges(wedge1, wedge2):
                 for t_idx in t_rl:
                     visibility2 = wedge2[ant1][ant2][nu_idx][t_idx]
                     #print("\n" + str(type(visibility2)) + "\n")
-                    system[t_idx] += visibility2
+                    wedge1[ant1][ant2][nu_idx][t_idx] = np.add(
+                        visibility2, system[t_idx])
+                    if np.array_equal(system[t_idx], np.zeros(4)):
+                        print("\nZero encountered!")
+                        print(system[t_idx] - visibility2)
+                        print(visibility2)
+                        print()
+    """
                    
 def tick(percent):
     """ Give the user a progress update."""
     percent_status = str(np.around(percent, 4))
     print("\nWedge tensor: " + percent_status + "% complete.")
+
+def null_source(obj):
+    return obj.alpha != obj.alpha
 
 def full_wedge(num_sources, start_idx):
     percent_interval = 100 / num_sources
@@ -156,8 +201,11 @@ def full_wedge(num_sources, start_idx):
     start = start_idx + 1
     end = start_idx + num_sources
     for next_obj in catalog.obj_catalog[start:end]:
+        if null_source(next_obj):
+            continue
+        
         next_wedge = single_wedge(next_obj)
-        merge_wedges(wedge, next_wedge)
+        wedge = merge_wedges(wedge, next_wedge)
         print(wedge[136][140])
 
         percent += percent_interval
