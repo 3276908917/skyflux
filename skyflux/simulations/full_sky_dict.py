@@ -217,7 +217,7 @@ def multi_helix(ant1, ant2, sources=catalog.obj_catalog):
     #percent_interval = 100 / len(list_sources)
     #percent = 0
     
-    helix = single_helix(list_sources[0])
+    helix = single_helix(ant1, ant2, sources[0])
     
     #percent += percent_interval
     #tick(percent)
@@ -226,14 +226,14 @@ def multi_helix(ant1, ant2, sources=catalog.obj_catalog):
         if null_source(next_obj):
             continue
         
-        next_helix = single_helix(next_obj)
+        next_helix = single_helix(ant1, ant2, next_obj)
         helix = np.add(helix, next_helix)
         
     return helix
 
 outer_ants = ant.ant_pos.copy()
 
-def single_helix(source, ant1, ant2)
+def single_helix(ant1, ant2, source):
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
     
@@ -337,7 +337,7 @@ def pickle_dict(dict_, label):
     with open(label + '.pickle', 'wb') as handle:
         pickle.dump(dict_, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
-def auto_dump(list_sources, label):
+def auto_wedge(list_sources, label):
     """
     Automatically runs
         full_wedge(list_sources)
@@ -345,4 +345,7 @@ def auto_dump(list_sources, label):
         pickle_dict
     """
     pickle_dict(package_wedge(full_wedge(list_sources)), label)
-
+    
+def auto_helix(ant1, ant2, sources, label):
+    np.save(label, multi_helix(ant1, ant2, sources))
+    
