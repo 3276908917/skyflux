@@ -245,8 +245,6 @@ def auto_show(fname, static=False):
     open_visual(wedge)
     
 def show_helix(fname):
-    helix = np.load(fname)
-    
     sim_file = open(fname, "rb")
     
     meta = pickle.load(sim_file)
@@ -261,7 +259,8 @@ def show_helix(fname):
     for ni in range(len(sim)):
         for ti in range(len(sim[ni])):
             visual.append(np.array((
-                etas[ni], ts[ti], sim[ni][ti][0]
+                etas[ni], ts[ti],
+                np.linalg.norm(sim[ni][ti])
             )))
     visual = np.array(visual)   
     
