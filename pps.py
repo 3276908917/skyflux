@@ -269,6 +269,8 @@ def show_helix(fname):
     delays = visual[:, 0]
     times = visual[:, 1]
     v = visual[:, 2]
+    
+    # v = np.log10(v)
 
     delays = np.fft.fftshift(delays) * 1e9
     #times = np.fft.fftshift(times)
@@ -276,6 +278,7 @@ def show_helix(fname):
 
     scaled_v = (v - v.min()) / v.ptp()
     colors = plt.cm.viridis(scaled_v)
+    #colors = plt.cm.viridis(v)
 
     " We HAVE to do better than this. How do I line up a color bar? "
 
