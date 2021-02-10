@@ -258,7 +258,7 @@ def load_sim(fname):
 
     # f2etas claims to accept frequencies in GHz,
     # but the axes come out strangely
-    etas = f2etas(frq / 1e9)
+    etas = f2etas(frq)# / 1e9)
     
     # we are ranging from 50 to 250 MHz
     center_f = np.average(frq)
@@ -372,7 +372,8 @@ def dynamic_visual(sim_dict):
        Based on the order in which I added data, I think that each consecutive
        len(nu_idxs) should have the same value of k_orth, right?
     """
-
+    
+    """
     nu_rl = len(nu_idxs)
 
     wedge_final = wedge_data.copy()
@@ -387,10 +388,10 @@ def dynamic_visual(sim_dict):
             wedge_final[j + start][2] = vis_over_f[j]
        
     ### terminate prototyping section  
+    """
    
-    # return np.array(wedge_data)
+    return np.array(wedge_data)
     
-
 def open_visual(wedge):
     k_orth = wedge[:, 0]
     k_parr = wedge[:, 1]
@@ -399,6 +400,10 @@ def open_visual(wedge):
     scaled_pow = (p_p - p_p.min()) / p_p.ptp()
     colors = plt.cm.viridis(scaled_pow)
 
+    print("Minimum:", p_p.min())
+    print("PTP:", p_p.ptp())
+
     plt.scatter(k_orth, k_parr, marker='.', c=colors)
+    plt.colorbar()
     plt.show()
 

@@ -259,7 +259,7 @@ def lookup(name):
     Returns -1 if the name was not found in the catalog.
     """
     for i in range(len(catalog.obj_catalog)):
-        if catalog.obj_catalog.name == name:
+        if catalog.obj_catalog[i].name == name:
             return i
     return -1
 
@@ -296,7 +296,7 @@ def sources_range(start=3, end=5, frq=151):
     print("Number of valid sources encountered:", len(valid_sources))
     return valid_sources
 
-def brightest_source(frq=151):
+def brightest_source(frq=151, sliced_list=catalog.obj_catalog):
     """
     Return the source with the highest value for integrated flux
         at frequency @frq (in MHz).
@@ -305,12 +305,13 @@ def brightest_source(frq=151):
 
     There is no error checking to make sure @frq is a valid frequency.
     """
-    max_obj = catalog.obj_catalog[0]
-    for gleam_obj in catalog.obj_catalog:
+    max_obj = sliced_list[0]
+    for gleam_obj in sliced_list:
         if gleam_obj.flux_by_frq[frq] > max_obj.flux_by_frq[frq]:
             max_obj = gleam_obj
     print("Largest flux value encountered:", max_obj.flux_by_frq[frq])
     print("Name of associated object:", max_obj.name)
+    print("Index of associated object:", lookup(max_obj.name))
     return max_obj
 
 def hist_data(list_source, frq=151, ln=False, data_lim=None):
