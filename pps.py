@@ -259,14 +259,20 @@ def show_helix(fname):
     for ni in range(len(sim)):
         for ti in range(len(sim[ni])):
             visual.append(np.array((
-                etas[ni], ts[ti],
+                etas[ni], ts[ti] * 12 / np.pi,
                 np.linalg.norm(sim[ni][ti])
             )))
     visual = np.array(visual)   
     
+    #visual = np.fft.fftshift(visual)
+    
     delays = visual[:, 0]
     times = visual[:, 1]
     v = visual[:, 2]
+
+    delays = np.fft.fftshift(delays) * 1e9
+    #times = np.fft.fftshift(times)
+    #v = np.fft.fftshift(v)
 
     scaled_v = (v - v.min()) / v.ptp()
     colors = plt.cm.viridis(scaled_v)
@@ -277,6 +283,8 @@ def show_helix(fname):
     print("PTP:", v.ptp())
 
     plt.scatter(delays, times, marker='.', c=colors)
+    plt.xlabel("Delays [ns]")
+    plt.ylabel("LST [hr]")
     plt.colorbar()
     plt.show()
     

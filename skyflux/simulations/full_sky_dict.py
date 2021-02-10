@@ -22,10 +22,18 @@ lst0 = np.radians(source.ra_angle)
 
 # we keep these as global parameters to avoid the potential overhead
 # of passing by value
-nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
+
+# For wedges
+# nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
+# For helices
+nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
+
 nu_rl = range(len(nu_axis))
 
-t_axis = np.arange(lst0 - hour, lst0 + hour, 4 * minute)
+# For wedges
+# t_axis = np.arange(lst0 - hour, lst0 + hour, 4 * minute)
+# For helices: 30 second intervals
+t_axis = np.arange(0, 2 * np.pi, np.pi / 1440)
 t_rl = range(len(t_axis))
 
 def A_tensor(ra, dec):
