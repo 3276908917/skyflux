@@ -237,14 +237,52 @@ import numpy as np
 import pickle
 
 def auto_show(fname, static=False):
-    sim_dict = load_sim(fname)
+    sim_dict = load_wedge_sim(fname)
     if static:
         wedge = static_visual(sim_dict)
     else:
         wedge = dynamic_visual(sim_dict) 
     open_visual(wedge)
+    
+def show_helix(fname):
+    helix = np.load(fname)
+    
+    sim_file = open(fname, "rb")
+    
+    meta = pickle.load(sim_file)
+    
+    frq = meta['frequencies']
+    etas = f2etas(frq)
+    ts = meta['times']
+    
+    sim = meta['picture']
+    
+    visual = []
+    for ni in range(len(sim)):
+        for ti in range(len(sim[ni])):
+            visual.append(np.array((
+                etas[ni], ts[ti], sim[ni][ti][0]
+            )))
+    visual = np.array(visual)   
+    
+    delays = visual[:, 0]
+    times = visual[:, 1]
+    v = visual[:, 2]
 
-def load_sim(fname):
+    scaled_v = (v - v.min()) / v.ptp()
+    colors = plt.cm.viridis(scaled_v)
+
+    " We HAVE to do better than this. How do I line up a color bar? "
+
+    print("Minimum:", v.min())
+    print("PTP:", v.ptp())
+
+    plt.scatter(delays, times, marker='.', c=colors)
+    plt.colorbar()
+    plt.show()
+    
+
+def load_wedge_sim(fname):
     global k_par
     global k_starter
     global nu_idxs
@@ -276,7 +314,7 @@ def load_sim(fname):
             "ks": k_starter,
             "sim": meta['picture']}
 
-def static_visual(sim_dict):
+def static_wedge_vis(sim_dict):
     wedge_data = []
     
     ### aliasing ###
@@ -316,7 +354,7 @@ def static_visual(sim_dict):
                 
     return np.array(wedge_data)
     
-def dynamic_visual(sim_dict):
+def dynamic_wedge_vis(sim_dict):
     wedge_data = []
     
     ### aliasing ###

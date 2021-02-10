@@ -316,16 +316,16 @@ def single_wedge(source):
 
     return outer_ants
     
-def package_wedge(wedge):
+def package(block):
     """
-    Returns a print-ready wedge dictionary,
+    Returns a print-ready dictionary,
         particularly for use with the pps.py routines.
         
     Use pickle_dict to save to disk.
     """
     return {'frequencies' : nu_axis,
             'times' : t_axis,
-            'picture' : wedge}
+            'picture' : block}
 
 def pickle_dict(dict_, label):
     """
@@ -344,8 +344,8 @@ def auto_wedge(list_sources, label):
         package_wedge()
         pickle_dict
     """
-    pickle_dict(package_wedge(full_wedge(list_sources)), label)
+    pickle_dict(package(full_wedge(list_sources)), label)
     
 def auto_helix(ant1, ant2, sources, label):
-    np.save(label, multi_helix(ant1, ant2, sources))
+    pickle_dict(package(multi_helix(ant1, ant2, sources)), label)
     
