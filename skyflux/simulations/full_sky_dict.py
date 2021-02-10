@@ -189,31 +189,82 @@ def tick(percent):
 def null_source(obj):
     return obj.alpha != obj.alpha
 
-def full_wedge(num_sources, start_idx):
-    percent_interval = 100 / num_sources
+def full_wedge(list_sources=catalog.obj_catalog):
+    percent_interval = 100 / len(list_sources)
     percent = 0
     
-    wedge = single_wedge(catalog.obj_catalog[start_idx])
+    wedge = single_wedge(list_sources[0])
     
     percent += percent_interval
     tick(percent)
     
-    start = start_idx + 1
-    end = start_idx + num_sources
-    for next_obj in catalog.obj_catalog[start:end]:
+    for next_obj in list_sources:
         if null_source(next_obj):
             continue
         
         next_wedge = single_wedge(next_obj)
         wedge = merge_wedges(wedge, next_wedge)
-        print(wedge[136][140])
+        
+        # Have we successfully moved beyond this bug?
+        #print(wedge[136][140])
 
         percent += percent_interval
         tick(percent)
         
     return wedge
+    
+def multi_helix(ant1, ant2, sources=catalog.obj_catalog):
+    #percent_interval = 100 / len(list_sources)
+    #percent = 0
+    
+    helix = single_helix(list_sources[0])
+    
+    #percent += percent_interval
+    #tick(percent)
+    
+    for next_obj in sources:
+        if null_source(next_obj):
+            continue
+        
+        next_helix = single_helix(next_obj)
+        helix = np.add(helix, next_helix)
+        
+    return helix
 
 outer_ants = ant.ant_pos.copy()
+
+def single_helix(source, ant1, ant2)
+    ra = np.radians(source.ra_angle)
+    dec = np.radians(source.dec_angle)
+    
+    A_full = A_tensor(ra, dec)
+
+    r = rot.radec2lm(ra, dec, ra0=lst0)
+    s_axis = []
+        
+    f_layer = []
+    
+    for ni in nu_rl:
+        nu = nu_axis[ni]
+        phi = ant.phase_factor(ant1, ant2, r, nu)
+        
+        I = vis.get_I(source, nu)
+        s = np.array([complex(I), 0, 0, 0])
+        A_n = A_full[ni]
+
+        t_layer = []
+        for ti in t_rl:
+            t = t_axis[ti]
+
+            A_t = A_n[ti]
+            
+            next_vista = np.dot(np.dot(A_t, s), phi)
+            t_layer.append(next_vista)
+  
+        f_layer.append(np.array(t_layer))
+
+    return np.array(f_layer)
+
 
 def single_wedge(source):
     # note
@@ -285,4 +336,13 @@ def pickle_dict(dict_, label):
     """
     with open(label + '.pickle', 'wb') as handle:
         pickle.dump(dict_, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        
+def auto_dump(list_sources, label):
+    """
+    Automatically runs
+        full_wedge(list_sources)
+        package_wedge()
+        pickle_dict
+    """
+    pickle_dict(package_wedge(full_wedge(list_sources)), label)
 
