@@ -237,7 +237,7 @@ import numpy as np
 import pickle
 
 def auto_show(fname, static=False):
-    sim_dict = load_wedge_sim(fname)
+    sim_dict = load_wedge_sim(fname + ".pickle")
     if static:
         wedge = static_visual(sim_dict)
     else:
@@ -245,7 +245,7 @@ def auto_show(fname, static=False):
     open_visual(wedge)
     
 def show_helix(fname):
-    sim_file = open(fname, "rb")
+    sim_file = open(fname + ".pickle", "rb")
     
     meta = pickle.load(sim_file)
     
@@ -255,24 +255,78 @@ def show_helix(fname):
     
     sim = meta['picture']
     
+    fourier_field = []
+    
+    raw_vis = []
+    
+    for ti in range(len(sim[0])):
+        fourier_i.append([])
+        fourier_q.append([])
+        fourier_u.append([])
+        fourier_v.append([])
+        
+        last_i = len(fourier_i) - 1
+        
+        for ni in range(len(sim)):
+            v = sim[ni][ti] #not really though
+            fourier_i.append(v[0])
+            fourier_q.append(v[2])
+            fourier_u.append(v[3])
+            fourier_v.append(v[4])
+            
+            raw_vis.append(sim[ni][ti])
+            #norm = np.linalg.norm(sim[ni][ti])
+            
+        fourier_i[last_i] = np.array(fourier_i[last_i])
+        fourier_q[last_i] = np.array(fourier_q[last_i])
+        fourier_u[last_i] = np.array(fourier_u[last_i])
+        fourier_v[last_i] = np.array(fourier_v[last_i])
+        
+    fourier_i = np.array(fourier_i)
+    fourier_q = np.array(fourier_q)
+    fourier_u = np.array(fourier_u)
+    fourier_v = np.array(fourier_v)
+    
     visual = []
-    for ni in range(len(sim)):
-        for ti in range(len(sim[ni])):
+    for ti in range(len(fourier_field)):
+        # print
+        fourier_i[ti] = \
+            np.fft.fftshift(np.fft.fft(fourier_i[ti][:, 0]))
+        fourier_q[ti] = \
+            np.fft.fftshift(np.fft.fft(fourier_q[ti][:, 0]))
+        fourier_u[ti] = \
+            np.fft.fftshift(np.fft.fft(fourier_u[ti][:, 0]))
+        fourier_v[ti] = \
+            np.fft.fftshift(np.fft.fft(fourier_v[ti][:, 0]))
+        
+        for ni in range(len(fourier_field[0])):
+            I = fourier_i[ti][ni]
+            Q = fourier_i[ti][ni]
+            U = fourier_i[ti][ni]
+            V = fourier_i[ti][ni]
+            
+            dspecvec = np.array([I, Q, U, V])
+        
+            #!! Are all the indices lining up as I think they are?
             visual.append(np.array((
-                etas[ni], ts[ti] * 12 / np.pi,
-                np.linalg.norm(sim[ni][ti])
+                etas[ni], ts[ti],
+                np.linalg.norm(dspecvec)
             )))
+        
     visual = np.array(visual)   
     
     #visual = np.fft.fftshift(visual)
     
-    delays = visual[:, 0]
-    times = visual[:, 1]
+    delays = visual[:, 0] * 1e9
+    times = visual[:, 1] * 12 / np.pi
+    
+    print("t zero", times[0])
+    
     v = visual[:, 2]
     
     # v = np.log10(v)
 
-    delays = np.fft.fftshift(delays) * 1e9
+    # delays = np.fft.fftshift(delays) * 1e9
     #times = np.fft.fftshift(times)
     #v = np.fft.fftshift(v)
 
@@ -285,11 +339,21 @@ def show_helix(fname):
     print("Minimum:", v.min())
     print("PTP:", v.ptp())
 
-    plt.scatter(delays, times, marker='.', c=colors)
     plt.xlabel("Delays [ns]")
     plt.ylabel("LST [hr]")
+
+    #print(len(delays))
+    
+
+    #plt.plot(delays[:len(frq)], v[:len(frq)])
+    #plt.show()
+    
+    plt.scatter(delays, times, marker='.', c=colors)
+    
     plt.colorbar()
     plt.show()
+    
+    #return delays[:len(frq)], raw_vis[:len(frq)], fourier_field
     
 
 def load_wedge_sim(fname):
