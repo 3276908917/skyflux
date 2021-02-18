@@ -329,19 +329,21 @@ def show_helix(fname):
         fourier_v[ti] = np.fft.fft(fourier_v[ti])
         """
         
+        """
         # fft with window: option 9 [next 4 lines]
         fourier_i[ti] = np.fft.fft(fourier_i[ti] * window)
         fourier_q[ti] = np.fft.fft(fourier_q[ti] * window)
         fourier_u[ti] = np.fft.fft(fourier_u[ti] * window)
         fourier_v[ti] = np.fft.fft(fourier_v[ti] * window)
-        
         """
+        
+        
         # ifft: option 7 [next p lines]
         fourier_i = np.fft.ifft(fourier_i)
         fourier_q = np.fft.ifft(fourier_q)
         fourier_u = np.fft.ifft(fourier_u)
         fourier_v = np.fft.ifft(fourier_v)
-        """
+        
         
         """
         # ifft with window: option 8 [next 4 lines]
@@ -389,7 +391,7 @@ def show_helix(fname):
     #colors = plt.cm.viridis(scaled_v)
     colors = plt.cm.viridis(v)
 
-    plt.title("Option 5, with v = np.log10(v)")
+    plt.title("88m baseline (pure E-W), 200 GHz bandwidth")
 
     " We HAVE to do better than this. How do I line up a color bar? "
 

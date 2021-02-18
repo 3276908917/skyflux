@@ -192,7 +192,7 @@ def merge_wedges(wedge1, wedge2):
 def tick(percent):
     """ Give the user a progress update."""
     percent_status = str(np.around(percent, 4))
-    print("\nWedge tensor: " + percent_status + "% complete.")
+    print("\nSimulation: " + percent_status + "% complete.")
 
 def null_source(obj):
     return obj.alpha != obj.alpha
@@ -222,13 +222,13 @@ def full_wedge(list_sources=catalog.obj_catalog):
     return wedge
     
 def multi_helix(ant1, ant2, sources=catalog.obj_catalog):
-    #percent_interval = 100 / len(list_sources)
-    #percent = 0
+    percent_interval = 100 / len(list_sources)
+    percent = 0
     
     helix = single_helix(ant1, ant2, sources[0])
     
-    #percent += percent_interval
-    #tick(percent)
+    percent += percent_interval
+    tick(percent)
     
     for next_obj in sources:
         if null_source(next_obj):
@@ -236,6 +236,9 @@ def multi_helix(ant1, ant2, sources=catalog.obj_catalog):
         
         next_helix = single_helix(ant1, ant2, next_obj)
         helix = np.add(helix, next_helix)
+        
+        percent += percent_interval
+        tick(percent)
         
     return helix
 
