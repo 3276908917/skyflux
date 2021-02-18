@@ -160,11 +160,8 @@ def delay_transform(data,fqs,convert=None):
     - fqs:  slected frequencies in GHz; dtypw:numpy.ndarray
     """
     N = fqs.size
-    print(N)
     df = fqs[1] - fqs[0]
-    print(df)
     window = genWindow(N)
-    print(window)
     delaySpec = np.fft.ifft(data) * N * df
     return delaySpec 
 
@@ -254,7 +251,10 @@ def show_helix(fname):
     
     frq = meta['frequencies']
     etas = f2etas(frq)
+    
     ts = meta['times']
+    #ts = np.fft.fft(meta['times'])
+    #plt.plot(ts); plt.show()
     
     sim = meta['picture']
     
@@ -271,19 +271,21 @@ def show_helix(fname):
         fourier_u.append([])
         fourier_v.append([])
         
+        raw_vis.append([])
+        
         last_i = len(fourier_i) - 1
         
         for ni in range(len(sim)):
             
             v = sim[ni][ti]
-            #print(v)
+            # print(v)
             
             fourier_i[last_i].append(v[0])
             fourier_q[last_i].append(v[1])
             fourier_u[last_i].append(v[2])
             fourier_v[last_i].append(v[3])
             
-            raw_vis.append(sim[ni][ti])
+            raw_vis[last_i].append(sim[ni][ti])
             #norm = np.linalg.norm(sim[ni][ti])
             
         fourier_i[last_i] = np.array(fourier_i[last_i])
@@ -291,10 +293,14 @@ def show_helix(fname):
         fourier_u[last_i] = np.array(fourier_u[last_i])
         fourier_v[last_i] = np.array(fourier_v[last_i])
         
+        raw_vis[last_i] = np.array(raw_vis[last_i])
+        
     fourier_i = np.array(fourier_i)
     fourier_q = np.array(fourier_q)
     fourier_u = np.array(fourier_u)
     fourier_v = np.array(fourier_v)
+    
+    raw_vis = np.array(raw_vis)
     
     print("Data from file re-organized.")
     
@@ -305,7 +311,11 @@ def show_helix(fname):
     print("Window generated.")
     
     visual = []
-    for ti in range(len(fourier_i)):
+    
+    # option 10
+    # ts = np.fft.fftshift(ts)
+    
+    for ti in range(int(len(fourier_i) / 2)):
         #print(fourier_i[ti])
         #print("Length is", len(fourier_i[ti]))
         
@@ -322,28 +332,27 @@ def show_helix(fname):
         """
         
         """
-        # option 5 [next 4 lines]
+        # what I had been doing before 2/17/21
+        # aka option 5 [next 4 lines]
         fourier_i[ti] = np.fft.fft(fourier_i[ti])
         fourier_q[ti] = np.fft.fft(fourier_q[ti])
         fourier_u[ti] = np.fft.fft(fourier_u[ti])
         fourier_v[ti] = np.fft.fft(fourier_v[ti])
         """
         
-        """
         # fft with window: option 9 [next 4 lines]
         fourier_i[ti] = np.fft.fft(fourier_i[ti] * window)
         fourier_q[ti] = np.fft.fft(fourier_q[ti] * window)
         fourier_u[ti] = np.fft.fft(fourier_u[ti] * window)
         fourier_v[ti] = np.fft.fft(fourier_v[ti] * window)
+        
         """
-        
-        
         # ifft: option 7 [next p lines]
         fourier_i = np.fft.ifft(fourier_i)
         fourier_q = np.fft.ifft(fourier_q)
         fourier_u = np.fft.ifft(fourier_u)
         fourier_v = np.fft.ifft(fourier_v)
-        
+        """
         
         """
         # ifft with window: option 8 [next 4 lines]
@@ -360,16 +369,20 @@ def show_helix(fname):
         
         for ni in range(len(fourier_i[ti])):
             I = fourier_i[ti][ni]
-            Q = fourier_i[ti][ni]
-            U = fourier_i[ti][ni]
-            V = fourier_i[ti][ni]
+            Q = fourier_q[ti][ni]
+            U = fourier_u[ti][ni]
+            V = fourier_v[ti][ni]
             
             dspecvec = np.array([I, Q, U, V])
+        
+            alpha_norm = np.linalg.norm(dspecvec)
+            beta_norm = float(np.dot(np.conj(dspecvec), dspecvec))
+            #print(beta_norm)
         
             #!! Are all the indices lining up as I think they are?
             visual.append(np.array((
                 etas[ni], ts[ti],
-                np.linalg.norm(dspecvec)
+                alpha_norm
             )))
         
     visual = np.array(visual)
@@ -391,7 +404,7 @@ def show_helix(fname):
     #colors = plt.cm.viridis(scaled_v)
     colors = plt.cm.viridis(v)
 
-    plt.title("88m baseline (pure E-W), 200 GHz bandwidth")
+    plt.title("88m, 200 MHz bandwidth")
 
     " We HAVE to do better than this. How do I line up a color bar? "
 
@@ -411,6 +424,7 @@ def show_helix(fname):
     plt.colorbar()
     plt.show()
     
+    return fourier_i, fourier_q, fourier_u, fourier_v, raw_vis
     #return delays[:len(frq)], raw_vis[:len(frq)], fourier_field
     
 
