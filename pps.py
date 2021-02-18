@@ -160,8 +160,11 @@ def delay_transform(data,fqs,convert=None):
     - fqs:  slected frequencies in GHz; dtypw:numpy.ndarray
     """
     N = fqs.size
+    print(N)
     df = fqs[1] - fqs[0]
+    print(df)
     window = genWindow(N)
+    print(window)
     delaySpec = np.fft.ifft(data) * N * df
     return delaySpec 
 
@@ -293,13 +296,21 @@ def show_helix(fname):
     fourier_u = np.array(fourier_u)
     fourier_v = np.array(fourier_v)
     
+    print("Data from file re-organized.")
+    
+    N = len(frq)
+    df = frq[1] - frq[0]
+    window = genWindow(N)
+        
+    print("Window generated.")
+    
     visual = []
     for ti in range(len(fourier_i)):
         #print(fourier_i[ti])
         #print("Length is", len(fourier_i[ti]))
         
         """
-        # option 6
+        # option 6 [next p lines]
         fourier_i[ti] = \
             np.fft.fftshift(np.fft.fft(fourier_i[ti]))
         fourier_q[ti] = \
@@ -310,11 +321,40 @@ def show_helix(fname):
             np.fft.fftshift(np.fft.fft(fourier_v[ti]))
         """
         
+        """
         # option 5 [next 4 lines]
         fourier_i[ti] = np.fft.fft(fourier_i[ti])
         fourier_q[ti] = np.fft.fft(fourier_q[ti])
         fourier_u[ti] = np.fft.fft(fourier_u[ti])
         fourier_v[ti] = np.fft.fft(fourier_v[ti])
+        """
+        
+        # fft with window: option 9 [next 4 lines]
+        fourier_i[ti] = np.fft.fft(fourier_i[ti] * window)
+        fourier_q[ti] = np.fft.fft(fourier_q[ti] * window)
+        fourier_u[ti] = np.fft.fft(fourier_u[ti] * window)
+        fourier_v[ti] = np.fft.fft(fourier_v[ti] * window)
+        
+        """
+        # ifft: option 7 [next p lines]
+        fourier_i = np.fft.ifft(fourier_i)
+        fourier_q = np.fft.ifft(fourier_q)
+        fourier_u = np.fft.ifft(fourier_u)
+        fourier_v = np.fft.ifft(fourier_v)
+        """
+        
+        """
+        # ifft with window: option 8 [next 4 lines]
+        fourier_i = np.fft.ifft(fourier_i * window)
+        fourier_q = np.fft.ifft(fourier_q * window)
+        fourier_u = np.fft.ifft(fourier_u * window)
+        fourier_v = np.fft.ifft(fourier_v * window)
+        """
+        
+        percent = (ti + 1) * 100 / len(fourier_i)
+        print("Fourier transforms", percent, "% complete.")
+        
+        #print("Fourier transforms computed")
         
         for ni in range(len(fourier_i[ti])):
             I = fourier_i[ti][ni]
@@ -340,16 +380,16 @@ def show_helix(fname):
     #times = np.fft.fftshift(times)
     
     v = visual[:, 2]
-    #v = np.log10(v)
+    v = np.log10(v)
     #v = np.fft.fftshift(v)
     
     print("t zero", times[0])
 
-    scaled_v = (v - v.min()) / v.ptp()
-    colors = plt.cm.viridis(scaled_v)
-    #colors = plt.cm.viridis(v)
+    #scaled_v = (v - v.min()) / v.ptp()
+    #colors = plt.cm.viridis(scaled_v)
+    colors = plt.cm.viridis(v)
 
-    plt.title("Helix Attempt")
+    plt.title("Option 5, with v = np.log10(v)")
 
     " We HAVE to do better than this. How do I line up a color bar? "
 
