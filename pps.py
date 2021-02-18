@@ -255,7 +255,10 @@ def show_helix(fname):
     
     sim = meta['picture']
     
-    fourier_field = []
+    fourier_i = []
+    fourier_q = []
+    fourier_u = []
+    fourier_v = []
     
     raw_vis = []
     
@@ -268,11 +271,14 @@ def show_helix(fname):
         last_i = len(fourier_i) - 1
         
         for ni in range(len(sim)):
-            v = sim[ni][ti] #not really though
-            fourier_i.append(v[0])
-            fourier_q.append(v[2])
-            fourier_u.append(v[3])
-            fourier_v.append(v[4])
+            
+            v = sim[ni][ti]
+            #print(v)
+            
+            fourier_i[last_i].append(v[0])
+            fourier_q[last_i].append(v[1])
+            fourier_u[last_i].append(v[2])
+            fourier_v[last_i].append(v[3])
             
             raw_vis.append(sim[ni][ti])
             #norm = np.linalg.norm(sim[ni][ti])
@@ -288,18 +294,20 @@ def show_helix(fname):
     fourier_v = np.array(fourier_v)
     
     visual = []
-    for ti in range(len(fourier_field)):
-        # print
-        fourier_i[ti] = \
-            np.fft.fftshift(np.fft.fft(fourier_i[ti][:, 0]))
-        fourier_q[ti] = \
-            np.fft.fftshift(np.fft.fft(fourier_q[ti][:, 0]))
-        fourier_u[ti] = \
-            np.fft.fftshift(np.fft.fft(fourier_u[ti][:, 0]))
-        fourier_v[ti] = \
-            np.fft.fftshift(np.fft.fft(fourier_v[ti][:, 0]))
+    for ti in range(len(fourier_i)):
+        #print(fourier_i[ti])
+        #print("Length is", len(fourier_i[ti]))
         
-        for ni in range(len(fourier_field[0])):
+        fourier_i[ti] = \
+            np.fft.fftshift(np.fft.fft(fourier_i[ti]))
+        fourier_q[ti] = \
+            np.fft.fftshift(np.fft.fft(fourier_q[ti]))
+        fourier_u[ti] = \
+            np.fft.fftshift(np.fft.fft(fourier_u[ti]))
+        fourier_v[ti] = \
+            np.fft.fftshift(np.fft.fft(fourier_v[ti]))
+        
+        for ni in range(len(fourier_i[ti])):
             I = fourier_i[ti][ni]
             Q = fourier_i[ti][ni]
             U = fourier_i[ti][ni]
@@ -315,7 +323,7 @@ def show_helix(fname):
         
     visual = np.array(visual)   
     
-    #visual = np.fft.fftshift(visual)
+    visual = np.fft.fftshift(visual)
     
     delays = visual[:, 0] * 1e9
     times = visual[:, 1] * 12 / np.pi
