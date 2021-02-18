@@ -298,6 +298,8 @@ def show_helix(fname):
         #print(fourier_i[ti])
         #print("Length is", len(fourier_i[ti]))
         
+        """
+        # option 6
         fourier_i[ti] = \
             np.fft.fftshift(np.fft.fft(fourier_i[ti]))
         fourier_q[ti] = \
@@ -306,6 +308,13 @@ def show_helix(fname):
             np.fft.fftshift(np.fft.fft(fourier_u[ti]))
         fourier_v[ti] = \
             np.fft.fftshift(np.fft.fft(fourier_v[ti]))
+        """
+        
+        # option 5 [next 4 lines]
+        fourier_i[ti] = np.fft.fft(fourier_i[ti])
+        fourier_q[ti] = np.fft.fft(fourier_q[ti])
+        fourier_u[ti] = np.fft.fft(fourier_u[ti])
+        fourier_v[ti] = np.fft.fft(fourier_v[ti])
         
         for ni in range(len(fourier_i[ti])):
             I = fourier_i[ti][ni]
@@ -321,26 +330,26 @@ def show_helix(fname):
                 np.linalg.norm(dspecvec)
             )))
         
-    visual = np.array(visual)   
-    
-    visual = np.fft.fftshift(visual)
+    visual = np.array(visual)
+    # visual = np.fft.fftshift(visual)
     
     delays = visual[:, 0] * 1e9
-    times = visual[:, 1] * 12 / np.pi
+    #delays = np.fft.fftshift(delays)
     
-    print("t zero", times[0])
+    times = visual[:, 1] * 12 / np.pi
+    #times = np.fft.fftshift(times)
     
     v = visual[:, 2]
-    
-    # v = np.log10(v)
-
-    # delays = np.fft.fftshift(delays) * 1e9
-    #times = np.fft.fftshift(times)
+    #v = np.log10(v)
     #v = np.fft.fftshift(v)
+    
+    print("t zero", times[0])
 
     scaled_v = (v - v.min()) / v.ptp()
     colors = plt.cm.viridis(scaled_v)
     #colors = plt.cm.viridis(v)
+
+    plt.title("Helix Attempt")
 
     " We HAVE to do better than this. How do I line up a color bar? "
 
@@ -352,7 +361,6 @@ def show_helix(fname):
 
     #print(len(delays))
     
-
     #plt.plot(delays[:len(frq)], v[:len(frq)])
     #plt.show()
     
