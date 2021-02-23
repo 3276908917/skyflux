@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 
+""" Begin section: pared-down copy of
+    Chuneeta/PolarizedSims/COSMO_constants.py """
+
 import numpy as np
 import astropy.cosmology as CS
 
@@ -73,16 +76,10 @@ def k_perp(z):
    """
    return 2 * np.pi / transverse_comoving_distance(z)
 
-"""
-  Generating power spectra using delay-filtering approach
-"""
+""" End section: Chuneeta/PolarizedSims/COSMO_constants.py """
 
-import optparse
-import scipy.constants as CNST1
-import os, sys
-import aipy as a
-
-curtime, zen = None, None
+""" Begin section: pared-down copy of
+    Chuneeta/PolarizedSims/genPowerSpectra.py"""
 
 def genWindow(size):
     """
@@ -122,38 +119,10 @@ def delay_transform(data,fqs,convert=None):
     delaySpec = np.fft.ifft(data) * N * df
     return delaySpec 
       
+""" End section: Chuneeta/PolarizedSims/genPowerSpectra.py """
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"power plot sketch"
+""" Remainder of this file: the code unique to this script.
+    i.e. my own work. "power plot sketch" """
 
 import skyflux as sf
 
@@ -161,6 +130,11 @@ import matplotlib.pyplot as plt
 import pickle
 
 def auto_show(fname, static=False):
+    """
+    Load simulated visibilities from the file named
+        @fname
+    and visually interpret the results using a 2D wedge plot.
+    """
     sim_dict = load_wedge_sim(fname + ".pickle")
     if static:
         wedge = static_visual(sim_dict)
@@ -169,6 +143,12 @@ def auto_show(fname, static=False):
     open_visual(wedge)
     
 def show_helix(fname):
+    """
+    Load simulated visibilities from the file named
+        @fname
+    and visually interpret the results as a
+    delay-spectrum helix a la (Parsons, 2012).
+    """
     sim_file = open(fname + ".pickle", "rb")
     
     meta = pickle.load(sim_file)
@@ -351,8 +331,26 @@ def show_helix(fname):
     return fourier_i, fourier_q, fourier_u, fourier_v, raw_vis
     #return delays[:len(frq)], raw_vis[:len(frq)], fourier_field
     
-
 def load_wedge_sim(fname):
+    """
+    Fill out a wedge data structure based on
+        the contents of the file with name @fname.
+    The returned dictionary has the following key-value pairs:
+        "fs": the frequencies used in the simulation
+        "kp": array of k-parallel, the proxy-variable for frequency
+        "ks": a constant coefficient, to be multiplied by
+            baseline lengths to yield k-perpendicular,
+            the proxy-variable for baseline
+        "sim": a three-dimensional array of visibilities
+            the first index corresponds to frequency
+            the second index corresponds to LST
+            the third index corresponds to Stokes parameter
+                0: I
+                1: Q
+                2: U
+                3: V
+    """
+    
     global k_par
     global k_starter
     global nu_idxs
