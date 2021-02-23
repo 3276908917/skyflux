@@ -133,14 +133,15 @@ def auto_show(fname, static=False):
     """
     Load simulated visibilities from the file named
         @fname
-    and visually interpret the results using a 2D wedge plot.
+    and visually interpret the results using a
+        2D + color wedge plot.
     """
     sim_dict = load_wedge_sim(fname + ".pickle")
     if static:
         wedge = static_visual(sim_dict)
     else:
         wedge = dynamic_visual(sim_dict) 
-    open_visual(wedge)
+    show_wedge(wedge)
     
 def show_helix(fname):
     """
@@ -350,11 +351,6 @@ def load_wedge_sim(fname):
                 2: U
                 3: V
     """
-    
-    global k_par
-    global k_starter
-    global nu_idxs
-
     sim_file = open(fname, "rb")
 
     meta = pickle.load(sim_file)
@@ -383,6 +379,24 @@ def load_wedge_sim(fname):
             "sim": meta['picture']}
 
 def static_wedge_vis(sim_dict):
+    """
+    Read from the wedge data structure @sim_dict
+        (specifically, one using the format
+        established in load_wedge_sim)
+    and generate 3D points appropriate for a wedge plot.
+    i.e., return a list of triples:
+        (k_perpendicular, k_parallel, power*)
+    
+    * currently, the implementation uses values that
+    should be proportional to power. The final constants
+    have not yet been considered.
+    
+    This function is distinct from
+        dynamic_wedge_vis
+    in assuming that the simulation corresponding to
+        @sim_dict
+    runs over only one value of LST.
+    """
     wedge_data = []
     
     ### aliasing ###
@@ -422,7 +436,26 @@ def static_wedge_vis(sim_dict):
                 
     return np.array(wedge_data)
     
+#! There has to be some way to merge this with the function
+# above
 def dynamic_wedge_vis(sim_dict):
+    """
+    Read from the wedge data structure @sim_dict
+        (specifically, one using the format
+        established in load_wedge_sim)
+    and generate 3D points appropriate for a wedge plot.
+    i.e., return a list of triples:
+        (k_perpendicular, k_parallel, power*)
+    
+    * currently, the implementation uses values that
+    should be proportional to power. The final constants
+    have not yet been considered.
+    
+    This function is distinct from
+        static_wedge_vis
+    in accepting multiple LST values from
+        @sim_dict.
+    """
     wedge_data = []
     
     ### aliasing ###
@@ -498,7 +531,15 @@ def dynamic_wedge_vis(sim_dict):
    
     return np.array(wedge_data)
     
-def open_visual(wedge):
+def show_wedge(wedge):
+    """
+    Primitive 3D plotter.
+    
+    For use with the return value of either
+        static_wedge_vis
+    or
+        dynamic_wedge_vis
+    """
     k_orth = wedge[:, 0]
     k_parr = wedge[:, 1]
     p_p = wedge[:, 2]
