@@ -14,66 +14,64 @@ def fq2z(fq):
    Input(s)
       fq :  [scalar] frequency in Hz
    """
-   z = F21/fq-1
-   return z
+   return F21 / fq - 1
    
 def transverse_comoving_distance(z):
    """
    Transverse comoving distance at redshift z
-   corresponding to an
-   angular separation of 1 radian in Mpc/h.
+       corresponding to an
+       angular separation of 1 radian in Mpc/h.
    
    Input(s)
       z :  [scalar] redshift
    """
-   Dz =  COSMO.comoving_distance(z).value # Mpc/h 
-   return Dz
-
+   return COSMO.comoving_distance(z).value # Mpc/h 
 
 def comoving_depth(B,z):
    """
    Comoving line-of-sight depth corresponding to
-   specified redshift and bandwidth for redshifted
-   21 cm line in Mpc/h
+       specified redshift and bandwidth for redshifted
+       21 cm line in Mpc/h
   
    Input(s)
       B :    [scalar] Observing bandwith in Hz
       z :    [scalar] redshift
    """
-   deltaD =  (C/1e3) * B * (1+z)**2 / \
+   return (C/1e3) * B * (1+z)**2 / \
        F21/COSMO.H0.value/COSMO.efunc(z) # Mpc/h 
-   return deltaD
-
 
 def dkprll_deta(z):
    """
    Constant to transform delays to line-of-sight
-   wavenumbers corresponding to redshift and
-   21 CM HI line in h/Mpc
+       wavenumbers corresponding to redshift and
+       21 CM HI line in h/Mpc
    
    Input(s)
       z :  [scalar] redshift
    """
-   return 2 * np.pi * COSMO.H0.value * F21 * COSMO.efunc(z) / C /  (1+z)**2 * 1e3
+   return 2 * np.pi * COSMO.H0.value * F21 * \
+       COSMO.efunc(z) / C /  (1+z)**2 * 1e3
 
 def k_parallel(delays, z):
-   '''
-   Compute line-of-sight wavenumbers corresponding to specified delays and redshift for redshifted 21 cm line in h/Mpc
+   """
+   Compute line-of-sight wavenumbers corresponding to
+       specified delays and redshift for
+       redshifted 21 cm line in h/Mpc
 
    Input(s):
       z : [scalar] redshift
-   '''
+   """
    return dkprll_deta(z) * delays
 
 def k_perp(z):
-   '''
-   Compute transverse wavenumbers corresponding for redshifted 21 cm line in h/Mpc
+   """
+   Compute transverse wavenumbers corresponding to
+       redshifted 21 cm line in h/Mpc
 
    Input(s)
       z              : [scalar] redshift
-   '''
-   kperp = 2 * np.pi / transverse_comoving_distance(z)
-   return kperp
+   """
+   return 2 * np.pi / transverse_comoving_distance(z)
 
 """
   Generating power spectra using delay-filtering approach
@@ -81,23 +79,23 @@ def k_perp(z):
 
 import optparse
 import scipy.constants as CNST1
-import os,sys
+import os, sys
 import aipy as a
 
-C = 2.99e8 # SPEED OF LIGHT IN M/S
-F21 = 1420405751.77 # FREQUENCY OF 21 CM HYDROGEN LINE
 curtime, zen = None, None
 
 def genWindow(size):
     """
     Implements Blackmann-Harris filter
 
-    size : Size/Lenth of frequency channel to which filter is applied; type:int
+    size : Size/Lenth of frequency channel to which
+        filter is applied; type:int
     """
-    
     window = np.zeros((size),)
-    alpha = 0.16
-    _w = lambda n: (1-alpha)/2. - 0.5*np.cos((2*np.pi*n)/(size-1)) + alpha/2.*np.cos((4*np.pi*n)/(size-1))
+    alpha = 0.16 #! magic number
+    _w = lambda n: \
+        (1-alpha) / 2. - 0.5 * np.cos((2 * np.pi * n)/(size - 1)) \
+        + alpha / 2. * np.cos((4 * np.pi * n)/(size - 1))
     window[:] = _w(np.arange(size))
     return window
 
