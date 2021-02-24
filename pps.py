@@ -141,22 +141,15 @@ def auto_show(fname, static=False):
         wedge = static_visual(sim_dict)
     else:
         wedge = dynamic_visual(sim_dict) 
-    show_wedge(wedge)
-    
-def show_helix(fname):
-    """
-    Load simulated visibilities from the file named
-        @fname
-    and visually interpret the results as a
-    delay-spectrum helix a la (Parsons, 2012).
-    """
+    plot_3D(wedge)
+
+def build_fourier_candidates(fname):
     sim_file = open(fname + ".pickle", "rb")
     
     meta = pickle.load(sim_file)
     
     fs = meta['frequencies']
     num_f = len(fs)
-    etas = f2etas(fs)
     
     ts = meta['times']
     num_t = len(ts)
@@ -200,18 +193,18 @@ def show_helix(fname):
     
     raw_vis = np.array(raw_vis)
     
-    print("Data from file re-organized.")
+    return fourier, raw_vis, fs, ts
+   
+def transform_power(original, fs, ts):
+    num_f = len(fs)
+    num_t = len(ts)
     
-    df = fs[1] - fs[0]
+    import copy
+    
+    fourier = copy.deepcopy(original)
+
     window = genWindow(num_f)
-    
-    print("Window generated.")
-    
-    visual = []
-    
-    # option 10
-    # ts = np.fft.fftshift(ts)
-    
+
     for ti in range(num_t):
         #print(fourier_i[ti])
         #print("Length is", len(fourier_i[ti]))
@@ -258,12 +251,22 @@ def show_helix(fname):
         """
         
         
-        percent = (ti + 1) * 100 / num_t
-        print("Fourier transforms", percent, "% complete.")
+        #percent = (ti + 1) * 100 / num_t
+        #print("Fourier transforms", percent, "% complete.")   
+
+def collect_helix_points(fourier, fs, ts):
+    num_t = len(ts)
+    num_f = len(fs)
+    
+    visual = []
+    
+    etas = f2etas(fs)
+     #for i in range(len(fourier)):
+    #    fourier[i] = np.fft.fftshift(fourier[i])  
+        
+    for ti in range(num_t):    
         
         #print("Fourier transforms computed")
-        
-        assert(len(fourier[0][ti]) == num_f)
         
         for ni in range(num_f):
             dspecvec = np.array([
@@ -275,51 +278,63 @@ def show_helix(fname):
         
             #!! Are all the indices lining up as I think they are?
             visual.append(np.array((
-                etas[ni], ts[ti],
-                norm
+                etas[ni] * 1e9,
+                ts[ti] * 12 / np.pi,
+                np.log10(norm)
             )))
+            
+    return np.array(visual)    
+    
+def show_helix(fname):
+    """
+    Load simulated visibilities from the file named
+        @fname
+    and visually interpret the results as a
+    delay-spectrum helix a la (Parsons, 2012).
+    """
+    fourier, raw_vis, fs, ts = build_fourier_candidates(fname)
+    
+    print("Data from file re-organized.")
+    
+    fouriered = transform_power(fourier, fs, ts)
+    
+    print("Fourier transforms computed.")
+    
+    visual = collect_helix_points(fouriered, fs, ts)  
+   
+    print("Points collected.")
         
-    visual = np.array(visual)
-    # visual = np.fft.fftshift(visual)
-    
-    delays = visual[:, 0] * 1e9
-    #delays = np.fft.fftshift(delays)
-    
-    times = visual[:, 1] * 12 / np.pi
-    #times = np.fft.fftshift(times)
-    
-    v = visual[:, 2]
-    v = np.log10(v)
-    #v = np.fft.fftshift(v)
-    
-    print("t zero", times[0])
-
-    #scaled_v = (v - v.min()) / v.ptp()
-    #colors = plt.cm.viridis(scaled_v)
-    colors = plt.cm.viridis(v)
-
     plt.title("88m, 200 MHz bandwidth")
-
-    " We HAVE to do better than this. How do I line up a color bar? "
-
-    print("Minimum:", v.min())
-    print("PTP:", v.ptp())
-
     plt.xlabel("Delays [ns]")
     plt.ylabel("LST [hr]")
-
-    #print(len(delays))
     
-    #plt.plot(delays[:len(frq)], v[:len(frq)])
-    #plt.show()
-    
-    plt.scatter(delays, times, marker='.', c=colors)
-    
-    plt.colorbar()
-    plt.show()
+    plot_3D(visual)
     
     return fourier, fs, ts, raw_vis
     #return delays[:len(frq)], raw_vis[:len(frq)], fourier_field
+
+def plot_3D(wedge):
+    """
+    Primitive 3D plotter.
+    
+    For use with the return value of either
+        static_wedge_vis
+    or
+        dynamic_wedge_vis
+    """
+    k_orth = wedge[:, 0]
+    k_parr = wedge[:, 1]
+    p_p = wedge[:, 2]
+
+    scaled_pow = (p_p - p_p.min()) / p_p.ptp()
+    colors = plt.cm.viridis(scaled_pow)
+
+    print("Minimum:", p_p.min())
+    print("PTP:", p_p.ptp())
+
+    plt.scatter(k_orth, k_parr, marker='.', c=colors)
+    plt.colorbar()
+    plt.show()
     
 def load_wedge_sim(fname):
     """
@@ -520,26 +535,3 @@ def dynamic_wedge_vis(sim_dict):
    
     return np.array(wedge_data)
     
-def show_wedge(wedge):
-    """
-    Primitive 3D plotter.
-    
-    For use with the return value of either
-        static_wedge_vis
-    or
-        dynamic_wedge_vis
-    """
-    k_orth = wedge[:, 0]
-    k_parr = wedge[:, 1]
-    p_p = wedge[:, 2]
-
-    scaled_pow = (p_p - p_p.min()) / p_p.ptp()
-    colors = plt.cm.viridis(scaled_pow)
-
-    print("Minimum:", p_p.min())
-    print("PTP:", p_p.ptp())
-
-    plt.scatter(k_orth, k_parr, marker='.', c=colors)
-    plt.colorbar()
-    plt.show()
-
