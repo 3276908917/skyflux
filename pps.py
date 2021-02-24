@@ -163,47 +163,39 @@ def show_helix(fname):
     
     sim = meta['picture']
     
-    fourier_i = []
-    fourier_q = []
-    fourier_u = []
-    fourier_v = []
+    # 0: I    1: Q    2: U    3: V
+    fourier = [[], [], [], []]
     
     raw_vis = []
     
     for ti in range(len(sim[0])):
-        fourier_i.append([])
-        fourier_q.append([])
-        fourier_u.append([])
-        fourier_v.append([])
+        for parameter in fourier:
+            parameter.append([])
         
         raw_vis.append([])
         
-        last_i = len(fourier_i) - 1
+        last_i = len(fourier[0]) - 1
         
         for ni in range(len(sim)):
             
             v = sim[ni][ti]
             # print(v)
             
-            fourier_i[last_i].append(v[0])
-            fourier_q[last_i].append(v[1])
-            fourier_u[last_i].append(v[2])
-            fourier_v[last_i].append(v[3])
+            for p_idx in range(len(fourier)):
+                fourier[p_idx][last_i].append(v[p_idx])
             
             raw_vis[last_i].append(sim[ni][ti])
             #norm = np.linalg.norm(sim[ni][ti])
-            
-        fourier_i[last_i] = np.array(fourier_i[last_i])
-        fourier_q[last_i] = np.array(fourier_q[last_i])
-        fourier_u[last_i] = np.array(fourier_u[last_i])
-        fourier_v[last_i] = np.array(fourier_v[last_i])
+        
+        for parameter in fourier:
+            parameter[last_i] = np.array(parameter[last_i])
         
         raw_vis[last_i] = np.array(raw_vis[last_i])
         
-    fourier_i = np.array(fourier_i)
-    fourier_q = np.array(fourier_q)
-    fourier_u = np.array(fourier_u)
-    fourier_v = np.array(fourier_v)
+    for parameter in fourier:
+        parameter = np.array(parameter)
+
+    fourier = np.array(fourier)
     
     raw_vis = np.array(raw_vis)
     
@@ -220,7 +212,7 @@ def show_helix(fname):
     # option 10
     # ts = np.fft.fftshift(ts)
     
-    for ti in range(int(len(fourier_i) / 2)):
+    for ti in range(int(len(fourier[0]) / 2)):
         #print(fourier_i[ti])
         #print("Length is", len(fourier_i[ti]))
         
@@ -246,10 +238,8 @@ def show_helix(fname):
         """
         
         # fft with window: option 9 [next 4 lines]
-        fourier_i[ti] = np.fft.fft(fourier_i[ti] * window)
-        fourier_q[ti] = np.fft.fft(fourier_q[ti] * window)
-        fourier_u[ti] = np.fft.fft(fourier_u[ti] * window)
-        fourier_v[ti] = np.fft.fft(fourier_v[ti] * window)
+        for parameter in fourier:
+            parameter[ti] = np.fft.fft(parameter[ti] * window)
         
         """
         # ifft: option 7 [next p lines]
@@ -267,18 +257,15 @@ def show_helix(fname):
         fourier_v = np.fft.ifft(fourier_v * window)
         """
         
-        percent = (ti + 1) * 100 / len(fourier_i)
+        percent = (ti + 1) * 100 / len(fourier[0])
         print("Fourier transforms", percent, "% complete.")
         
         #print("Fourier transforms computed")
         
-        for ni in range(len(fourier_i[ti])):
-            I = fourier_i[ti][ni]
-            Q = fourier_q[ti][ni]
-            U = fourier_u[ti][ni]
-            V = fourier_v[ti][ni]
-            
-            dspecvec = np.array([I, Q, U, V])
+        for ni in range(len(fourier[0][ti])):
+            dspecvec = np.array([
+                parameter[ti][ni] for parameter in fourier
+            ])
         
             alpha_norm = np.linalg.norm(dspecvec)
             beta_norm = float(np.dot(np.conj(dspecvec), dspecvec))
@@ -329,7 +316,7 @@ def show_helix(fname):
     plt.colorbar()
     plt.show()
     
-    return fourier_i, fourier_q, fourier_u, fourier_v, raw_vis
+    return fourier, raw_vis
     #return delays[:len(frq)], raw_vis[:len(frq)], fourier_field
     
 def load_wedge_sim(fname):
