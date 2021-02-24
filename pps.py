@@ -153,8 +153,6 @@ def build_fourier_candidates(fname):
     
     ts = meta['times']
     num_t = len(ts)
-    #ts = np.fft.fft(meta['times'])
-    #plt.plot(ts); plt.show()
     
     sim = meta['picture']
     
@@ -170,16 +168,13 @@ def build_fourier_candidates(fname):
         raw_vis.append([])
         
         for ni in range(num_f):
-            
-            # a stokes vector
             v = sim[ni][ti]
-            # print(v)
-            
+
             for p_idx in range(len(fourier)):
                 fourier[p_idx][ti].append(v[p_idx])
             
             raw_vis[ti].append(sim[ni][ti])
-            #norm = np.linalg.norm(sim[ni][ti])
+            #norm = np.linalg.norm(sim[ni][ti]) same outcome
         
         for parameter in fourier:
             parameter[ti] = np.array(parameter[ti])
@@ -206,53 +201,37 @@ def transform_power(original, fs, ts):
     window = genWindow(num_f)
 
     for ti in range(num_t):
-        #print(fourier_i[ti])
-        #print("Length is", len(fourier_i[ti]))
-        
         """
-        # option 6 [next p lines]
-        fourier_i[ti] = \
-            np.fft.fftshift(np.fft.fft(fourier_i[ti]))
-        fourier_q[ti] = \
-            np.fft.fftshift(np.fft.fft(fourier_q[ti]))
-        fourier_u[ti] = \
-            np.fft.fftshift(np.fft.fft(fourier_u[ti]))
-        fourier_v[ti] = \
-            np.fft.fftshift(np.fft.fft(fourier_v[ti]))
+        # option 6
+        for parameter in fourier:
+            parameter[ti] = \
+                np.fft.fftshift(np.fft.fft(parameter[ti])
         """
         
         """
         # what I had been doing before 2/17/21
-        # aka option 5 [next 4 lines]
-        fourier_i[ti] = np.fft.fft(fourier_i[ti])
-        fourier_q[ti] = np.fft.fft(fourier_q[ti])
-        fourier_u[ti] = np.fft.fft(fourier_u[ti])
-        fourier_v[ti] = np.fft.fft(fourier_v[ti])
+        # aka option 5
+        for parameter in fourier:
+            parameter[ti] = np.fft.fft(parameter[ti])
         """
         
-        # fft with window: option 9 [next 4 lines]
+        # fft with window: option 9
         for parameter in fourier:
             parameter[ti] = np.fft.fft(parameter[ti] * window)
         
         """
-        # ifft: option 7 [next p lines]
-        fourier_i = np.fft.ifft(fourier_i)
-        fourier_q = np.fft.ifft(fourier_q)
-        fourier_u = np.fft.ifft(fourier_u)
-        fourier_v = np.fft.ifft(fourier_v)
+        # ifft: option 7
+        for parameter in fourier:
+            parameter[ti] = np.fft.ifft(parameter[ti])
         """
         
         """
         # ifft with window: option 8 [next 4 lines]
-        fourier_i = np.fft.ifft(fourier_i * window)
-        fourier_q = np.fft.ifft(fourier_q * window)
-        fourier_u = np.fft.ifft(fourier_u * window)
-        fourier_v = np.fft.ifft(fourier_v * window)
+        for parameter in fourier:
+            parameter[ti] = np.fft.ifft(parameter[ti] * window)
         """
         
-        
-        #percent = (ti + 1) * 100 / num_t
-        #print("Fourier transforms", percent, "% complete.")   
+    return fourier 
 
 def collect_helix_points(fourier, fs, ts):
     num_t = len(ts)
@@ -261,12 +240,8 @@ def collect_helix_points(fourier, fs, ts):
     visual = []
     
     etas = f2etas(fs)
-     #for i in range(len(fourier)):
-    #    fourier[i] = np.fft.fftshift(fourier[i])  
         
     for ti in range(num_t):    
-        
-        #print("Fourier transforms computed")
         
         for ni in range(num_f):
             dspecvec = np.array([
@@ -274,13 +249,11 @@ def collect_helix_points(fourier, fs, ts):
             ])
         
             norm = np.linalg.norm(dspecvec)
-            #print(beta_norm)
-        
-            #!! Are all the indices lining up as I think they are?
+
             visual.append(np.array((
                 etas[ni] * 1e9,
                 ts[ti] * 12 / np.pi,
-                np.log10(norm)
+                norm #np.log10(norm)
             )))
             
     return np.array(visual)    
@@ -311,7 +284,6 @@ def show_helix(fname):
     plot_3D(visual)
     
     return fourier, fs, ts, raw_vis
-    #return delays[:len(frq)], raw_vis[:len(frq)], fourier_field
 
 def plot_3D(wedge):
     """
