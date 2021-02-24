@@ -155,9 +155,11 @@ def show_helix(fname):
     meta = pickle.load(sim_file)
     
     fs = meta['frequencies']
+    num_f = len(fs)
     etas = f2etas(fs)
     
     ts = meta['times']
+    num_t = len(ts)
     #ts = np.fft.fft(meta['times'])
     #plt.plot(ts); plt.show()
     
@@ -168,31 +170,28 @@ def show_helix(fname):
     
     raw_vis = []
     
-    for ti in range(len(ts)):
+    for ti in range(num_t):
         for parameter in fourier:
             parameter.append([])
         
         raw_vis.append([])
         
-        last_i = len(fourier[0]) - 1
-        
-        assert(len(sim) == len(fs))
-        
-        for ni in range(len(fs)):
+        for ni in range(num_f):
             
+            # a stokes vector
             v = sim[ni][ti]
             # print(v)
             
             for p_idx in range(len(fourier)):
-                fourier[p_idx][last_i].append(v[p_idx])
+                fourier[p_idx][ti].append(v[p_idx])
             
-            raw_vis[last_i].append(sim[ni][ti])
+            raw_vis[ti].append(sim[ni][ti])
             #norm = np.linalg.norm(sim[ni][ti])
         
         for parameter in fourier:
-            parameter[last_i] = np.array(parameter[last_i])
+            parameter[ti] = np.array(parameter[ti])
         
-        raw_vis[last_i] = np.array(raw_vis[last_i])
+        raw_vis[ti] = np.array(raw_vis[ti])
         
     for parameter in fourier:
         parameter = np.array(parameter)
@@ -203,15 +202,9 @@ def show_helix(fname):
     
     print("Data from file re-organized.")
     
-    N = len(fs)
     df = fs[1] - fs[0]
-    window = genWindow(N)
-
-    print(N)
-    print(len(fourier[0]))
-
-    #assert(len(fourier[0]) == N)
-        
+    window = genWindow(num_f)
+    
     print("Window generated.")
     
     visual = []
@@ -219,7 +212,7 @@ def show_helix(fname):
     # option 10
     # ts = np.fft.fftshift(ts)
     
-    for ti in range(int(len(fourier[0]))):
+    for ti in range(num_t):
         #print(fourier_i[ti])
         #print("Length is", len(fourier_i[ti]))
         
@@ -264,24 +257,26 @@ def show_helix(fname):
         fourier_v = np.fft.ifft(fourier_v * window)
         """
         
-        percent = (ti + 1) * 100 / len(fourier[0])
+        
+        percent = (ti + 1) * 100 / num_t
         print("Fourier transforms", percent, "% complete.")
         
         #print("Fourier transforms computed")
         
-        for ni in range(len(fourier[0][ti])):
+        assert(len(fourier[0][ti]) == num_f)
+        
+        for ni in range(num_f):
             dspecvec = np.array([
                 parameter[ti][ni] for parameter in fourier
             ])
         
-            alpha_norm = np.linalg.norm(dspecvec)
-            beta_norm = float(np.dot(np.conj(dspecvec), dspecvec))
+            norm = np.linalg.norm(dspecvec)
             #print(beta_norm)
         
             #!! Are all the indices lining up as I think they are?
             visual.append(np.array((
                 etas[ni], ts[ti],
-                alpha_norm
+                norm
             )))
         
     visual = np.array(visual)
@@ -323,7 +318,7 @@ def show_helix(fname):
     plt.colorbar()
     plt.show()
     
-    return fourier, raw_vis
+    return fourier, fs, ts, raw_vis
     #return delays[:len(frq)], raw_vis[:len(frq)], fourier_field
     
 def load_wedge_sim(fname):
