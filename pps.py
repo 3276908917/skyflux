@@ -157,12 +157,12 @@ def build_fourier_candidates(fname):
     sim = meta['picture']
     
     # 0: I    1: Q    2: U    3: V
-    fourier = [[], [], [], []]
+    fourierc = [[], [], [], []]
     
     raw_vis = []
     
     for ti in range(num_t):
-        for parameter in fourier:
+        for parameter in fourierc:
             parameter.append([])
         
         raw_vis.append([])
@@ -170,25 +170,25 @@ def build_fourier_candidates(fname):
         for ni in range(num_f):
             v = sim[ni][ti]
 
-            for p_idx in range(len(fourier)):
-                fourier[p_idx][ti].append(v[p_idx])
+            for p_idx in range(len(fourierc)):
+                fourierc[p_idx][ti].append(v[p_idx])
             
-            raw_vis[ti].append(sim[ni][ti])
+            raw_vis[ti].append(v)
             #norm = np.linalg.norm(sim[ni][ti]) same outcome
         
-        for parameter in fourier:
+        for parameter in fourierc:
             parameter[ti] = np.array(parameter[ti])
         
         raw_vis[ti] = np.array(raw_vis[ti])
         
-    for parameter in fourier:
+    for parameter in fourierc:
         parameter = np.array(parameter)
 
-    fourier = np.array(fourier)
+    fourierc = np.array(fourierc)
     
     raw_vis = np.array(raw_vis)
     
-    return fourier, raw_vis, fs, ts
+    return fourierc, raw_vis, fs, ts
    
 def transform_power(original, fs, ts):
     num_f = len(fs)
@@ -233,7 +233,7 @@ def transform_power(original, fs, ts):
         
     return fourier 
 
-def collect_helix_points(fourier, fs, ts):
+def collect_helix_points(fouriered, fs, ts):
     num_t = len(ts)
     num_f = len(fs)
     
@@ -241,11 +241,10 @@ def collect_helix_points(fourier, fs, ts):
     
     etas = f2etas(fs)
         
-    for ti in range(num_t):    
-        
+    for ti in range(num_t):
         for ni in range(num_f):
             dspecvec = np.array([
-                parameter[ti][ni] for parameter in fourier
+                parameter[ti][ni] for parameter in fouriered
             ])
         
             norm = np.linalg.norm(dspecvec)
@@ -253,7 +252,7 @@ def collect_helix_points(fourier, fs, ts):
             visual.append(np.array((
                 etas[ni] * 1e9,
                 ts[ti] * 12 / np.pi,
-                norm #np.log10(norm)
+                np.log10(norm)
             )))
             
     return np.array(visual)    
@@ -265,11 +264,11 @@ def show_helix(fname):
     and visually interpret the results as a
     delay-spectrum helix a la (Parsons, 2012).
     """
-    fourier, raw_vis, fs, ts = build_fourier_candidates(fname)
+    fourierc, raw_vis, fs, ts = build_fourier_candidates(fname)
     
     print("Data from file re-organized.")
     
-    fouriered = transform_power(fourier, fs, ts)
+    fouriered = transform_power(fourierc, fs, ts)
     
     print("Fourier transforms computed.")
     
@@ -283,9 +282,9 @@ def show_helix(fname):
     
     plot_3D(visual)
     
-    return fourier, fs, ts, raw_vis
+    return fouriered, fs, ts, raw_vis
 
-def plot_3D(wedge):
+def plot_3D(visual):
     """
     Primitive 3D plotter.
     
@@ -294,17 +293,17 @@ def plot_3D(wedge):
     or
         dynamic_wedge_vis
     """
-    k_orth = wedge[:, 0]
-    k_parr = wedge[:, 1]
-    p_p = wedge[:, 2]
+    x = visual[:, 0]
+    y = visual[:, 1]
+    z = visual[:, 2]
 
-    scaled_pow = (p_p - p_p.min()) / p_p.ptp()
-    colors = plt.cm.viridis(scaled_pow)
+    scaled_z = (z - z.min()) / z.ptp()
+    colors = plt.cm.viridis(scaled_z)
 
-    print("Minimum:", p_p.min())
-    print("PTP:", p_p.ptp())
+    print("Minimum:", z.min())
+    print("PTP:", z.ptp())
 
-    plt.scatter(k_orth, k_parr, marker='.', c=colors)
+    plt.scatter(x, y, marker='.', c=colors)
     plt.colorbar()
     plt.show()
     
