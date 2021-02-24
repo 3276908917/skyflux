@@ -154,8 +154,8 @@ def show_helix(fname):
     
     meta = pickle.load(sim_file)
     
-    frq = meta['frequencies']
-    etas = f2etas(frq)
+    fs = meta['frequencies']
+    etas = f2etas(fs)
     
     ts = meta['times']
     #ts = np.fft.fft(meta['times'])
@@ -168,7 +168,7 @@ def show_helix(fname):
     
     raw_vis = []
     
-    for ti in range(len(sim[0])):
+    for ti in range(len(ts)):
         for parameter in fourier:
             parameter.append([])
         
@@ -176,7 +176,9 @@ def show_helix(fname):
         
         last_i = len(fourier[0]) - 1
         
-        for ni in range(len(sim)):
+        assert(len(sim) == len(fs))
+        
+        for ni in range(len(fs)):
             
             v = sim[ni][ti]
             # print(v)
@@ -201,9 +203,14 @@ def show_helix(fname):
     
     print("Data from file re-organized.")
     
-    N = len(frq)
-    df = frq[1] - frq[0]
+    N = len(fs)
+    df = fs[1] - fs[0]
     window = genWindow(N)
+
+    print(N)
+    print(len(fourier[0]))
+
+    #assert(len(fourier[0]) == N)
         
     print("Window generated.")
     
@@ -212,7 +219,7 @@ def show_helix(fname):
     # option 10
     # ts = np.fft.fftshift(ts)
     
-    for ti in range(int(len(fourier[0]) / 2)):
+    for ti in range(int(len(fourier[0]))):
         #print(fourier_i[ti])
         #print("Length is", len(fourier_i[ti]))
         
