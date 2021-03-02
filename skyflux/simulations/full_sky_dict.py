@@ -222,7 +222,7 @@ def full_wedge(list_sources=catalog.obj_catalog):
     return wedge
     
 def multi_helix(ant1, ant2, sources=catalog.obj_catalog):
-    percent_interval = 100 / len(list_sources)
+    percent_interval = 100 / len(sources)
     percent = 0
     
     helix = single_helix(ant1, ant2, sources[0])
@@ -230,7 +230,7 @@ def multi_helix(ant1, ant2, sources=catalog.obj_catalog):
     percent += percent_interval
     tick(percent)
     
-    for next_obj in sources:
+    for next_obj in sources[1:]:
         if null_source(next_obj):
             continue
         
@@ -289,7 +289,6 @@ def single_wedge(source):
     
     A_full = A_tensor(ra, dec)
 
-    r = rot.radec2lm(ra, dec, ra0=lst0)
     s_axis = []
     
     for ni in nu_rl:
@@ -303,8 +302,6 @@ def single_wedge(source):
 
         for inner_ant in inner_ants.keys():
         
-            phi = ant.phase_factor(outer_ant, inner_ant, r, nu)
-        
             f_layer = []
             for ni in nu_rl:
                 s = s_axis[ni]
@@ -314,6 +311,10 @@ def single_wedge(source):
                 for ti in t_rl:
                     t = t_axis[ti]
 
+                    r = rot.radec2lm(ra, dec, ra0=t)
+                    phi = ant.phase_factor(
+                        outer_ant, inner_ant, r, nu)
+                    
                     A_t = A_n[ti]
                     
                     next_vista = np.dot(np.dot(A_t, s), phi)

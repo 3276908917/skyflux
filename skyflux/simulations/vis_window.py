@@ -71,22 +71,23 @@ def tick(percent):
 def null_source(obj):
     return obj.alpha != obj.alpha
 
-def single_helix(ant1, ant2, source):
+def fwhm(ant1, ant2, source, nu):
+    """
+    Full width at half maximum 
+    """
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
     
     A_full = A_tensor(ra, dec)
 
-    r = rot.radec2lm(ra, dec, ra0=lst0)
+    r = rot.radec2lm(ra, dec, ra0=lst0) # this feels strange all of a sudden
     s_axis = []
         
     f_layer = []
     
-    for ni in nu_rl:
-        nu = nu_axis[ni]
-        phi = ant.phase_factor(ant1, ant2, r, nu)
+    phi = ant.phase_factor(ant1, ant2, r, nu)
         
-        I = vis.get_I(source, nu)
+    I = vis.get_I(source, nu)
         s = np.array([complex(I), 0, 0, 0])
         A_n = A_full[ni]
 

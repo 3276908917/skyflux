@@ -252,7 +252,7 @@ def collect_helix_points(fouriered, fs, ts):
             visual.append(np.array((
                 etas[ni] * 1e9,
                 ts[ti] * 12 / np.pi,
-                np.log10(norm)
+                norm #np.log10(norm)
             )))
             
     return np.array(visual)    
