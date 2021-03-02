@@ -13,12 +13,9 @@ from skyflux import demo
 MACRO_EPSILON = 0.001
 
 # constants
-hour = 2 * np.pi / 24
-minute = hour / 60
-
-### Hard coding, for speed ###
-source = catalog.obj_catalog[3871]
-lst0 = np.radians(source.ra_angle)
+HOUR = 2 * np.pi / 24
+MINUTE = HOUR / 60
+SECOND = MINUTE / 60
 
 # we keep these as global parameters to avoid the potential overhead
 # of passing by value
@@ -33,7 +30,7 @@ nu_rl = range(len(nu_axis))
 # For wedges
 # t_axis = np.arange(lst0 - hour, lst0 + hour, 4 * minute)
 # For helices: 30 second intervals
-t_axis = np.arange(0, 2 * np.pi, np.pi / 1440)
+t_axis = np.arange(0, 24 * HOUR, 30 * SECOND)
 t_rl = range(len(t_axis))
 
 def A_tensor(ra, dec):
@@ -250,14 +247,12 @@ def single_helix(ant1, ant2, source):
     
     A_full = A_tensor(ra, dec)
 
-    r = rot.radec2lm(ra, dec, ra0=lst0)
     s_axis = []
         
     f_layer = []
     
     for ni in nu_rl:
         nu = nu_axis[ni]
-        phi = ant.phase_factor(ant1, ant2, r, nu)
         
         I = vis.get_I(source, nu)
         s = np.array([complex(I), 0, 0, 0])
@@ -268,6 +263,9 @@ def single_helix(ant1, ant2, source):
             t = t_axis[ti]
 
             A_t = A_n[ti]
+            
+            r = rot.radec2lm(ra, dec, ra0=t)
+            phi = ant.phase_factor(ant1, ant2, r, nu)
             
             next_vista = np.dot(np.dot(A_t, s), phi)
             t_layer.append(next_vista)
