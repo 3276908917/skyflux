@@ -326,7 +326,7 @@ def single_wedge(source):
 
     return outer_ants
     
-def package(block):
+def package(block, ptitle):
     """
     Returns a print-ready dictionary,
         particularly for use with the pps.py routines.
@@ -335,7 +335,8 @@ def package(block):
     """
     return {'frequencies' : nu_axis,
             'times' : t_axis,
-            'picture' : block}
+            'picture' : block,
+            'title' : ptitle}
 
 def pickle_dict(dict_, label):
     """
@@ -347,15 +348,19 @@ def pickle_dict(dict_, label):
     with open(label + '.pickle', 'wb') as handle:
         pickle.dump(dict_, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
-def auto_wedge(list_sources, label):
+def auto_wedge(list_sources, label, ptitle):
     """
     Automatically runs
         full_wedge(list_sources)
         package_wedge()
         pickle_dict
     """
-    pickle_dict(package(full_wedge(list_sources)), label)
+    pickle_dict(package(
+        full_wedge(list_sources), ptitle
+    ), label)
     
-def auto_helix(ant1, ant2, sources, label):
-    pickle_dict(package(multi_helix(ant1, ant2, sources)), label)
+def auto_helix(ant1, ant2, sources, label, ptitle):
+    pickle_dict(package(
+        multi_helix(ant1, ant2, sources), ptitle
+    ), label)
     

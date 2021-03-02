@@ -148,6 +148,8 @@ def build_fourier_candidates(fname):
     
     meta = pickle.load(sim_file)
     
+    ptitle = meta['title']
+    
     fs = meta['frequencies']
     num_f = len(fs)
     
@@ -188,7 +190,7 @@ def build_fourier_candidates(fname):
     
     raw_vis = np.array(raw_vis)
     
-    return fourierc, raw_vis, fs, ts
+    return fourierc, raw_vis, fs, ts, ptitle
    
 def transform_power(original, fs, ts):
     num_f = len(fs)
@@ -257,14 +259,22 @@ def collect_helix_points(fouriered, fs, ts):
             
     return np.array(visual)    
     
-def show_helix(fname):
+def show_helix(fname, pt_override=None):
     """
     Load simulated visibilities from the file named
         @fname
     and visually interpret the results as a
     delay-spectrum helix a la (Parsons, 2012).
+    
+    @pt_override is a way to override the title with which
+    a simulation came. It is extremely bad form to use this,
+    but it can come in handy during lapses of diligence.
     """
-    fourierc, raw_vis, fs, ts = build_fourier_candidates(fname)
+    fourierc, raw_vis, fs, ts, ptitle = \
+        build_fourier_candidates(fname)
+    
+    if pt_override is not None:
+        ptitle = pt_override
     
     print("Data from file re-organized.")
     
@@ -280,11 +290,11 @@ def show_helix(fname):
     plt.xlabel("Delays [ns]")
     plt.ylabel("LST [hr]")
     
-    plot_3D(visual)
+    plot_3D(visual, ptitle)
     
     return fouriered, fs, ts, raw_vis
 
-def plot_3D(visual):
+def plot_3D(visual, title, scaled=False):
     """
     Primitive 3D plotter.
     
@@ -292,15 +302,21 @@ def plot_3D(visual):
         static_wedge_vis
     or
         dynamic_wedge_vis
+        
+    Disable @scaled if you are using values such as logarithms
     """
     x = visual[:, 0]
     y = visual[:, 1]
     z = visual[:, 2]
 
-    #scaled_z = (z - z.min()) / z.ptp()
-    #colors = plt.cm.viridis(scaled_z)
+    colors = None
+    if (scaled):
+        scaled_z = (z - z.min()) / z.ptp()
+        colors = plt.cm.viridis(scaled_z)
+    else:
+        colors = z
 
-    colors = z
+    plt.title(title)
 
     print("Minimum:", z.min())
     print("PTP:", z.ptp())
