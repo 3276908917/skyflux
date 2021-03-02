@@ -98,9 +98,21 @@ def fwhm(ant1, ant2, source, nu, max_):
         if vnorm1 is None:
             continue
         elif 2 * vnorm2 >= max_ and 2 * vnorm1 <= max_:
-            print("Rise time:", t)
+            print("Rise time:", t, "radians")
+            print("(" + rad_to_time(t) + ")\n")
         elif 2 * vnorm2 <= max_ and 2 * vnorm1 >= max_:
             print("Set time:", t)
+            print("(" + rad_to_time(t) + ")")
+
+def rad_to_time(theta):
+    hr = int(theta / HOUR)
+    rem = theta - HOUR * hr
+    m = int(rem / MINUTE)
+    rem = rem - MINUTE * m
+    s = int(rem / SECOND)
+    return str(hr) + " hours, " + \
+        str(m) + " minutes, " + \
+        str(s) + " seconds."
 
 def vmax(ant1, ant2, source, nu):
     """
@@ -138,3 +150,8 @@ def vmax(ant1, ant2, source, nu):
             max_ = vis_norm
     
     return max_
+    
+def find_window(ant1, ant2, source, nu):
+    m = vmax(ant1, ant2, source, nu)
+    fwhm(ant1, ant2, source, nu, m)
+    
