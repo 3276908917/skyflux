@@ -252,7 +252,7 @@ def collect_helix_points(fouriered, fs, ts):
             visual.append(np.array((
                 etas[ni] * 1e9,
                 ts[ti] * 12 / np.pi,
-                norm #np.log10(norm)
+                np.log10(norm)
             )))
             
     return np.array(visual)    
@@ -297,8 +297,10 @@ def plot_3D(visual):
     y = visual[:, 1]
     z = visual[:, 2]
 
-    scaled_z = (z - z.min()) / z.ptp()
-    colors = plt.cm.viridis(scaled_z)
+    #scaled_z = (z - z.min()) / z.ptp()
+    #colors = plt.cm.viridis(scaled_z)
+
+    colors = z
 
     print("Minimum:", z.min())
     print("PTP:", z.ptp())
