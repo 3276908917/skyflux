@@ -26,7 +26,7 @@ SECOND = MINUTE / 60
 t_axis = np.arange(0, 24 * HOUR, 30 * SECOND)
 t_rl = range(len(t_axis))
 
-def A_tensor(ra, dec):
+def A_tensor(ra, dec, nu):
     """
     Returned format: a |nu_axis| * |t_axis| * 4 * 4 matrix
     Contains every possible exact A matrix.
@@ -45,13 +45,10 @@ def A_tensor(ra, dec):
         alts.append(alt)
         azs.append(az)
 
-    for nu in nu_axis:
-        J_source = stokes.create_J(az=azs, alt=alts, nu=nu, radians=True)
-        A_source = np.array([stokes.create_A(J=J) for J in J_source])
-
-        A_tensor.append(np.array(A_source))
+    J_source = stokes.create_J(az=azs, alt=alts, nu=nu, radians=True)
+    A_source = np.array([stokes.create_A(J=J) for J in J_source])
         
-    return np.array(A_tensor)
+    return np.array(A_source)
                    
 def tick(percent):
     """ Give the user a progress update."""
@@ -68,7 +65,7 @@ def fwhm(ant1, ant2, source, nu, max_):
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
     
-    A_full = A_tensor(ra, dec)
+    A_n = A_tensor(ra, dec, nu)
 
     s_axis = []
         
@@ -76,7 +73,6 @@ def fwhm(ant1, ant2, source, nu, max_):
         
     I = vis.get_I(source, nu)
     s = np.array([complex(I), 0, 0, 0])
-    A_n = A_full[ni]
 
     t_layer = []
     
@@ -99,11 +95,11 @@ def fwhm(ant1, ant2, source, nu, max_):
         vnorm2 = vis_norm
         vnorm1 = temp
         
-        if (vnorm1 = None)
+        if vnorm1 is None:
             continue
-        elif (2 * vnorm2 >= max_ and 2 * vnorm1 <= max_):
+        elif 2 * vnorm2 >= max_ and 2 * vnorm1 <= max_:
             print("Rise time:", t)
-        elif (2 * vnorm2 <= max_ and 2 * vnorm1 >= max_):
+        elif 2 * vnorm2 <= max_ and 2 * vnorm1 >= max_:
             print("Set time:", t)
 
 def vmax(ant1, ant2, source, nu):
@@ -115,7 +111,7 @@ def vmax(ant1, ant2, source, nu):
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
     
-    A_full = A_tensor(ra, dec)
+    A_n = A_tensor(ra, dec, nu)
 
     s_axis = []
         
@@ -123,7 +119,6 @@ def vmax(ant1, ant2, source, nu):
         
     I = vis.get_I(source, nu)
     s = np.array([complex(I), 0, 0, 0])
-    A_n = A_full[ni]
 
     t_layer = []
     
