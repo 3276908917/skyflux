@@ -13,27 +13,17 @@ from skyflux import demo
 MACRO_EPSILON = 0.001
 
 # constants
-hour = 2 * np.pi / 24
-minute = hour / 60
-
-### Hard coding, for speed ###
-source = catalog.obj_catalog[3871]
-lst0 = np.radians(source.ra_angle)
+HOUR = 2 * np.pi / 24
+MINUTE = HOUR / 60
+SECOND = MINUTE / 60
 
 # we keep these as global parameters to avoid the potential overhead
 # of passing by value
 
 # For wedges
-# nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
-# For helices
-nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
-
-nu_rl = range(len(nu_axis))
-
-# For wedges
 # t_axis = np.arange(lst0 - hour, lst0 + hour, 4 * minute)
 # For helices: 30 second intervals
-t_axis = np.arange(0, 2 * np.pi, np.pi / 1440)
+t_axis = np.arange(0, 24 * HOUR, 30 * SECOND)
 t_rl = range(len(t_axis))
 
 def A_tensor(ra, dec):
@@ -71,7 +61,7 @@ def tick(percent):
 def null_source(obj):
     return obj.alpha != obj.alpha
 
-def fwhm(ant1, ant2, source, nu):
+def fwhm(ant1, ant2, source, nu, max_):
     """
     Full width at half maximum 
     """
@@ -80,27 +70,76 @@ def fwhm(ant1, ant2, source, nu):
     
     A_full = A_tensor(ra, dec)
 
-    r = rot.radec2lm(ra, dec, ra0=lst0) # this feels strange all of a sudden
     s_axis = []
         
     f_layer = []
-    
-    phi = ant.phase_factor(ant1, ant2, r, nu)
         
     I = vis.get_I(source, nu)
-        s = np.array([complex(I), 0, 0, 0])
-        A_n = A_full[ni]
+    s = np.array([complex(I), 0, 0, 0])
+    A_n = A_full[ni]
 
-        t_layer = []
-        for ti in t_rl:
-            t = t_axis[ti]
-
-            A_t = A_n[ti]
-            
-            next_vista = np.dot(np.dot(A_t, s), phi)
-            t_layer.append(next_vista)
-  
-        f_layer.append(np.array(t_layer))
-
-    return np.array(f_layer)
+    t_layer = []
     
+    vnorm1 = None
+    vnorm2 = None
+    
+    for ti in t_rl:
+        t = t_axis[ti]
+
+        A_t = A_n[ti]
+        
+        r = rot.radec2lm(ra, dec, ra0=t)
+        phi = ant.phase_factor(ant1, ant2, r, nu)
+        
+        next_vista = np.dot(np.dot(A_t, s), phi)
+        
+        vis_norm = np.linalg.norm(next_vista)
+        
+        temp = vnorm2
+        vnorm2 = vis_norm
+        vnorm1 = temp
+        
+        if (vnorm1 = None)
+            continue
+        elif (2 * vnorm2 >= max_ and 2 * vnorm1 <= max_):
+            print("Rise time:", t)
+        elif (2 * vnorm2 <= max_ and 2 * vnorm1 >= max_):
+            print("Set time:", t)
+
+def vmax(ant1, ant2, source, nu):
+    """
+    Maximum visibility. For use with fwhm
+    """
+    max_ = float("-inf")
+    
+    ra = np.radians(source.ra_angle)
+    dec = np.radians(source.dec_angle)
+    
+    A_full = A_tensor(ra, dec)
+
+    s_axis = []
+        
+    f_layer = []
+        
+    I = vis.get_I(source, nu)
+    s = np.array([complex(I), 0, 0, 0])
+    A_n = A_full[ni]
+
+    t_layer = []
+    
+    for ti in t_rl:
+        t = t_axis[ti]
+
+        A_t = A_n[ti]
+        
+        r = rot.radec2lm(ra, dec, ra0=t)
+        phi = ant.phase_factor(ant1, ant2, r, nu)
+        
+        next_vista = np.dot(np.dot(A_t, s), phi)
+        
+        vis_norm = np.linalg.norm(next_vista)
+        
+        if (vis_norm > max_):
+            max_ = vis_norm
+    
+    return max_
