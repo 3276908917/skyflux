@@ -14,6 +14,7 @@ lists give sf.catalog.srcs indices
     B: [0, 968, 1936, 2903, 3871]
         * keep in mind that none of these sources necessarily
         rises/sets in the particular cold patch that I have chosen
+    C: everything except for index 1918
         
 The lower-case letter that appears at the end
 tells you the type of simulation
@@ -22,5 +23,5 @@ tells you the type of simulation
     
 "Why is it named sBw?"
     That is an excellent question. I do not know.
-    I think it should be "cBw"
+    I think it should just be "Bw"
 

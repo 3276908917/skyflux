@@ -147,7 +147,8 @@ def merge_wedges(wedge1, wedge2):
                     vis1 = wedge1[ant1][ant2][nu_idx][t_idx]
                     vis2 = wedge2[ant1][ant2][nu_idx][t_idx]
                     
-                    """ Debugging block
+                    """
+                    # Debugging block 1
                     print(vis1)
                     print()
                     print(vis2)
@@ -157,6 +158,9 @@ def merge_wedges(wedge1, wedge2):
                     
                     sum_[ant1][ant2][nu_idx][t_idx] = \
                         np.add(vis1, vis2)
+                    
+                    """
+                    # Debugging block 2
                     if np.array_equal(
                         sum_[ant1][ant2][nu_idx][t_idx],
                         np.zeros(4)
@@ -165,7 +169,7 @@ def merge_wedges(wedge1, wedge2):
                         print(vis1)
                         print(vis2)
                         print()
-                
+                    """
     return sum_
                 
     """

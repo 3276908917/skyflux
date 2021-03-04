@@ -136,7 +136,7 @@ def auto_show(fname, static=False):
     and visually interpret the results using a
         2D + color wedge plot.
     """
-    fcd, fs, ts = load_wedge_sim(fname + ".pickle")
+    fcd, fs, ts, ptitle = load_wedge_sim(fname + ".pickle")
     print("Simulation file loaded.\n")
     
     transformed = transform_wedge(fcd, fs, ts)
@@ -148,7 +148,7 @@ def auto_show(fname, static=False):
         wedge = collect_wedge_points(transformed, fs, ts)
     print("Wedge points collected.\n")
     
-    plot_3D(transformed)
+    plot_3D(wedge, ptitle)
 
 def build_fourier_candidates(fname):
     sim_file = open(fname + ".pickle", "rb")
@@ -391,7 +391,7 @@ def load_wedge_sim(fname):
 
             fcd[ant1][ant2] = np.array(fourierc)
 
-    return fcd, fs, ts
+    return fcd, fs, ts, ptitle
 
 def static_wedge_vis(sim_dict, fs):
     raise NotImplementedError("I have only updated" + \
@@ -528,6 +528,20 @@ def collect_wedge_points(fcd, fs, ts):
                         )
                     )
                 ])
+                
+                """
+                dspecvec = np.array([
+                parameter[ti][ni] for parameter in fouriered
+                ])
+            
+                norm = np.linalg.norm(dspecvec)
+
+                visual.append(np.array((
+                    etas[ni] * 1e9,
+                    ts[ti] * 12 / np.pi,
+                    np.log10(norm)
+                )))
+                """
 
                 visual.append(wedge_datum)   
 
