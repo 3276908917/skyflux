@@ -299,7 +299,7 @@ def show_helix(fname, pt_override=None):
     
     plot_3D(visual, ptitle)
     
-    return fouriered, fs, ts, raw_vis
+    return visual, fouriered, fs, ts, raw_vis
 
 def plot_3D(visual, title, scaled=False):
     """
@@ -548,6 +548,48 @@ def collect_wedge_points(fcd, fs, ts):
     visual = np.array(visual)
    
     return np.array(visual)
+
+def micro_wedge(h1, f1, b1, h2, f2, b2, h3, f3, b3):
+    """
+    The axes do not line up with Nunhokee et al.
+    Probably something wrong with your constants
+        or usage thereof.
+    """
+    center_f1 = np.average(f1)
+    z1 = fq2z(center_f1)
+    lambda1 = C / center_f1
+    k_par1 = k_parallel(h1[:, 0], z1)
+    k_orth1 = k_perp(z1) / lambda1 * b1
+    
+    center_f2 = np.average(f2)
+    z2 = fq2z(center_f2)
+    lambda2 = C / center_f2
+    k_par2 = k_parallel(h2[:, 0], z2)
+    k_orth2 = k_perp(z2) / lambda2 * b2
+    
+    center_f3 = np.average(f3)
+    z3 = fq2z(center_f3)
+    lambda3 = C / center_f3
+    k_par3 = k_parallel(h3[:, 0], z3)
+    k_orth3 = k_perp(z3) / lambda3 * b3
+    
+    y = np.concatenate((k_par1, k_par2, k_par3))
+    x = np.concatenate((
+        np.repeat(k_orth1, len(k_par1)),
+        np.repeat(k_orth2, len(k_par2)),
+        np.repeat(k_orth3, len(k_par3))
+    ))
+    
+    colors = np.concatenate((h1[:, 2], h2[:, 2], h3[:, 2]))
+
+    plt.title("Helix concatenation")
+
+    #print("Minimum:", z.min())
+    #print("PTP:", z.ptp())
+
+    plt.scatter(x, y, marker='.', c=colors)
+    plt.colorbar()
+    plt.show()
     
 def transform_wedge(original, fs, ts):
     num_f = len(fs)
