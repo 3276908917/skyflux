@@ -21,16 +21,15 @@ SECOND = MINUTE / 60
 # of passing by value
 
 # For wedges
-# nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
+nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
+t_axis = np.arange(3 * HOUR, 5 * HOUR, 4 * MINUTE)
+    # it's an arbitrary region of the cold patch
+
 # For helices
-nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
+#nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
+#t_axis = np.arange(0, 24 * HOUR, 30 * SECOND)
 
 nu_rl = range(len(nu_axis))
-
-# For wedges
-# t_axis = np.arange(lst0 - hour, lst0 + hour, 4 * minute)
-# For helices: 30 second intervals
-t_axis = np.arange(0, 24 * HOUR, 30 * SECOND)
 t_rl = range(len(t_axis))
 
 def A_tensor(ra, dec):
@@ -194,16 +193,16 @@ def tick(percent):
 def null_source(obj):
     return obj.alpha != obj.alpha
 
-def full_wedge(list_sources=catalog.srcs):
-    percent_interval = 100 / len(list_sources)
+def full_wedge(sources=catalog.srcs):
+    percent_interval = 100 / len(sources)
     percent = 0
     
-    wedge = single_wedge(list_sources[0])
+    wedge = single_wedge(sources[0])
     
     percent += percent_interval
     tick(percent)
     
-    for next_obj in list_sources:
+    for next_obj in sources[1:]:
         if null_source(next_obj):
             continue
         
