@@ -194,7 +194,7 @@ def tick(percent):
 def null_source(obj):
     return obj.alpha != obj.alpha
 
-def full_wedge(list_sources=catalog.obj_catalog):
+def full_wedge(list_sources=catalog.srcs):
     percent_interval = 100 / len(list_sources)
     percent = 0
     
@@ -218,7 +218,7 @@ def full_wedge(list_sources=catalog.obj_catalog):
         
     return wedge
     
-def multi_helix(ant1, ant2, sources=catalog.obj_catalog):
+def multi_helix(ant1, ant2, sources=catalog.srcs):
     percent_interval = 100 / len(sources)
     percent = 0
     

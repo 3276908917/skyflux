@@ -17,9 +17,10 @@ expected_frequencies = [76, 84, 92, 99, 107, 115, 122, 130,
 class GLEAM_entry:
     def __init__(self, line):
         """
-        Initialize GLEAM object with a line from the catalog excerpt
-        downloaded as a text file. We expect all of the following, in
-        this order, on a separate line associated with a single GLEAM object:
+        Initialize GLEAM object with a line from the catalog
+        excerpt downloaded as a text file. We expect all of
+        the following, in this order, on a separate line
+        associated with a single GLEAM object:
             name
             right ascension (hour, minute, second)
             declination (degree, arcminute, arcsecond)
@@ -27,7 +28,8 @@ class GLEAM_entry:
                 expected_frequencies
             spectral index, alpha
         """
-        # Might want to redo this line later to exclude universal "GLEAM " prefix
+        # Might want to redo this line later to
+        # exclude universal "GLEAM " prefix
         self.name = line[:line.index("|")]
         line = line[line.index("|") + 1:]
         
@@ -120,6 +122,14 @@ class GLEAM_entry:
 data_prefix = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 try:
-    obj_catalog = np.load(data_prefix + 'catalog.npy', allow_pickle=True)
+    srcs = np.load(data_prefix + 'catalog.npy', allow_pickle=True)
 except FileNotFoundError:
     print("Failure to load GLEAM object array.")
+    
+def idxs_to_objs(indices):
+    objs = []
+    for i in indices:
+        objs.append(srcs[i])
+    return np.array(objs)
+    
+

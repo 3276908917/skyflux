@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 
+### I should probably kill this script;
+### I think it is entirely obsolete in light of pps.py
+
 "power plot sketch"
 
 import matplotlib.pyplot as plt

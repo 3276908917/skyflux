@@ -1,0 +1,12 @@
+simulation glossary
+    * In the shell, to compartmentalize these kinds of
+        subjects, I will prefix baseline variables with bl
+        and source subset variables with ss
+
+Baselines indicated by lower case letter
+a: (136, 143) ~ 102 m
+
+Sources subsets indicated by upper case letter
+tuples give sf.catalog.srcs indices    
+    A: (3831, 3841, 3851, 3861, 3871)
+

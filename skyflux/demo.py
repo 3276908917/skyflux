@@ -296,7 +296,7 @@ def sources_range(start=3, end=5, frq=151):
     print("Number of valid sources encountered:", len(valid_sources))
     return valid_sources
 
-def brightest_source(frq=151, sliced_list=catalog.obj_catalog):
+def brightest_source(frq=151, sliced_list=catalog.srcs):
     """
     Return the source with the highest value for integrated flux
         at frequency @frq (in MHz).
