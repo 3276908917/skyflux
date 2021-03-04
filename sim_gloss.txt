@@ -12,4 +12,11 @@ Sources subsets indicated by upper case letter
 lists give sf.catalog.srcs indices    
     A: [3831, 3841, 3851, 3861, 3871]
     B: [0, 968, 1936, 2903, 3871]
+        * keep in mind that none of these sources necessarily
+        rises/sets in the particular cold patch that I have chosen
+        
+The lower-case letter that appears at the end
+tells you the type of simulation
+    h: helix
+    w: wedge
 

@@ -348,30 +348,49 @@ def load_wedge_sim(fname):
 
     meta = pickle.load(sim_file)
 
-    frq = meta['frequencies'] #! I don't remember where this
-       # naming scheme is in the code
+    ptitle = meta['title']
 
-    # f2etas claims to accept frequencies in GHz,
-    # but the axes come out strangely
-    etas = f2etas(frq)# / 1e9)
+    fs = meta['frequencies']
+    num_f = len(fs)
     
-    # we are ranging from 50 to 250 MHz
-    center_f = np.average(frq)
-    z = fq2z(center_f)
-    lambda_ = C / center_f
+    ts = meta['times']
+    num_t = len(ts)
+    
+    sim = meta['picture']
+    
+    # 0: I    1: Q    2: U    3: V
+    fourierc = [[], [], [], []]
+    
+    for ti in range(num_t):
+        for parameter in fourierc:
+            parameter.append([])
+        
+        raw_vis.append([])
+        
+        for ni in range(num_f):
+            v = sim[ni][ti]
 
-    k_par = k_parallel(etas, z)
-    k_starter = k_perp(z) / lambda_ # this will need to be
-    # multiplied on a per-baseline basis
+            for p_idx in range(len(fourierc)):
+                fourierc[p_idx][ti].append(v[p_idx])
+            
+            raw_vis[ti].append(v)
+            #norm = np.linalg.norm(sim[ni][ti]) same outcome
+        
+        for parameter in fourierc:
+            parameter[ti] = np.array(parameter[ti])
+        
+        raw_vis[ti] = np.array(raw_vis[ti])
+        
+    for parameter in fourierc:
+        parameter = np.array(parameter)
 
-    nu_idxs = range(len(frq))
+    fourierc = np.array(fourierc)
+    
+    raw_vis = np.array(raw_vis)
 
-    return {"fs": nu_idxs,
-            "kp": k_par,
-            "ks": k_starter,
-            "sim": meta['picture']}
+    return fourierc, fs, ts, kp, ks
 
-def static_wedge_vis(sim_dict):
+def static_wedge_vis(sim_dict, fs):
     """
     Read from the wedge data structure @sim_dict
         (specifically, one using the format
@@ -392,10 +411,19 @@ def static_wedge_vis(sim_dict):
     """
     wedge_data = []
     
+    etas = f2etas(fs)    
+
+    center_f = np.average(fs)
+    z = fq2z(center_f)
+    lambda_ = C / center_f
+
+    k_par = k_parallel(etas, z)
+    k_starter = k_perp(z) / lambda_ # this will need to be
+    # multiplied on a per-baseline basis
+    
     ### aliasing ###
     nu_idxs = sim_dict['fs']
-    k_par = sim_dict['kp']
-    k_starter = sim_dict['ks']
+
     sim = sim_dict['sim']
 
     for ant1 in sim.keys():
@@ -431,7 +459,7 @@ def static_wedge_vis(sim_dict):
     
 #! There has to be some way to merge this with the function
 # above
-def dynamic_wedge_vis(sim_dict):
+def dynamic_wedge_vis(sim_dict, fs):
     """
     Read from the wedge data structure @sim_dict
         (specifically, one using the format
@@ -450,6 +478,16 @@ def dynamic_wedge_vis(sim_dict):
         @sim_dict.
     """
     wedge_data = []
+    
+    etas = f2etas(fs)    
+
+    center_f = np.average(fs)
+    z = fq2z(center_f)
+    lambda_ = C / center_f
+
+    k_par = k_parallel(etas, z)
+    k_starter = k_perp(z) / lambda_ # this will need to be
+    # multiplied on a per-baseline basis
     
     ### aliasing ###
     nu_idxs = sim_dict['fs']
