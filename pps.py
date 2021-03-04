@@ -136,12 +136,13 @@ def auto_show(fname, static=False):
     and visually interpret the results using a
         2D + color wedge plot.
     """
-    sim_dict = load_wedge_sim(fname + ".pickle")
+    fcd, fs, ts = load_wedge_sim(fname + ".pickle")
     if static:
         wedge = static_visual(sim_dict)
     else:
-        wedge = dynamic_visual(sim_dict) 
-    plot_3D(wedge)
+        wedge = dynamic_visual(fcd, fs, ts)
+    transformed = transform_wedge(fcd, fs, ts)
+    plot_3D(transformed)
 
 def build_fourier_candidates(fname):
     sim_file = open(fname + ".pickle", "rb")
@@ -358,39 +359,40 @@ def load_wedge_sim(fname):
     
     sim = meta['picture']
     
-    # 0: I    1: Q    2: U    3: V
-    fourierc = [[], [], [], []]
+    fcd = {}# fourier candidate dictionary
     
-    for ti in range(num_t):
-        for parameter in fourierc:
-            parameter.append([])
-        
-        raw_vis.append([])
-        
-        for ni in range(num_f):
-            v = sim[ni][ti]
-
-            for p_idx in range(len(fourierc)):
-                fourierc[p_idx][ti].append(v[p_idx])
+    for ant1 in sim.keys():
+        fcd[ant1] = {}
+        for ant2 in sim[ant1].keys():
+            # 0: I    1: Q    2: U    3: V
+            fourierc = [[], [], [], []]
             
-            raw_vis[ti].append(v)
-            #norm = np.linalg.norm(sim[ni][ti]) same outcome
-        
-        for parameter in fourierc:
-            parameter[ti] = np.array(parameter[ti])
-        
-        raw_vis[ti] = np.array(raw_vis[ti])
-        
-    for parameter in fourierc:
-        parameter = np.array(parameter)
+            for ti in range(num_t):
+                for parameter in fourierc:
+                    parameter.append([])
+                
+                for ni in range(num_f):
+                    v = sim[ant1][ant2][ni][ti]
 
-    fourierc = np.array(fourierc)
-    
-    raw_vis = np.array(raw_vis)
+                    for p_idx in range(len(fourierc)):
+                        fourierc[p_idx][ti].append(v[p_idx])
+                
+                for parameter in fourierc:
+                    parameter[ti] = np.array(parameter[ti])
+                
+                raw_vis[ti] = np.array(raw_vis[ti])
+        
+            for parameter in fourierc:
+                parameter = np.array(parameter)
 
-    return fourierc, fs, ts, kp, ks
+            fcd[ant1][ant2] = np.array(fourierc)
+
+    return fcd, fs, ts
 
 def static_wedge_vis(sim_dict, fs):
+    raise NotImplementedError("I have only updated" + \
+    " the dynamic wedge routine at this moment.")
+    
     """
     Read from the wedge data structure @sim_dict
         (specifically, one using the format
@@ -459,7 +461,7 @@ def static_wedge_vis(sim_dict, fs):
     
 #! There has to be some way to merge this with the function
 # above
-def dynamic_wedge_vis(sim_dict, fs):
+def collect_wedge_points(fcd, fs, ts):
     """
     Read from the wedge data structure @sim_dict
         (specifically, one using the format
@@ -477,7 +479,10 @@ def dynamic_wedge_vis(sim_dict, fs):
     in accepting multiple LST values from
         @sim_dict.
     """
-    wedge_data = []
+    num_t = len(ts)
+    num_f = len(fs)
+    
+    visual = []
     
     etas = f2etas(fs)    
 
@@ -491,9 +496,6 @@ def dynamic_wedge_vis(sim_dict, fs):
     
     ### aliasing ###
     nu_idxs = sim_dict['fs']
-    k_par = sim_dict['kp']
-    k_starter = sim_dict['ks']
-    sim = sim_dict['sim']
 
     for ant1 in sim.keys():
         for ant2 in sim[ant1].keys():
@@ -513,9 +515,6 @@ def dynamic_wedge_vis(sim_dict, fs):
                         this_instant,
                         next_instant
                     ))
-
-                    # Does v have units of brightness or square of brightness?
-                    # We want a delay transform delay_transform(data, fqs)
 
                 wedge_datum = np.array([
                     k_orth,
@@ -561,4 +560,50 @@ def dynamic_wedge_vis(sim_dict, fs):
     """
    
     return np.array(wedge_data)
+    
+def transform_wedge(original, fs, ts):
+    num_f = len(fs)
+    num_t = len(ts)
+    
+    import copy
+    
+    fourier_dict = copy.deepcopy(original)
+
+    window = genWindow(num_f)
+
+    for ant1 in fourier_dict.keys():
+        for ant2 in fourier_dict[ant1].keys():
+            fourier = fourier_dict[ant1][ant2]
+            for ti in range(num_t):
+                for parameter in fourier:
+                    parameter[ti] = np.fft.fft(parameter[ti] * window)
+                
+    return fourier_dict
+    
+def collect_wedge_points(transformed, fs, ts):
+    num_t = len(ts)
+    num_f = len(fs)
+    
+    visual = []
+    
+    etas = f2etas(fs)
+        
+    for ant1 in transformed.keys():
+        for ant2 in transformed[ant1].keys():
+            fouriered = transformed[ant1][ant2]
+            for ti in range(num_t):
+                for ni in range(num_f):
+                    dspecvec = np.array([
+                        parameter[ti][ni] for parameter in fouriered
+                    ])
+                
+                    norm = np.linalg.norm(dspecvec)
+
+                    visual.append(np.array((
+                        etas[ni] * 1e9,
+                        ts[ti] * 12 / np.pi,
+                        np.log10(norm)
+                    )))
+            
+    return np.array(visual)  
     
