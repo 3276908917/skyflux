@@ -19,4 +19,8 @@ The lower-case letter that appears at the end
 tells you the type of simulation
     h: helix
     w: wedge
+    
+"Why is it named sBw?"
+    That is an excellent question. I do not know.
+    I think it should be "cBw"
 

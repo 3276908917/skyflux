@@ -137,11 +137,17 @@ def auto_show(fname, static=False):
         2D + color wedge plot.
     """
     fcd, fs, ts = load_wedge_sim(fname + ".pickle")
+    print("Simulation file loaded.\n")
+    
+    transformed = transform_wedge(fcd, fs, ts)
+    print("Fourier transforms applied to simulation.\n")
+    
     if static:
         wedge = static_visual(sim_dict)
     else:
-        wedge = dynamic_visual(fcd, fs, ts)
-    transformed = transform_wedge(fcd, fs, ts)
+        wedge = collect_wedge_points(transformed, fs, ts)
+    print("Wedge points collected.\n")
+    
     plot_3D(transformed)
 
 def build_fourier_candidates(fname):
@@ -379,8 +385,6 @@ def load_wedge_sim(fname):
                 
                 for parameter in fourierc:
                     parameter[ti] = np.array(parameter[ti])
-                
-                raw_vis[ti] = np.array(raw_vis[ti])
         
             for parameter in fourierc:
                 parameter = np.array(parameter)
@@ -493,24 +497,21 @@ def collect_wedge_points(fcd, fs, ts):
     k_par = k_parallel(etas, z)
     k_starter = k_perp(z) / lambda_ # this will need to be
     # multiplied on a per-baseline basis
-    
-    ### aliasing ###
-    nu_idxs = sim_dict['fs']
 
-    for ant1 in sim.keys():
-        for ant2 in sim[ant1].keys():
+    for ant1 in fcd.keys():
+        for ant2 in fcd[ant1].keys():
             k_orth = k_starter * sf.ant.baselength(ant1, ant2)
             
-            for nu_idx in nu_idxs:
-                system = sim[ant1][ant2][nu_idx]
+            for nu_idx in range(num_f):
+                ###!!! Just using I at the moment
+                system_I = fcd[ant1][ant2][0]
                 powers_prop = []
                 
-                for t_idx in range(len(system) - 1):
-                    this_instant = system[t_idx]
-                    next_instant = system[t_idx + 1]
-                    # this is a proportionality.
-                    # The real deal uses the power equation 6
-                    # from Nunhokee et al.
+                for t_idx in range(num_t - 1):
+                    this_instant = system_I[t_idx][nu_idx]
+                    next_instant = system_I[t_idx + 1][nu_idx]
+                    
+                    # this is just a proportionality.
                     powers_prop.append(np.vdot(
                         this_instant,
                         next_instant
@@ -528,38 +529,11 @@ def collect_wedge_points(fcd, fs, ts):
                     )
                 ])
 
-                wedge_data.append(wedge_datum)   
+                visual.append(wedge_datum)   
 
-    ### begin prototyping section
-
-    wedge_data = np.array(wedge_data)
-
-    """
-       The structure of wedge_data is a collection of triplets
-       (k_orth, k_parr, some squared brightness)
-
-       Based on the order in which I added data, I think that each consecutive
-       len(nu_idxs) should have the same value of k_orth, right?
-    """
-    
-    """
-    nu_rl = len(nu_idxs)
-
-    wedge_final = wedge_data.copy()
-
-    for i in range(len(wedge_data) / nu_rl - 1):
-        start = i * nu_rl
-        end = (i + 1) * nu_rl
-        vis_over_f = wedge_data[start:end]
-        dt = delay_transform(vis_over_f[:, 2], frq / 1e9)
-        # now copy that into wedge_final somehow
-        for j in range(len(vis_over_f)):
-            wedge_final[j + start][2] = vis_over_f[j]
-       
-    ### terminate prototyping section  
-    """
+    visual = np.array(visual)
    
-    return np.array(wedge_data)
+    return np.array(visual)
     
 def transform_wedge(original, fs, ts):
     num_f = len(fs)
@@ -579,31 +553,4 @@ def transform_wedge(original, fs, ts):
                     parameter[ti] = np.fft.fft(parameter[ti] * window)
                 
     return fourier_dict
-    
-def collect_wedge_points(transformed, fs, ts):
-    num_t = len(ts)
-    num_f = len(fs)
-    
-    visual = []
-    
-    etas = f2etas(fs)
-        
-    for ant1 in transformed.keys():
-        for ant2 in transformed[ant1].keys():
-            fouriered = transformed[ant1][ant2]
-            for ti in range(num_t):
-                for ni in range(num_f):
-                    dspecvec = np.array([
-                        parameter[ti][ni] for parameter in fouriered
-                    ])
-                
-                    norm = np.linalg.norm(dspecvec)
-
-                    visual.append(np.array((
-                        etas[ni] * 1e9,
-                        ts[ti] * 12 / np.pi,
-                        np.log10(norm)
-                    )))
-            
-    return np.array(visual)  
     
