@@ -4,9 +4,12 @@ simulation glossary
         and source subset variables with ss
 
 Baselines indicated by lower case letter
-a: (136, 143) ~ 102 m
+a: (136, 143) ~ 102.3 m
+b: (139, 143) ~ 58.4 m
+c: (142, 143) ~ 14.6 m
 
 Sources subsets indicated by upper case letter
-tuples give sf.catalog.srcs indices    
-    A: (3831, 3841, 3851, 3861, 3871)
+lists give sf.catalog.srcs indices    
+    A: [3831, 3841, 3851, 3861, 3871]
+    B: [0, 968, 1936, 2903, 3871]
 
