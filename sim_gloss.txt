@@ -15,6 +15,7 @@ lists give sf.catalog.srcs indices
         * keep in mind that none of these sources necessarily
         rises/sets in the particular cold patch that I have chosen
     C: everything except for index 1918
+    D: [3865, 3866, 3867, 3868, 3869, 3870, 3871]
         
 The lower-case letter that appears at the end
 tells you the type of simulation

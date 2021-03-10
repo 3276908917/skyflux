@@ -512,10 +512,6 @@ def collect_wedge_points(fcd, fs, ts):
                     next_instant = \
                         fcd[ant1][ant2][:, t_idx + 1, nu_idx]
                     
-                    
-                    #this_instant = system_I[t_idx][nu_idx]
-                    #next_instant = system_I[t_idx + 1][nu_idx]
-                    
                     # this is just a proportionality.
                     powers_prop.append(np.abs(np.vdot(
                         this_instant,

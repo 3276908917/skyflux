@@ -305,6 +305,8 @@ def single_wedge(source):
         
             f_layer = []
             for ni in nu_rl:
+                nu = nu_axis[ni]
+            
                 s = s_axis[ni]
                 A_n = A_full[ni]
 
