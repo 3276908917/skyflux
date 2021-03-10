@@ -30,7 +30,7 @@ def transverse_comoving_distance(z):
    """
    return COSMO.comoving_distance(z).value # Mpc/h 
 
-def comoving_depth(B,z):
+def comoving_depth(B, z):
    """
    Comoving line-of-sight depth corresponding to
        specified redshift and bandwidth for redshifted
@@ -40,7 +40,7 @@ def comoving_depth(B,z):
       B :    [scalar] Observing bandwith in Hz
       z :    [scalar] redshift
    """
-   return (C/1e3) * B * (1+z)**2 / \
+   return (C / 1e3) * B * (1 + z)**2 / \
        F21/COSMO.H0.value/COSMO.efunc(z) # Mpc/h 
 
 def dkprll_deta(z):
@@ -53,7 +53,7 @@ def dkprll_deta(z):
       z :  [scalar] redshift
    """
    return 2 * np.pi * COSMO.H0.value * F21 * \
-       COSMO.efunc(z) / C /  (1+z)**2 * 1e3
+       COSMO.efunc(z) / C /  (1 + z)**2 * 1e3
 
 def k_parallel(delays, z):
    """
