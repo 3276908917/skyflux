@@ -123,47 +123,6 @@ def picture_tensor():
         outer_ants[outer_ant] = inner_ants
 
     return outer_ants
-
-def merge_wedges(wedge1, wedge2):
-    """ We assume that both wedges have the same format:
-        ant1, ant2, nu, t hierarchies are exactly the same.
-    """
-
-    sum_ = {}
-    for ant1 in wedge1.keys():
-        sum_[ant1] = {}
-        for ant2 in wedge1[ant1].keys():
-            sum_[ant1][ant2] = np.zeros(
-                (len(nu_rl), len(t_rl), 4), dtype=np.complex128
-            )
-            for nu_idx in nu_rl:
-                for t_idx in t_rl:
-                    vis1 = wedge1[ant1][ant2][nu_idx][t_idx]
-                    vis2 = wedge2[ant1][ant2][nu_idx][t_idx]
-                    
-                    sum_[ant1][ant2][nu_idx][t_idx] = \
-                        np.add(vis1, vis2)
-                        
-    return sum_
-                
-    """
-    # I think we are past the zeroes issue, at
-    # least in a conceptual sense
-    for ant1 in wedge1.keys():
-        for ant2 in wedge1[ant1].keys():
-            for nu_idx in nu_rl:
-                system = wedge1[ant1][ant2][nu_idx]
-                for t_idx in t_rl:
-                    visibility2 = wedge2[ant1][ant2][nu_idx][t_idx]
-                    #print("\n" + str(type(visibility2)) + "\n")
-                    wedge1[ant1][ant2][nu_idx][t_idx] = np.add(
-                        visibility2, system[t_idx])
-                    if np.array_equal(system[t_idx], np.zeros(4)):
-                        print("\nZero encountered!")
-                        print(system[t_idx] - visibility2)
-                        print(visibility2)
-                        print()
-    """
                    
 def tick(percent):
     """ Give the user a progress update."""
@@ -173,7 +132,7 @@ def tick(percent):
 def null_source(obj):
     return obj.alpha != obj.alpha
 
-def full_wedge(sources=catalog.srcs):
+def full_wedge(sources=catalog.srcs, seed=None):
     percent_interval = 100 / len(sources)
     percent = 0
     
@@ -200,12 +159,6 @@ def full_wedge(sources=catalog.srcs):
 outer_ants = ant.ant_pos.copy()
     
 def single_wedge(source):
-    # note
-    # it does not really make sense to do a two-hour interval
-    # with a full sky,
-    # but I do not want to risk large file sizes,
-    # so the simulation will be deliberately truncated...
-    
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
     
@@ -251,6 +204,75 @@ def single_wedge(source):
         outer_ants[outer_ant] = inner_ants
 
     return outer_ants
+    
+def merge_wedges(wedge1, wedge2):
+    """ We assume that both wedges have the same format:
+        ant1, ant2, nu, t hierarchies are exactly the same.
+    """
+
+    sum_ = {}
+    for ant1 in wedge1.keys():
+        sum_[ant1] = {}
+        for ant2 in wedge1[ant1].keys():
+            sum_[ant1][ant2] = np.zeros(
+                (len(nu_rl), len(t_rl), 4), dtype=np.complex128
+            )
+            for nu_idx in nu_rl:
+                for t_idx in t_rl:
+                    vis1 = wedge1[ant1][ant2][nu_idx][t_idx]
+                    vis2 = wedge2[ant1][ant2][nu_idx][t_idx]
+                    
+                    sum_[ant1][ant2][nu_idx][t_idx] = \
+                        np.add(vis1, vis2)
+                        
+    return sum_
+                
+    """
+    # I think we are past the zeroes issue, at
+    # least in a conceptual sense
+    for ant1 in wedge1.keys():
+        for ant2 in wedge1[ant1].keys():
+            for nu_idx in nu_rl:
+                system = wedge1[ant1][ant2][nu_idx]
+                for t_idx in t_rl:
+                    visibility2 = wedge2[ant1][ant2][nu_idx][t_idx]
+                    #print("\n" + str(type(visibility2)) + "\n")
+                    wedge1[ant1][ant2][nu_idx][t_idx] = np.add(
+                        visibility2, system[t_idx])
+                    if np.array_equal(system[t_idx], np.zeros(4)):
+                        print("\nZero encountered!")
+                        print(system[t_idx] - visibility2)
+                        print(visibility2)
+                        print()
+    """
+    
+def merge_files(fname1, fname2, new_fname, new_ptitle):
+    """ This function only really makes sense if f1 and f2 
+        have common simulation parameters
+            (frequency res, time res, etc)
+    """
+    f1 = open(fname1, "rb")
+    f2 = open(fname2, "rb")
+    
+    sim1 = pickle.load(f1)
+    sim2 = pickle.load(f2)
+    
+    # arbitrarily take common sim. parameters from f1
+    fs = sim1['frequencies']
+    ts = sim1['times']
+    
+    # merge the wedges
+    wedge1 = sim1['picture']
+    wedge2 = sim2['picture']
+    wmerged = merge_wedges(wedge1, wedge2)
+    
+    packed = {
+        'frequencies' : fs,
+        'times' : ts,
+        'picture' : wmerged
+        'title' : new_ptitle
+    }
+    pickle_dict(packed, new_fname)
     
 def package(block, ptitle):
     """
