@@ -504,18 +504,23 @@ def collect_wedge_points(fcd, fs, ts):
             
             for nu_idx in range(num_f):
                 ###!!! Just using I at the moment
-                system_I = fcd[ant1][ant2][0]
                 powers_prop = []
                 
                 for t_idx in range(num_t - 1):
-                    this_instant = system_I[t_idx][nu_idx]
-                    next_instant = system_I[t_idx + 1][nu_idx]
+                    this_instant = \
+                        fcd[ant1][ant2][:, t_idx, nu_idx]
+                    next_instant = \
+                        fcd[ant1][ant2][:, t_idx + 1, nu_idx]
+                    
+                    
+                    #this_instant = system_I[t_idx][nu_idx]
+                    #next_instant = system_I[t_idx + 1][nu_idx]
                     
                     # this is just a proportionality.
-                    powers_prop.append(np.vdot(
+                    powers_prop.append(np.abs(np.vdot(
                         this_instant,
                         next_instant
-                    ))
+                    )))
 
                 wedge_datum = np.array([
                     k_orth,
