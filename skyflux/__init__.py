@@ -7,6 +7,8 @@ import skyflux.vis
 import skyflux.stokes
 import skyflux.demo
 
+import skyflux.deprecated.polSims
+
 """
 I wanted to use this block of code to automatically import any new
 scripts that I add, but for some reason it breaks relative imports

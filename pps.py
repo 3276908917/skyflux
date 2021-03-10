@@ -1,133 +1,9 @@
-#! /usr/bin/env python
-
-""" Begin section: pared-down copy of
-    Chuneeta/PolarizedSims/COSMO_constants.py """
-
 import numpy as np
-import astropy.cosmology as CS
-
-C = 2.99e8 # SPEED OF LIGHT IN M/S
-F21 = 1.42040575177 # FREQUENCY OF 21 CM HYDROGEN LINE IN GHZ
-COSMO = CS.FlatLambdaCDM(H0=100.0, Om0=0.27) # H0 = 100 km/s/Mpc
-
-def fq2z(fq):
-   """
-   Redshift corresponding the specified frequency
-
-   Input(s)
-      fq :  [scalar] frequency in Hz
-   """
-   return F21 / fq - 1
-   
-def transverse_comoving_distance(z):
-   """
-   Transverse comoving distance at redshift z
-       corresponding to an
-       angular separation of 1 radian in Mpc/h.
-   
-   Input(s)
-      z :  [scalar] redshift
-   """
-   return COSMO.comoving_distance(z).value # Mpc/h 
-
-def comoving_depth(B,z):
-   """
-   Comoving line-of-sight depth corresponding to
-       specified redshift and bandwidth for redshifted
-       21 cm line in Mpc/h
-  
-   Input(s)
-      B :    [scalar] Observing bandwith in Hz
-      z :    [scalar] redshift
-   """
-   return (C/1e3) * B * (1+z)**2 / \
-       F21/COSMO.H0.value/COSMO.efunc(z) # Mpc/h 
-
-def dkprll_deta(z):
-   """
-   Constant to transform delays to line-of-sight
-       wavenumbers corresponding to redshift and
-       21 CM HI line in h/Mpc
-   
-   Input(s)
-      z :  [scalar] redshift
-   """
-   return 2 * np.pi * COSMO.H0.value * F21 * \
-       COSMO.efunc(z) / C /  (1+z)**2 * 1e3
-
-def k_parallel(delays, z):
-   """
-   Compute line-of-sight wavenumbers corresponding to
-       specified delays and redshift for
-       redshifted 21 cm line in h/Mpc
-
-   Input(s):
-      z : [scalar] redshift
-   """
-   return dkprll_deta(z) * delays
-
-def k_perp(z):
-   """
-   Compute transverse wavenumbers corresponding to
-       redshifted 21 cm line in h/Mpc
-
-   Input(s)
-      z              : [scalar] redshift
-   """
-   return 2 * np.pi / transverse_comoving_distance(z)
-
-""" End section: Chuneeta/PolarizedSims/COSMO_constants.py """
-
-""" Begin section: pared-down copy of
-    Chuneeta/PolarizedSims/genPowerSpectra.py"""
-
-def genWindow(size):
-    """
-    Implements Blackmann-Harris filter
-
-    size : Size/Lenth of frequency channel to which
-        filter is applied; type:int
-    """
-    window = np.zeros((size),)
-    alpha = 0.16 #! magic number
-    _w = lambda n: \
-        (1-alpha) / 2. - 0.5 * np.cos((2 * np.pi * n)/(size - 1)) \
-        + alpha / 2. * np.cos((4 * np.pi * n)/(size - 1))
-    window[:] = _w(np.arange(size))
-    return window
-
-def f2etas(freqs):
-    """
-    Evaluates geometric delay (fourier conjugate of frequency)
-   
-    -freqs: Frequencies in GHz; type:numpy.ndarray
-    """
-    df = freqs[1] - freqs[0]
-    etas = np.fft.fftfreq(freqs.size, df)
-    return etas
-
-def delay_transform(data,fqs,convert=None):
-    """
-    Fourier transforms visibility along frequency axis
-
-    - data: per baseline visibility; type:numpy.ndarray
-    - fqs:  slected frequencies in GHz; dtypw:numpy.ndarray
-    """
-    N = fqs.size
-    df = fqs[1] - fqs[0]
-    window = genWindow(N) #! this label is never used
-    delaySpec = np.fft.ifft(data) * N * df
-    return delaySpec 
-      
-""" End section: Chuneeta/PolarizedSims/genPowerSpectra.py """
-
-""" Remainder of this file: the code unique to this script.
-    i.e. my own work. "power plot sketch" """
-
-import skyflux as sf
-
 import matplotlib.pyplot as plt
 import pickle
+
+import skyflux as sf
+import skyflux.deprecated.polSims as pol
 
 def auto_show(fname, static=False):
     """
@@ -365,7 +241,7 @@ def load_wedge_sim(fname):
     
     sim = meta['picture']
     
-    fcd = {}# fourier candidate dictionary
+    fcd = {} # fourier candidate dictionary
     
     for ant1 in sim.keys():
         fcd[ant1] = {}
@@ -488,14 +364,14 @@ def collect_wedge_points(fcd, fs, ts):
     
     visual = []
     
-    etas = f2etas(fs)    
+    etas = pol.f2etas(fs)    
 
     center_f = np.average(fs)
-    z = fq2z(center_f)
-    lambda_ = C / center_f
+    z = pol.fq2z(center_f)
+    lambda_ = pol.C / center_f
 
-    k_par = k_parallel(etas, z)
-    k_starter = k_perp(z) / lambda_ # this will need to be
+    k_par = pol.k_parallel(etas, z)
+    k_starter = pol.k_perp(z) / lambda_ # this will need to be
     # multiplied on a per-baseline basis
 
     for ant1 in fcd.keys():
@@ -550,6 +426,8 @@ def collect_wedge_points(fcd, fs, ts):
    
     return np.array(visual)
 
+### This is a really bad ad-hoc testing script.
+### We want to scrap this ASAP
 def micro_wedge(h1, f1, b1, h2, f2, b2, h3, f3, b3):
     """
     The axes do not line up with Nunhokee et al.
@@ -557,22 +435,22 @@ def micro_wedge(h1, f1, b1, h2, f2, b2, h3, f3, b3):
         or usage thereof.
     """
     center_f1 = np.average(f1)
-    z1 = fq2z(center_f1)
-    lambda1 = C / center_f1
-    k_par1 = k_parallel(h1[:, 0], z1)
-    k_orth1 = k_perp(z1) / lambda1 * b1
+    z1 = pol.fq2z(center_f1)
+    lambda1 = pol.C / center_f1
+    k_par1 = pol.k_parallel(h1[:, 0], z1)
+    k_orth1 = pol.k_perp(z1) / lambda1 * b1
     
     center_f2 = np.average(f2)
-    z2 = fq2z(center_f2)
-    lambda2 = C / center_f2
-    k_par2 = k_parallel(h2[:, 0], z2)
-    k_orth2 = k_perp(z2) / lambda2 * b2
+    z2 = pol.fq2z(center_f2)
+    lambda2 = pol.C / center_f2
+    k_par2 = pol.k_parallel(h2[:, 0], z2)
+    k_orth2 = pol.k_perp(z2) / lambda2 * b2
     
     center_f3 = np.average(f3)
-    z3 = fq2z(center_f3)
-    lambda3 = C / center_f3
-    k_par3 = k_parallel(h3[:, 0], z3)
-    k_orth3 = k_perp(z3) / lambda3 * b3
+    z3 = pol.fq2z(center_f3)
+    lambda3 = pol.C / center_f3
+    k_par3 = pol.k_parallel(h3[:, 0], z3)
+    k_orth3 = pol.k_perp(z3) / lambda3 * b3
     
     y = np.concatenate((k_par1, k_par2, k_par3))
     x = np.concatenate((
@@ -600,7 +478,7 @@ def transform_wedge(original, fs, ts):
     
     fourier_dict = copy.deepcopy(original)
 
-    window = genWindow(num_f)
+    window = pol.genWindow(num_f)
 
     for ant1 in fourier_dict.keys():
         for ant2 in fourier_dict[ant1].keys():
