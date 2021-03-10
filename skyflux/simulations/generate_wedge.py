@@ -25,10 +25,6 @@ nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
 t_axis = np.arange(3 * HOUR, 5 * HOUR, 4 * MINUTE)
     # it's an arbitrary region of the cold patch
 
-# For helices
-#nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 1e6)
-#t_axis = np.arange(0, 24 * HOUR, 30 * SECOND)
-
 nu_rl = range(len(nu_axis))
 t_rl = range(len(t_axis))
 
@@ -85,6 +81,7 @@ def f_only():
     return np.array(A_tensor)
 
 # Scan over all frequencies, for a single source, over all possible baselines
+#! Is this method still relevant?
 def picture_tensor():
     raise NotImplementedError("Still processes just one source.")
 
@@ -130,10 +127,7 @@ def picture_tensor():
 def merge_wedges(wedge1, wedge2):
     """ We assume that both wedges have the same format:
         ant1, ant2, nu, t hierarchies are exactly the same.
-        
-        WARNING: this is not write-safe!
-        To conserve memory, we modify the wedge1 parameter."""
-
+    """
 
     sum_ = {}
     for ant1 in wedge1.keys():
@@ -147,32 +141,14 @@ def merge_wedges(wedge1, wedge2):
                     vis1 = wedge1[ant1][ant2][nu_idx][t_idx]
                     vis2 = wedge2[ant1][ant2][nu_idx][t_idx]
                     
-                    """
-                    # Debugging block 1
-                    print(vis1)
-                    print()
-                    print(vis2)
-                    print()
-                    print(sum_[ant1][ant2][nu_idx][t_idx])
-                    """
-                    
                     sum_[ant1][ant2][nu_idx][t_idx] = \
                         np.add(vis1, vis2)
-                    
-                    """
-                    # Debugging block 2
-                    if np.array_equal(
-                        sum_[ant1][ant2][nu_idx][t_idx],
-                        np.zeros(4)
-                    ):
-                        print("\nZero encountered!")
-                        print(vis1)
-                        print(vis2)
-                        print()
-                    """
+                        
     return sum_
                 
     """
+    # I think we are past the zeroes issue, at
+    # least in a conceptual sense
     for ant1 in wedge1.keys():
         for ant2 in wedge1[ant1].keys():
             for nu_idx in nu_rl:
@@ -220,64 +196,9 @@ def full_wedge(sources=catalog.srcs):
         tick(percent)
         
     return wedge
-    
-def multi_helix(ant1, ant2, sources=catalog.srcs):
-    percent_interval = 100 / len(sources)
-    percent = 0
-    
-    helix = single_helix(ant1, ant2, sources[0])
-    
-    percent += percent_interval
-    tick(percent)
-    
-    for next_obj in sources[1:]:
-        if null_source(next_obj):
-            continue
-        
-        next_helix = single_helix(ant1, ant2, next_obj)
-        helix = np.add(helix, next_helix)
-        
-        percent += percent_interval
-        tick(percent)
-        
-    return helix
 
 outer_ants = ant.ant_pos.copy()
-
-def single_helix(ant1, ant2, source):
-    ra = np.radians(source.ra_angle)
-    dec = np.radians(source.dec_angle)
     
-    A_full = A_tensor(ra, dec)
-
-    s_axis = []
-        
-    f_layer = []
-    
-    for ni in nu_rl:
-        nu = nu_axis[ni]
-        
-        I = vis.get_I(source, nu)
-        s = np.array([complex(I), 0, 0, 0])
-        A_n = A_full[ni]
-
-        t_layer = []
-        for ti in t_rl:
-            t = t_axis[ti]
-
-            A_t = A_n[ti]
-            
-            r = rot.radec2lm(ra, dec, ra0=t)
-            phi = ant.phase_factor(ant1, ant2, r, nu)
-            
-            next_vista = np.dot(np.dot(A_t, s), phi)
-            t_layer.append(next_vista)
-  
-        f_layer.append(np.array(t_layer))
-
-    return np.array(f_layer)
-
-
 def single_wedge(source):
     # note
     # it does not really make sense to do a two-hour interval
@@ -362,10 +283,5 @@ def auto_wedge(list_sources, label, ptitle):
     """
     pickle_dict(package(
         full_wedge(list_sources), ptitle
-    ), label)
-    
-def auto_helix(ant1, ant2, sources, label, ptitle):
-    pickle_dict(package(
-        multi_helix(ant1, ant2, sources), ptitle
     ), label)
     
