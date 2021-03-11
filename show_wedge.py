@@ -204,19 +204,23 @@ def collect_wedge_points(fcd, fs, ts):
     etas = pol.f2etas(fs)    
 
     center_f = np.average(fs)
-    z = pol.fq2z(center_f)
+    
+    z = pol.fq2z(center_f / 1e9)
     lambda_ = pol.C / center_f
 
     k_par = pol.k_parallel(etas, z)
     k_starter = pol.k_perp(z) / lambda_ # this will need to be
     # multiplied on a per-baseline basis
 
+    assert sf.deprecated.COSMO.efunc(z)
+
     for ant1 in fcd.keys():
         for ant2 in fcd[ant1].keys():
             k_orth = k_starter * sf.ant.baselength(ant1, ant2)
             
+            special = []
+                
             for nu_idx in range(num_f):
-                ###!!! Just using I at the moment
                 powers_prop = []
                 
                 for t_idx in range(num_t - 1):
@@ -225,23 +229,40 @@ def collect_wedge_points(fcd, fs, ts):
                     next_instant = \
                         fcd[ant1][ant2][:, t_idx + 1, nu_idx]
                     
+                    # [I1, Q1, U1, V1] * [I2*, Q2*, U2*, V2*]
+                    
+                    # todo:
+                    # Fix amplitudes and axes
+                    # Create separate plots for I, Q, U, V
+                    # Create slices after the fashion of
+                        # Nunhokee figure 6
+                    # do some linear interpolation via imshow
+                        # to make the plot more continuous
+                        
+                    # try UV tools: it's a wrapper for
+                        # imshow
+                        
+                    # make some notes for HERA team
+                    # circulation
+                    
                     # this is just a proportionality.
                     powers_prop.append(np.abs(np.vdot(
                         this_instant,
                         next_instant
                     )))
 
+                avg = np.average(np.array(powers_prop))
+                
                 wedge_datum = np.array([
                     k_orth,
                     k_par[nu_idx],
-                    float(
-                        np.log10(
-                            np.average(
-                                np.array(powers_prop)
-                            )
-                        )
-                    )
+                    float(np.log10(avg))
                 ])
+                
+                special.append(np.array([
+                    k_par[nu_idx],
+                    float(np.log10(avg))
+                ]))
                 
                 """
                 dspecvec = np.array([
@@ -257,7 +278,11 @@ def collect_wedge_points(fcd, fs, ts):
                 )))
                 """
 
-                visual.append(wedge_datum)   
+                visual.append(wedge_datum)
+            
+            # Figure 6-esque investigation    
+            #if ant1 == 1 and ant2 == 50:
+            #    return np.array(special)
 
     visual = np.array(visual)
    

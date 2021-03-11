@@ -64,8 +64,8 @@ def f_only():
         LST is of concern.
 
     Returned format: a |nu_axis| * 4 * 4 matrix
-    Contains every possible frequency A matrix. When performing calculations
-    frequency index f, we say
+    Contains every possible frequency A matrix;
+    When performing calculations at frequency index f, we say
         this_A = A_tensor[f]
     """
     A_tensor = []

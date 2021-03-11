@@ -53,7 +53,7 @@ def dkprll_deta(z):
       z :  [scalar] redshift
    """
    return 2 * np.pi * COSMO.H0.value * F21 * \
-       COSMO.efunc(z) / C /  (1 + z)**2 * 1e3
+       COSMO.efunc(z) / C / (1 + z)**2 * 1e3
 
 def k_parallel(delays, z):
    """
