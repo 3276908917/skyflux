@@ -22,3 +22,14 @@
 	Furthermore, split the skyflux.demo module into several child modules,
 	each of which is intended to illustrate and elaborate upon the functionality
 	of one of the non-demo scripts.
+	
+	However, we have to address a building problem that I have
+	already suffered: I have so many demos now that I sometimes
+	accidentally rewrite demos.
+	    An easy fix is to split up the demos script into a folder
+	    of demos scripts, where each script demo.s some primary
+	    script.
+	    
+	    However, this system could be difficult to navigate
+	    as I frequently write demos that rely heavily on
+	    multiple primary scripts.

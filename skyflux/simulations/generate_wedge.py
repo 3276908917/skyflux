@@ -251,8 +251,8 @@ def merge_files(fname1, fname2, new_fname, new_ptitle):
         have common simulation parameters
             (frequency res, time res, etc)
     """
-    f1 = open(fname1, "rb")
-    f2 = open(fname2, "rb")
+    f1 = open(fname1 + ".pickle", "rb")
+    f2 = open(fname2 + ".pickle", "rb")
     
     sim1 = pickle.load(f1)
     sim2 = pickle.load(f2)
@@ -269,7 +269,7 @@ def merge_files(fname1, fname2, new_fname, new_ptitle):
     packed = {
         'frequencies' : fs,
         'times' : ts,
-        'picture' : wmerged
+        'picture' : wmerged,
         'title' : new_ptitle
     }
     pickle_dict(packed, new_fname)
