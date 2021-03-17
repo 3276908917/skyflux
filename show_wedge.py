@@ -24,7 +24,7 @@ def wauto_show(fname, static=False):
         wedge = collect_wedge_points(transformed, fs, ts)
     print("Wedge points collected.\n")
     
-    plot_3D(wedge, ptitle)
+    return plot_3D(wedge, ptitle)
     
 def load_wedge_sim(fname):
     """
@@ -212,7 +212,7 @@ def collect_wedge_points(fcd, fs, ts):
     k_starter = pol.k_perp(z) / lambda_ # this will need to be
     # multiplied on a per-baseline basis
 
-    assert sf.deprecated.COSMO.efunc(z)
+    assert sf.deprecated.polSims.COSMO.efunc(z) > 0
 
     for ant1 in fcd.keys():
         for ant2 in fcd[ant1].keys():
@@ -287,6 +287,44 @@ def collect_wedge_points(fcd, fs, ts):
     visual = np.array(visual)
    
     return np.array(visual)
+ 
+def visual_to_image(visual):
+    # We need to order these lists for the wedge to cohere
+    xu = np.unique(visual[:, 0])
+    yu = np.unique(visual[:, 1])
+    
+    image = np.zeros((len(xu), len(yu)))
+    
+    for v in visual:
+        xi = np.where(xu == v[0])[0][0]
+        yi = np.where(yu == v[1])[0][0]
+        image[xi][yi] += v[2]
+    
+    return image 
+
+"""
+def visual_to_image(visual):
+    import scipy.interpolate
+    x = visual[:, 0]
+    y = visual[:, 1]
+    z = visual[:, 2]
+
+    xi = np.linspace(x.min(), x.max(), 1000)
+    yi = np.linspace(y.min(), y.max(), 1000)
+    
+    xi, yi = np.meshgrid(xi, yi)
+    
+    zi = scipy.interpolate.griddata((x, y), z,
+        (xi, yi), method='cubic')
+    #rbf = scipy.interpolate.Rbf(x, y, z, function='linear')
+    #zi = rbf(xi, yi)
+    
+    plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower',
+        )
+    #plt.scatter(x, y, c=z)
+    plt.colorbar()
+    plt.show()
+"""
    
 def plot_3D(visual, title, scaled=False):
     """
@@ -315,7 +353,30 @@ def plot_3D(visual, title, scaled=False):
     print("Minimum:", z.min())
     print("PTP:", z.ptp())
 
-    plt.scatter(x, y, marker='.', c=colors)
+    image = visual_to_image(visual)
+
+    plt.imshow(image.T, extent=[
+        x.min(), x.max(), y.min(), y.max()
+    ], interpolation='nearest', aspect='auto')
+
     plt.colorbar()
     plt.show()
+
+    plt.scatter(x, y, marker='.', c=colors)
+    
+    plt.colorbar()
+    plt.show()
+    
+    """
+    visual_to_image(visual)
+    
+    
+    import matplotlib.tri as tri
+    plt.tricontour(x, y, colors, 15, linewidths=0.5, colors='k')
+    plt.tricontourf(x, y, z, 15)
+    
+    plt.show()
+    """
+    
+    return x, y, visual, image
     
