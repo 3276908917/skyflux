@@ -15,7 +15,7 @@ def fq2z(fq):
    Redshift corresponding the specified frequency
 
    Input(s)
-      fq :  [scalar] frequency in Hz
+      fq :  [scalar] frequency in GHz
    """
    return F21 / fq - 1
    

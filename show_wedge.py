@@ -204,7 +204,7 @@ def normalization_volume(fs):
                 J = sf.stokes.create_J(
                     az=az, alt=alt, nu=f, radians=True)
                 A = stokes.create_A(J=J)
-        
+                # then what? Frobenius norm?
 
 def collect_wedge_points(fcd, fs, ts, sp=None):
     """
@@ -257,14 +257,14 @@ def collect_wedge_points(fcd, fs, ts, sp=None):
     DeltaD = sf.deprecated.polSims.comoving_depth(B, z)
     kB = 1.380649e-23
     
-    # 1 Jy = 1e-26
-    square_Jy = (1e-26) ** 2
+    # 1 Jy = 1e-20 J / km^2 / s^2
+    square_Jy = (1e-20) ** 2
     
     # This is an approximation for the normalization volume
     Thyagarajan = 1 / 2 / np.pi / B
     
     p_coeff = (lambda_ ** 2 / 2 / kB) ** 2 * \
-         D ** 2 * DeltaD / B * square_Jy #* Thyagarajan
+         D ** 2 * DeltaD / B * square_Jy * Thyagarajan
     # end
 
     for ant1 in fcd.keys():
@@ -316,20 +316,6 @@ def collect_wedge_points(fcd, fs, ts, sp=None):
                     float(np.log10(avg))
                 ]))
                 
-                """
-                dspecvec = np.array([
-                parameter[ti][ni] for parameter in fouriered
-                ])
-            
-                norm = np.linalg.norm(dspecvec)
-
-                visual.append(np.array((
-                    etas[ni] * 1e9,
-                    ts[ti] * 12 / np.pi,
-                    np.log10(norm)
-                )))
-                """
-
                 visual.append(wedge_datum)
             
             # Figure 6-esque investigation    
@@ -353,30 +339,6 @@ def visual_to_image(visual):
         image[xi][yi] += v[2]
     
     return image 
-
-"""
-def visual_to_image(visual):
-    import scipy.interpolate
-    x = visual[:, 0]
-    y = visual[:, 1]
-    z = visual[:, 2]
-
-    xi = np.linspace(x.min(), x.max(), 1000)
-    yi = np.linspace(y.min(), y.max(), 1000)
-    
-    xi, yi = np.meshgrid(xi, yi)
-    
-    zi = scipy.interpolate.griddata((x, y), z,
-        (xi, yi), method='cubic')
-    #rbf = scipy.interpolate.Rbf(x, y, z, function='linear')
-    #zi = rbf(xi, yi)
-    
-    plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower',
-        )
-    #plt.scatter(x, y, c=z)
-    plt.colorbar()
-    plt.show()
-"""
    
 def plot_3D(visual, title, scaled=False):
     """
@@ -407,9 +369,10 @@ def plot_3D(visual, title, scaled=False):
 
     image = visual_to_image(visual)
 
+    # Gaussian looks smooth
     plt.imshow(image.T, extent=[
         x.min(), x.max(), y.min(), y.max()
-    ], interpolation='nearest', aspect='auto')
+    ], interpolation='gaussian', aspect='auto')
 
     cbar = plt.colorbar()
     plt.xlabel("$k_\perp$ [$h$ Mpc$^{-1}$]")
@@ -426,17 +389,6 @@ def plot_3D(visual, title, scaled=False):
     cbar.set_label("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
     
     plt.show()
-    
-    """
-    visual_to_image(visual)
-    
-    
-    import matplotlib.tri as tri
-    plt.tricontour(x, y, colors, 15, linewidths=0.5, colors='k')
-    plt.tricontourf(x, y, z, 15)
-    
-    plt.show()
-    """
     
     return x, y, visual, image
     
