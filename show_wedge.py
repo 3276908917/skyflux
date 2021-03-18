@@ -411,15 +411,19 @@ def plot_3D(visual, title, scaled=False):
         x.min(), x.max(), y.min(), y.max()
     ], interpolation='nearest', aspect='auto')
 
-    plt.colorbar()
-    cbar.set_label("log10(Jy) ?")
+    cbar = plt.colorbar()
+    plt.xlabel("$k_\perp$ [$h$ Mpc$^{-1}$]")
+    plt.ylabel("$k_\parallel$ [$h$ Mpc$^{-1}$]")
+    cbar.set_label("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
     
     plt.show()
 
     plt.scatter(x, y, marker='.', c=colors)
     
     cbar = plt.colorbar()
-    cbar.set_label("log10(Jy) ?")
+    plt.xlabel("$k_\perp$ [$h$ Mpc$^{-1}$]")
+    plt.ylabel("$k_\parallel$ [$h$ Mpc$^{-1}$]")
+    cbar.set_label("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
     
     plt.show()
     
