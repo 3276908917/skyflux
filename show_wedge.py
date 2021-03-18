@@ -5,14 +5,26 @@ import pickle
 import skyflux as sf
 import skyflux.deprecated.polSims as pol
 
-def wauto_show(fname, static=False):
+def wauto_show(fname, sp=None, pt_override=None, static=False):
     """
     Load simulated visibilities from the file named
         @fname
     and visually interpret the results using a
         2D + color wedge plot.
+        
+    @sp : Stokes parameter, if you want to look at just one
+        at a time
+        0 : I    1 : Q    2 : U    3 : V    
+        
+    @pt_override is a way to override the title with which
+        a simulation came. It is extremely bad form to use this,
+        but it can come in handy during lapses of diligence.
     """
     fcd, fs, ts, ptitle = load_wedge_sim(fname + ".pickle")
+    
+    if pt_override is not None:
+        ptitle = pt_override
+    
     print("Simulation file loaded.\n")
     
     transformed = transform_wedge(fcd, fs, ts)
@@ -21,7 +33,7 @@ def wauto_show(fname, static=False):
     if static:
         wedge = static_visual(sim_dict)
     else:
-        wedge = collect_wedge_points(transformed, fs, ts)
+        wedge = collect_wedge_points(transformed, fs, ts, sp)
     print("Wedge points collected.\n")
     
     return plot_3D(wedge, ptitle)
@@ -176,9 +188,25 @@ def transform_wedge(original, fs, ts):
                 
     return fourier_dict
     
-#! There has to be some way to merge this with the function
-# above
-def collect_wedge_points(fcd, fs, ts):
+def normalization_volume(fs):
+    df = fs[1] - fs[0]
+    
+    az_sky = np.linspace(0, 2 * np.pi, 1000)
+    daz = az_sky[1]
+    
+    alt_sky = np.linspace(0, np.pi / 2, 250)
+    dalt = alt_sky[1]
+    
+    # Riemann sum
+    for f in fs:
+        for alt in alt_sky:
+            for az in az_sky:
+                J = sf.stokes.create_J(
+                    az=az, alt=alt, nu=f, radians=True)
+                A = stokes.create_A(J=J)
+        
+
+def collect_wedge_points(fcd, fs, ts, sp=None):
     """
     Read from the wedge data structure @sim_dict
         (specifically, one using the format
@@ -195,6 +223,10 @@ def collect_wedge_points(fcd, fs, ts):
         static_wedge_vis
     in accepting multiple LST values from
         @sim_dict.
+        
+    @sp : Stokes parameter, if you want to look at just one
+        at a time
+        0 : I    1 : Q    2 : U    3 : V
     """
     num_t = len(ts)
     num_f = len(fs)
@@ -214,6 +246,7 @@ def collect_wedge_points(fcd, fs, ts):
     # the negative and positive value thing is fine;
     # the wedge plot in Nunhokee is just the positive half
     # of what you already have
+    k_par = k_parSym
     
     k_starter = pol.k_perp(z) / lambda_ # this will need to be
     # multiplied on a per-baseline basis
@@ -252,12 +285,10 @@ def collect_wedge_points(fcd, fs, ts):
                     # [I1, Q1, U1, V1] * [I2*, Q2*, U2*, V2*]
                     
                     # todo:
-                    # Fix amplitudes and axes
+                    # Fix amplitudes
                     # Create separate plots for I, Q, U, V
                     # Create slices after the fashion of
                         # Nunhokee figure 6
-                    # do some linear interpolation via imshow
-                        # to make the plot more continuous
                         
                     # try UV tools: it's a wrapper for
                         # imshow
@@ -265,10 +296,12 @@ def collect_wedge_points(fcd, fs, ts):
                     # make some notes for HERA team
                     # circulation
                     
-                    powers_prop.append(np.abs(np.vdot(
-                        this_instant,
-                        next_instant
-                    )))
+                    if sp is None:
+                        sqBr = np.vdot(this_instant, next_instant)
+                    else:
+                        sqBr = this_instant[sp] * next_instant[sp]
+                    
+                    powers_prop.append(np.abs(sqBr))
 
                 avg = p_coeff * np.average(np.array(powers_prop))
                 
@@ -379,11 +412,15 @@ def plot_3D(visual, title, scaled=False):
     ], interpolation='nearest', aspect='auto')
 
     plt.colorbar()
+    cbar.set_label("log10(Jy) ?")
+    
     plt.show()
 
     plt.scatter(x, y, marker='.', c=colors)
     
-    plt.colorbar()
+    cbar = plt.colorbar()
+    cbar.set_label("log10(Jy) ?")
+    
     plt.show()
     
     """
