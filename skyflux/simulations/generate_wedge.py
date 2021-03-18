@@ -132,7 +132,7 @@ def tick(percent):
 def null_source(obj):
     return obj.alpha != obj.alpha
 
-def full_wedge(sources=catalog.srcs, seed=None):
+def full_wedge(sources=catalog.srcs):
     percent_interval = 100 / len(sources)
     percent = 0
     

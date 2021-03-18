@@ -208,11 +208,31 @@ def collect_wedge_points(fcd, fs, ts):
     z = pol.fq2z(center_f / 1e9)
     lambda_ = pol.C / center_f
 
-    k_par = pol.k_parallel(etas, z)
+    k_parSym = pol.k_parallel(etas, z)
+    #!! Does this address the underlying problem?
+    #k_par = np.add(k_parSym, -k_parSym.min())
+    # the negative and positive value thing is fine;
+    # the wedge plot in Nunhokee is just the positive half
+    # of what you already have
+    
     k_starter = pol.k_perp(z) / lambda_ # this will need to be
     # multiplied on a per-baseline basis
-
-    assert sf.deprecated.polSims.COSMO.efunc(z) > 0
+    
+    # Power constants
+    B = 200e6 # 200 MHz
+    D = sf.deprecated.polSims.transverse_comoving_distance(z)
+    DeltaD = sf.deprecated.polSims.comoving_depth(B, z)
+    kB = 1.380649e-23
+    
+    # 1 Jy = 1e-26
+    square_Jy = (1e-26) ** 2
+    
+    # This is an approximation for the normalization volume
+    Thyagarajan = 1 / 2 / np.pi / B
+    
+    p_coeff = (lambda_ ** 2 / 2 / kB) ** 2 * \
+         D ** 2 * DeltaD / B * square_Jy #* Thyagarajan
+    # end
 
     for ant1 in fcd.keys():
         for ant2 in fcd[ant1].keys():
@@ -245,13 +265,12 @@ def collect_wedge_points(fcd, fs, ts):
                     # make some notes for HERA team
                     # circulation
                     
-                    # this is just a proportionality.
                     powers_prop.append(np.abs(np.vdot(
                         this_instant,
                         next_instant
                     )))
 
-                avg = np.average(np.array(powers_prop))
+                avg = p_coeff * np.average(np.array(powers_prop))
                 
                 wedge_datum = np.array([
                     k_orth,

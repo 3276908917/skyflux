@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-""" Begin section: pared-down copy of
+""" pared-down copy of
     Chuneeta/PolarizedSims/COSMO_constants.py """
 
 import numpy as np
@@ -41,7 +41,7 @@ def comoving_depth(B, z):
       z :    [scalar] redshift
    """
    return (C / 1e3) * B * (1 + z)**2 / \
-       F21/COSMO.H0.value/COSMO.efunc(z) # Mpc/h 
+       (F21 * 1e9) / COSMO.H0.value/ COSMO.efunc(z) # Mpc/h 
 
 def dkprll_deta(z):
    """
@@ -52,8 +52,8 @@ def dkprll_deta(z):
    Input(s)
       z :  [scalar] redshift
    """
-   return 2 * np.pi * COSMO.H0.value * F21 * \
-       COSMO.efunc(z) / C / (1 + z)**2 * 1e3
+   return 2 * np.pi * COSMO.H0.value * (F21 * 1e9) * \
+       COSMO.efunc(z) / (C / 1e3) / (1 + z)**2 
 
 def k_parallel(delays, z):
    """
@@ -118,8 +118,4 @@ def delay_transform(data,fqs,convert=None):
     window = genWindow(N) #! this label is never used
     delaySpec = np.fft.ifft(data) * N * df
     return delaySpec 
-      
-""" End section: Chuneeta/PolarizedSims/genPowerSpectra.py """
 
-""" Remainder of this file: the code unique to this script.
-    i.e. my own work. "power plot sketch" """
