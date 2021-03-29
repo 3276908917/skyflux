@@ -255,13 +255,23 @@ def collect_wedge_points(fcd, fs, ts, sp=None):
     B = 200e6 # 200 MHz
     D = sf.deprecated.polSims.transverse_comoving_distance(z)
     DeltaD = sf.deprecated.polSims.comoving_depth(B, z)
-    kB = 1.380649e-23
+    kB = 1.380649e-23#1.380649e-23
     
     # 1 Jy = 1e-20 J / km^2 / s^2
     square_Jy = (1e-20) ** 2
     
     # This is an approximation for the normalization volume
     Thyagarajan = 1 / 2 / np.pi / B
+    # todo 3/22
+    # you can use rows of the A matrix--that's the \vec{a} term
+    # the A approximation ignores normalization and uses
+        # only diagonal terms: the ideal beam
+    # it's worth it to simulate and compare the two cases:
+        # is there a big difference?
+    
+    # also horizon line, white dots
+    
+    # once the power magnitude is solved, get the cross sections
     
     p_coeff = (lambda_ ** 2 / 2 / kB) ** 2 * \
          D ** 2 * DeltaD / B * square_Jy * Thyagarajan

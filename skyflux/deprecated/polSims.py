@@ -41,7 +41,7 @@ def comoving_depth(B, z):
       z :    [scalar] redshift
    """
    return (C / 1e3) * B * (1 + z)**2 / \
-       (F21 * 1e9) / COSMO.H0.value/ COSMO.efunc(z) # Mpc/h 
+       (F21 * 1e9) / COSMO.H0.value / COSMO.efunc(z) # Mpc/h 
 
 def dkprll_deta(z):
    """
