@@ -372,8 +372,6 @@ def plot_3D(visual, title, scaled=False):
     else:
         colors = z
 
-    plt.title(title)
-
     print("Minimum:", z.min())
     print("PTP:", z.ptp())
 
@@ -383,22 +381,26 @@ def plot_3D(visual, title, scaled=False):
     plt.imshow(image.T, extent=[
         x.min(), x.max(), y.min(), y.max()
     ], interpolation='gaussian', aspect='auto')
-
-    cbar = plt.colorbar()
-    plt.xlabel("$k_\perp$ [$h$ Mpc$^{-1}$]")
-    plt.ylabel("$k_\parallel$ [$h$ Mpc$^{-1}$]")
-    cbar.set_label("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
-    
-    plt.show()
+    finalize_plot(title)
 
     plt.scatter(x, y, marker='.', c=colors)
+    finalize_plot(title)
     
+    return x, y, visual, image
+    
+def finalize_plot(title):
+    """
+    Add automatic labels to the plot.
+    
+    This function chiefly serves as convenience for the
+    programmer, due to its almost entire reliance on
+    hard-coded strings.
+    """
     cbar = plt.colorbar()
+    plt.title(title)
     plt.xlabel("$k_\perp$ [$h$ Mpc$^{-1}$]")
     plt.ylabel("$k_\parallel$ [$h$ Mpc$^{-1}$]")
     cbar.set_label("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
     
     plt.show()
-    
-    return x, y, visual, image
     
