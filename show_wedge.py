@@ -5,7 +5,7 @@ import pickle
 import skyflux as sf
 import skyflux.deprecated.polSims as pol
 
-def wauto_show(fname, sp=None, pt_override=None, static=False):
+def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None):
     """
     Load simulated visibilities from the file named
         @fname
@@ -33,7 +33,7 @@ def wauto_show(fname, sp=None, pt_override=None, static=False):
     if static:
         wedge = static_visual(sim_dict)
     else:
-        wedge = collect_wedge_points(transformed, fs, ts, sp)
+        wedge = collect_wedge_points(transformed, fs, ts, sp, Qi)
     print("Wedge points collected.\n")
     
     return plot_3D(wedge, ptitle)
@@ -187,26 +187,8 @@ def transform_wedge(original, fs, ts):
                     parameter[ti] = np.fft.fft(parameter[ti] * window)
                 
     return fourier_dict
-    
-def normalization_volume(fs):
-    df = fs[1] - fs[0]
-    
-    az_sky = np.linspace(0, 2 * np.pi, 1000)
-    daz = az_sky[1]
-    
-    alt_sky = np.linspace(0, np.pi / 2, 250)
-    dalt = alt_sky[1]
-    
-    # Riemann sum
-    for f in fs:
-        for alt in alt_sky:
-            for az in az_sky:
-                J = sf.stokes.create_J(
-                    az=az, alt=alt, nu=f, radians=True)
-                A = stokes.create_A(J=J)
-                # then what? Frobenius norm?
 
-def collect_wedge_points(fcd, fs, ts, sp=None):
+def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
     """
     Read from the wedge data structure @sim_dict
         (specifically, one using the format
@@ -274,7 +256,7 @@ def collect_wedge_points(fcd, fs, ts, sp=None):
     # once the power magnitude is solved, get the cross sections
     
     p_coeff = (lambda_ ** 2 / 2 / kB) ** 2 * \
-         D ** 2 * DeltaD / B * square_Jy * Thyagarajan
+         D ** 2 * DeltaD / B * square_Jy #* Thyagarajan
     # end
 
     for ant1 in fcd.keys():
@@ -309,7 +291,15 @@ def collect_wedge_points(fcd, fs, ts, sp=None):
                     if sp is None:
                         sqBr = np.vdot(this_instant, next_instant)
                     else:
-                        sqBr = this_instant[sp] * next_instant[sp]
+                        ### trial code for implementation of Q
+                        if Qi is not None:
+                            hadamard = np.multiply(
+                                this_instant, next_instant
+                            )
+                            p = np.dot(Qi, hadamard)
+                            sqBr = p[sp]
+                        else:    
+                            sqBr = this_instant[sp] * next_instant[sp]
                     
                     powers_prop.append(np.abs(sqBr))
 
@@ -444,21 +434,24 @@ def calculate_Q(
     dtheta = list_theta[1] - list_theta[0]
     
     # I can't remember what would be a neutral LST value...
-    dummy_A = create_A(az = 0, alt = 0, nu=151e6, radians=True)
-    Q = np.zeros(dummy_A.shape)
+    dummy_A = sf.stokes.create_A(
+        az = 0, alt = 0, nu=151e6, radians=True
+    )
+    Q = np.zeros(dummy_A.shape, dtype=np.complex128)
 
     d3 = dnu * dphi * dtheta
     
     print("Integration paramaters established. Integrating...")
 
     for phi in list_phi:
+        print("phi is", phi)
         for theta in list_theta:
-            for nu in B:
-                next_A = create_A(
-                    az=phi, alt=theta, nu=nu, radians=True
+            for nu_idx in range(len(B)):
+                next_A = sf.stokes.create_A(
+                    az=phi, alt=theta, nu=B[nu_idx], radians=True
                 )
-                Aw = next_A * window
-                Q += np.product(Aw, np.conj(Aw)) * d3
+                Aw = next_A * window[nu_idx]
+                Q += np.multiply(Aw, np.conj(Aw)) * d3
     
     print("Integration complete.")
     
