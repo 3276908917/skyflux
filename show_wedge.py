@@ -377,10 +377,44 @@ def plot_3D(visual, title, scaled=False):
 
     image = visual_to_image(visual)
 
+    ### begin temporary horizon-code
+    MACRO_EPSILON = 0.001
+    fs = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
+    center_f = np.average(fs)
+    z = pol.fq2z(center_f / 1e9)
+    lambda_ = pol.C / center_f
+    k_starter = pol.k_perp(z) / lambda_
+    
+    horizonx = np.unique(visual[:, 0])
+    horizony = []
+    
+    for hx in horizonx:
+        baselength = hx / k_starter
+        tau = baselength / 2.9979e8 # geometric delay
+        horizony.append(pol.k_parallel(tau, z))
+        horizony.append(pol.k_parallel(-tau, z))
+        
+    plt.scatter(horizonx, horizony, marker='.', c='w')
+    ### end temporary horizon-code
+    
     # Gaussian looks smooth
     plt.imshow(image.T, extent=[
         x.min(), x.max(), y.min(), y.max()
     ], interpolation='gaussian', aspect='auto')
+    
+    # testing to see if two consecutive imshows
+    # overplot in the expected fashion
+    
+    
+    """
+    # you want to pick a coefficient which places the diagonal
+    # close to the bottom, but which does not stretch the
+    # color bar in any way
+    counterVisual = np.ones(visual.shape) * -9
+    """
+    
+    
+    
     finalize_plot(title)
 
     plt.scatter(x, y, marker='.', c=colors)
