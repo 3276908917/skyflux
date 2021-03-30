@@ -386,34 +386,23 @@ def plot_3D(visual, title, scaled=False):
     k_starter = pol.k_perp(z) / lambda_
     
     horizonx = np.unique(visual[:, 0])
-    horizony = []
+    horizonyp = []
+    horizonym = []
     
     for hx in horizonx:
         baselength = hx / k_starter
         tau = baselength / 2.9979e8 # geometric delay
-        horizony.append(pol.k_parallel(tau, z))
-        horizony.append(pol.k_parallel(-tau, z))
+        horizonyp.append(pol.k_parallel(tau, z))
+        horizonym.append(pol.k_parallel(-tau, z))
         
-    plt.scatter(horizonx, horizony, marker='.', c='w')
+    plt.scatter(horizonx, horizonyp, marker='.', c='w')
+    plt.scatter(horizonx, horizonym, marker='.', c='w')
     ### end temporary horizon-code
     
     # Gaussian looks smooth
     plt.imshow(image.T, extent=[
         x.min(), x.max(), y.min(), y.max()
     ], interpolation='gaussian', aspect='auto')
-    
-    # testing to see if two consecutive imshows
-    # overplot in the expected fashion
-    
-    
-    """
-    # you want to pick a coefficient which places the diagonal
-    # close to the bottom, but which does not stretch the
-    # color bar in any way
-    counterVisual = np.ones(visual.shape) * -9
-    """
-    
-    
     
     finalize_plot(title)
 
@@ -437,4 +426,41 @@ def finalize_plot(title):
     cbar.set_label("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
     
     plt.show()
+
+# hard-coding for now
+def calculate_Q(
+    B=np.arange(50e6, 250e6 + 0.001, 4e6),
+    angular_resolution = 250
+):
+    
+    print("Establishing integration parameters")
+    dnu = B[1] - B[0]
+    window = pol.genWindow(len(B))
+    
+    list_phi = np.linspace(0, 2 * np.pi, 4 * angular_resolution)
+    dphi = list_phi[1] - list_phi[0]
+    
+    list_theta = np.linspace(0, np.pi / 2, angular_resolution)
+    dtheta = list_theta[1] - list_theta[0]
+    
+    # I can't remember what would be a neutral LST value...
+    dummy_A = create_A(az = 0, alt = 0, nu=151e6, radians=True)
+    Q = np.zeros(dummy_A.shape)
+
+    d3 = dnu * dphi * dtheta
+    
+    print("Integration paramaters established. Integrating...")
+
+    for phi in list_phi:
+        for theta in list_theta:
+            for nu in B:
+                next_A = create_A(
+                    az=phi, alt=theta, nu=nu, radians=True
+                )
+                Aw = next_A * window
+                Q += np.product(Aw, np.conj(Aw)) * d3
+    
+    print("Integration complete.")
+    
+    return Q
     
