@@ -368,8 +368,7 @@ def plot_3D(visual, title, scaled=False):
     image = visual_to_image(visual)
 
     ### begin temporary horizon-code
-    MACRO_EPSILON = 0.001
-    fs = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
+    fs = np.arange(50e6, 250e6 + 0.001, 4e6)
     center_f = np.average(fs)
     z = pol.fq2z(center_f / 1e9)
     lambda_ = pol.C / center_f
@@ -381,7 +380,7 @@ def plot_3D(visual, title, scaled=False):
     
     for hx in horizonx:
         baselength = hx / k_starter
-        tau = baselength / 2.9979e8 # geometric delay
+        tau = baselength / 2.9979e8 # geometric delay, Parsons eq. 3
         horizonyp.append(pol.k_parallel(tau, z))
         horizonym.append(pol.k_parallel(-tau, z))
         
@@ -457,3 +456,15 @@ def calculate_Q(
     
     return Q
     
+"""
+Just some prototyping
+""" 
+
+def diag(matrix):
+    # Be careful! We are assuming that a shallow copy is fine
+    diagd = np.copy(matrix)
+    
+    for i in range(len(diagd)):
+        for j in range(len(diagd[i])):
+            if i != j:
+                diagd[i][j] = 0
