@@ -378,9 +378,14 @@ def plot_3D(visual, title, scaled=False):
     horizonyp = []
     horizonym = []
     
-    for hx in horizonx:
-        baselength = hx / k_starter
+    for k_orthogonal in horizonx:
+        # after fixing this: pick a bin of k_perpendicular and do a cut
+        # it's a 1D plot, include all four Stokes parameters
+        # as different lines
+        baselength = k_orthogonal / k_starter
+        print(baselength, "baselength [m]")
         tau = baselength / 2.9979e8 # geometric delay, Parsons eq. 3
+        print(tau * 1e9, "delay [ns]")
         horizonyp.append(pol.k_parallel(tau, z))
         horizonym.append(pol.k_parallel(-tau, z))
         
@@ -432,7 +437,7 @@ def calculate_Q(
     list_theta = np.linspace(0, np.pi / 2, angular_resolution)
     dtheta = list_theta[1] - list_theta[0]
     
-    # I can't remember what would be a neutral LST value...
+    #!!! I can't remember what would be a neutral LST value...
     dummy_A = sf.stokes.create_A(
         az = 0, alt = 0, nu=151e6, radians=True
     )
@@ -468,3 +473,6 @@ def diag(matrix):
         for j in range(len(diagd[i])):
             if i != j:
                 diagd[i][j] = 0
+    
+    return diagd
+                
