@@ -209,6 +209,15 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
     @sp : Stokes parameter, if you want to look at just one
         at a time
         0 : I    1 : Q    2 : U    3 : V
+        
+        
+    TODO: last updated 3/30
+    # we need the horizon line: white dots
+    # Fix amplitudes?
+    # Create separate plots for I, Q, U, V
+        # Create slices after the fashion of Nunhokee fig 6
+        
+    # make some notes for HERA team circulation
     """
     num_t = len(ts)
     num_f = len(fs)
@@ -222,19 +231,13 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
     z = pol.fq2z(center_f / 1e9)
     lambda_ = pol.C / center_f
 
-    k_parSym = pol.k_parallel(etas, z)
-    #!! Does this address the underlying problem?
-    #k_par = np.add(k_parSym, -k_parSym.min())
-    # the negative and positive value thing is fine;
-    # the wedge plot in Nunhokee is just the positive half
-    # of what you already have
-    k_par = k_parSym
+    k_par = pol.k_parallel(etas, z)
     
     k_starter = pol.k_perp(z) / lambda_ # this will need to be
     # multiplied on a per-baseline basis
     
     # Power constants
-    B = 200e6 # 200 MHz
+    B = 200e6 # 200 MHz, hard-coding the simulation parameter
     D = sf.deprecated.polSims.transverse_comoving_distance(z)
     DeltaD = sf.deprecated.polSims.comoving_depth(B, z)
     kB = 1.380649e-23#1.380649e-23
@@ -242,22 +245,9 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
     # 1 Jy = 1e-20 J / km^2 / s^2
     square_Jy = (1e-20) ** 2
     
-    # This is an approximation for the normalization volume
-    Thyagarajan = 1 / 2 / np.pi / B
-    # todo 3/22
-    # you can use rows of the A matrix--that's the \vec{a} term
-    # the A approximation ignores normalization and uses
-        # only diagonal terms: the ideal beam
-    # it's worth it to simulate and compare the two cases:
-        # is there a big difference?
-    
-    # also horizon line, white dots
-    
-    # once the power magnitude is solved, get the cross sections
-    
+    # put everything together to get a single power coefficient
     p_coeff = (lambda_ ** 2 / 2 / kB) ** 2 * \
-         D ** 2 * DeltaD / B * square_Jy #* Thyagarajan
-    # end
+         D ** 2 * DeltaD / B * square_Jy
 
     for ant1 in fcd.keys():
         for ant2 in fcd[ant1].keys():
@@ -276,18 +266,6 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
                     
                     # [I1, Q1, U1, V1] * [I2*, Q2*, U2*, V2*]
                     
-                    # todo:
-                    # Fix amplitudes
-                    # Create separate plots for I, Q, U, V
-                    # Create slices after the fashion of
-                        # Nunhokee figure 6
-                        
-                    # try UV tools: it's a wrapper for
-                        # imshow
-                        
-                    # make some notes for HERA team
-                    # circulation
-                    
                     if sp is None:
                         sqBr = np.vdot(this_instant, next_instant)
                     else:
@@ -298,6 +276,7 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
                             )
                             p = np.dot(Qi, hadamard)
                             sqBr = p[sp]
+                        ### end trial code
                         else:    
                             sqBr = this_instant[sp] * next_instant[sp]
                     
