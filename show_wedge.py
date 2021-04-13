@@ -274,7 +274,7 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
         
             k_orth = k_starter * sf.ant.baselength(ant1, ant2)
             
-            special = []
+            special = [[], [], [], []]
                 
             for nu_idx in range(num_f):
                 powers_prop = []
@@ -311,9 +311,9 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                     # breaks all roads that do not use Q
                     if special_request is not None:
                         for vector in np.array(special_times):
-                            for stokes_i in range(len(vector)):
-                                param = vector[stokes_i]
-                            special_powers[stokes_i].append(np.abs(param))
+                            for stokes_idx in range(len(vector)):
+                                param = vector[stokes_idx]
+                            special_powers[stokes_idx].append(np.abs(param))
 
                 avg = p_coeff * np.average(np.array(powers_prop))
                 
@@ -323,12 +323,16 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                     float(np.log10(avg))
                 ])
                 
+                
                 if special_request is not None:
-                    for stokes_param in np.array(special_powers):
+                    special_powers = np.array(special_powers)
+                    
+                    for stokes_idx in range(len(special_powers)):
+                        stokes_param = special_powers[stokes_idx]
                         avg = p_coeff * np.average(stokes_param)
                         
                         #!!! duplicate reference
-                        special.append(np.array([
+                        special[stokes_idx].append(np.array([
                             k_par[nu_idx],
                             float(np.log10(avg))
                         ]))
@@ -343,8 +347,6 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                     return np.array(special)
 
     visual = np.array(visual)
-   
-    print(visual)
    
     return np.array(visual)
  
