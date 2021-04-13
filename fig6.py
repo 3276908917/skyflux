@@ -19,6 +19,7 @@ def slicer(ant1, ant2, func_show, Qi):
     plt.xlabel("$k_\parallel$ [$h$ Mpc$^{-1}$]")
     plt.ylabel("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
     plt.title(str(ant1) + "-" + str(ant2) + " baseline")
+    plt.legend(loc='upper right')
     
     plt.show()
     return special

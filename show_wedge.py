@@ -311,9 +311,10 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                     # breaks all roads that do not use Q
                     if special_request is not None:
                         for vector in np.array(special_times):
-                            for stokes_idx in range(len(vector)):
-                                param = vector[stokes_idx]
-                            special_powers[stokes_idx].append(np.abs(param))
+                            # si: Stokes index
+                            for si in range(len(vector)):
+                                param = np.abs(vector[si])
+                                special_powers[si].append(param)
 
                 avg = p_coeff * np.average(np.array(powers_prop))
                 
@@ -327,12 +328,13 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                 if special_request is not None:
                     special_powers = np.array(special_powers)
                     
-                    for stokes_idx in range(len(special_powers)):
-                        stokes_param = special_powers[stokes_idx]
+                    # si: Stokes index
+                    for si in range(len(special_powers)):
+                        stokes_param = special_powers[si]
                         avg = p_coeff * np.average(stokes_param)
                         
                         #!!! duplicate reference
-                        special[stokes_idx].append(np.array([
+                        special[si].append(np.array([
                             k_par[nu_idx],
                             float(np.log10(avg))
                         ]))
