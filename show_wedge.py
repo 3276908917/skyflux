@@ -37,7 +37,11 @@ def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None, special_
     if static:
         wedge = static_visual(sim_dict)
     else:
-        wedge = collect_wedge_points(transformed, fs, ts, sp, Qi)
+        wedge = collect_wedge_points(
+            transformed, fs, ts, sp, Qi, special_request
+        )
+        if special_requests is not None:
+            return wedge
         #return wedge # just for individual baseline testing
     print("Wedge points collected.\n")
     
@@ -269,7 +273,8 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                 
             for nu_idx in range(num_f):
                 powers_prop = []
-                special_powers = []
+                special_powers = [[], [], [], []]
+                special_times = []
                 
                 for t_idx in range(num_t - 1):
                     this_instant = \
@@ -299,8 +304,10 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                     powers_prop.append(np.abs(sqBr))
                     # this branch unfortunately
                     # breaks all roads that do not use Q
-                    for stokes_param in np.array(special_times):
-                        special_powers.append(np.abs(stokes_param))
+                    for vector in np.array(special_times):
+                        for stokes_i in range(len(vector)):
+                            param = vector[stokes_i]
+                            special_powers[stokes_i].append(np.abs(param))
 
                 avg = p_coeff * np.average(np.array(powers_prop))
                 
@@ -325,8 +332,8 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
             if special_request is not None:
                 if ant1 == special_request[0] and \
                     ant2 == special_request[1]:
-                print("Exiting")
-                return np.array(special)
+                    print("Exiting")
+                    return np.array(special)
 
     visual = np.array(visual)
    
@@ -386,10 +393,6 @@ def plot_3D(visual, title, scaled=False):
     
     etas = pol.f2etas(fs)    
     k_par = pol.k_parallel(etas, z)
-    
-    #for k_part in k_par:
-        
-    
     
     for i in range(len(horizonx)):
         k_orthogonal = horizonx[i]
