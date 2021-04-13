@@ -21,6 +21,7 @@ SECOND = MINUTE / 60
 # of passing by value
 
 # For wedges
+# 8 MHz from 145 to 155, split them into one MHz resolution
 nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
 t_axis = np.arange(3 * HOUR, 5 * HOUR, 4 * MINUTE)
     # it's an arbitrary region of the cold patch

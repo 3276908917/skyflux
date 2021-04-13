@@ -3,6 +3,10 @@ simulation glossary
         subjects, I will prefix baseline variables with bl
         and source subset variables with ss
 
+Bandwidth is indicated by number at the start
+    [blank]: default is 50 MHz to 250 MHz
+    0: 125 MHz-175 MHz
+
 Baselines indicated by lower case letter
 a: (136, 143) ~ 102.3 m
 b: (139, 143) ~ 58.4 m

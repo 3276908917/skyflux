@@ -5,7 +5,7 @@ import pickle
 import skyflux as sf
 import skyflux.deprecated.polSims as pol
 
-def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None):
+def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None, special_request=None):
     """
     Load simulated visibilities from the file named
         @fname
@@ -19,6 +19,10 @@ def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None):
     @pt_override is a way to override the title with which
         a simulation came. It is extremely bad form to use this,
         but it can come in handy during lapses of diligence.
+        
+    @special_requests:
+        (ant1, ant2) tuple, in case you want to look at a
+        k_orth cross-section
     """
     fcd, fs, ts, ptitle = load_wedge_sim(fname + ".pickle")
     
@@ -34,6 +38,7 @@ def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None):
         wedge = static_visual(sim_dict)
     else:
         wedge = collect_wedge_points(transformed, fs, ts, sp, Qi)
+        #return wedge # just for individual baseline testing
     print("Wedge points collected.\n")
     
     return plot_3D(wedge, ptitle)
@@ -188,7 +193,8 @@ def transform_wedge(original, fs, ts):
                 
     return fourier_dict
 
-def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
+def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
+    special_request=None):
     """
     Read from the wedge data structure @sim_dict
         (specifically, one using the format
@@ -209,6 +215,12 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
     @sp : Stokes parameter, if you want to look at just one
         at a time
         0 : I    1 : Q    2 : U    3 : V
+        
+    @special_request: tuple of
+        (baseline1, baseline2,    
+    to really complete the Nunhokee parallel,
+        you would want to average over a range of
+        k_orth values 
         
         
     TODO: last updated 3/30
@@ -240,7 +252,7 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
     B = 200e6 # 200 MHz, hard-coding the simulation parameter
     D = sf.deprecated.polSims.transverse_comoving_distance(z)
     DeltaD = sf.deprecated.polSims.comoving_depth(B, z)
-    kB = 1.380649e-23#1.380649e-23
+    kB = 1.380649e-23 #milliKelvin -> ADD 3 orders of magnitude
     
     # 1 Jy = 1e-20 J / km^2 / s^2
     square_Jy = (1e-20) ** 2
@@ -257,6 +269,7 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
                 
             for nu_idx in range(num_f):
                 powers_prop = []
+                special_powers = []
                 
                 for t_idx in range(num_t - 1):
                     this_instant = \
@@ -275,12 +288,19 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
                                 this_instant, next_instant
                             )
                             p = np.dot(Qi, hadamard)
+                            # stop trying to code in two
+                            # areas at once!!!
                             sqBr = p[sp]
+                            special_times.append(p)
                         ### end trial code
                         else:    
                             sqBr = this_instant[sp] * next_instant[sp]
                     
                     powers_prop.append(np.abs(sqBr))
+                    # this branch unfortunately
+                    # breaks all roads that do not use Q
+                    for stokes_param in np.array(special_times):
+                        special_powers.append(np.abs(stokes_param))
 
                 avg = p_coeff * np.average(np.array(powers_prop))
                 
@@ -290,16 +310,23 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None):
                     float(np.log10(avg))
                 ])
                 
-                special.append(np.array([
-                    k_par[nu_idx],
-                    float(np.log10(avg))
-                ]))
+                for stokes_param in np.array(special_powers):
+                    avg = p_coeff * np.average(stokes_param)
+                    
+                    #!!! duplicate reference
+                    special.append(np.array([
+                        k_par[nu_idx],
+                        float(np.log10(avg))
+                    ]))
                 
                 visual.append(wedge_datum)
             
             # Figure 6-esque investigation    
-            #if ant1 == 1 and ant2 == 50:
-            #    return np.array(special)
+            if special_request is not None:
+                if ant1 == special_request[0] and \
+                    ant2 == special_request[1]:
+                print("Exiting")
+                return np.array(special)
 
     visual = np.array(visual)
    
@@ -357,16 +384,32 @@ def plot_3D(visual, title, scaled=False):
     horizonyp = []
     horizonym = []
     
-    for k_orthogonal in horizonx:
+    etas = pol.f2etas(fs)    
+    k_par = pol.k_parallel(etas, z)
+    
+    #for k_part in k_par:
+        
+    
+    
+    for i in range(len(horizonx)):
+        k_orthogonal = horizonx[i]
+        #zi = int(i * len(fs) / len(horizonx)) # terrible
+        #zloc = pol.fq2z(fs[zi] / 1e9)
         # after fixing this: pick a bin of k_perpendicular and do a cut
         # it's a 1D plot, include all four Stokes parameters
         # as different lines
-        baselength = k_orthogonal / k_starter
-        print(baselength, "baselength [m]")
-        tau = baselength / 2.9979e8 # geometric delay, Parsons eq. 3
-        print(tau * 1e9, "delay [ns]")
-        horizonyp.append(pol.k_parallel(tau, z))
-        horizonym.append(pol.k_parallel(-tau, z))
+        #baselength = k_orthogonal / k_starter
+        #tau = baselength / 2.9979e8 # geometric delay, Parsons eq. 3
+        
+        print(pol.horizon_limit(k_orthogonal, z) / k_orthogonal,
+            "horizon constant")
+        
+        horizonyp.append(pol.horizon_limit(k_orthogonal, z))
+        horizonym.append(-pol.horizon_limit(k_orthogonal, z))
+        
+        #horizonyp.append(pol.k_parallel(tau, zloc))
+        #horizonym.append(pol.k_parallel(-tau, zloc))
+    
         
     plt.scatter(horizonx, horizonyp, marker='.', c='w')
     plt.scatter(horizonx, horizonym, marker='.', c='w')
@@ -402,7 +445,7 @@ def finalize_plot(title):
 
 # hard-coding for now
 def calculate_Q(
-    B=np.arange(50e6, 250e6 + 0.001, 4e6),
+    B=np.arange(125e6, 175e6 + 0.001, 4e6),
     angular_resolution = 250
 ):
     

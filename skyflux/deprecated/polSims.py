@@ -117,5 +117,15 @@ def delay_transform(data,fqs,convert=None):
     df = fqs[1] - fqs[0]
     window = genWindow(N) #! this label is never used
     delaySpec = np.fft.ifft(data) * N * df
-    return delaySpec 
-
+    return delaySpec
+    
+def horizon_limit(k_perp, z):
+   """
+   Compute the horizon limit in Mpc/h at a given redshift for a specified baseline length (from Thyagarajan 2013)
+   Input(s):
+      k_perp : ...
+      z : [scalar] redshift
+   """
+   return k_perp * COSMO.H0.value * COSMO.efunc(z) * \
+    transverse_comoving_distance(z) / (C / 1e3) / (1 + z)
+   
