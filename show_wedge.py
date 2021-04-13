@@ -40,7 +40,7 @@ def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None, special_
         wedge = collect_wedge_points(
             transformed, fs, ts, sp, Qi, special_request
         )
-        if special_requests is not None:
+        if special_request is not None:
             return wedge
         #return wedge # just for individual baseline testing
     print("Wedge points collected.\n")
@@ -267,6 +267,11 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
 
     for ant1 in fcd.keys():
         for ant2 in fcd[ant1].keys():
+            if special_request is not None:
+                if ant1 != special_request[0] or \
+                    ant2 != special_request[1]:
+                    continue
+        
             k_orth = k_starter * sf.ant.baselength(ant1, ant2)
             
             special = []
@@ -304,9 +309,10 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                     powers_prop.append(np.abs(sqBr))
                     # this branch unfortunately
                     # breaks all roads that do not use Q
-                    for vector in np.array(special_times):
-                        for stokes_i in range(len(vector)):
-                            param = vector[stokes_i]
+                    if special_request is not None:
+                        for vector in np.array(special_times):
+                            for stokes_i in range(len(vector)):
+                                param = vector[stokes_i]
                             special_powers[stokes_i].append(np.abs(param))
 
                 avg = p_coeff * np.average(np.array(powers_prop))
@@ -317,15 +323,16 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                     float(np.log10(avg))
                 ])
                 
-                for stokes_param in np.array(special_powers):
-                    avg = p_coeff * np.average(stokes_param)
+                if special_request is not None:
+                    for stokes_param in np.array(special_powers):
+                        avg = p_coeff * np.average(stokes_param)
+                        
+                        #!!! duplicate reference
+                        special.append(np.array([
+                            k_par[nu_idx],
+                            float(np.log10(avg))
+                        ]))
                     
-                    #!!! duplicate reference
-                    special.append(np.array([
-                        k_par[nu_idx],
-                        float(np.log10(avg))
-                    ]))
-                
                 visual.append(wedge_datum)
             
             # Figure 6-esque investigation    
@@ -336,6 +343,8 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                     return np.array(special)
 
     visual = np.array(visual)
+   
+    print(visual)
    
     return np.array(visual)
  
@@ -402,10 +411,6 @@ def plot_3D(visual, title, scaled=False):
         # it's a 1D plot, include all four Stokes parameters
         # as different lines
         #baselength = k_orthogonal / k_starter
-        #tau = baselength / 2.9979e8 # geometric delay, Parsons eq. 3
-        
-        print(pol.horizon_limit(k_orthogonal, z) / k_orthogonal,
-            "horizon constant")
         
         horizonyp.append(pol.horizon_limit(k_orthogonal, z))
         horizonym.append(-pol.horizon_limit(k_orthogonal, z))
