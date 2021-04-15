@@ -1,6 +1,12 @@
 import matplotlib.pyplot as plt
 
-def slicer(ant1, ant2, func_show, Qi):
+import skyflux.deprecated.polSims as pol
+import skyflux.ant as ant
+
+import numpy as np
+
+def slicer(ant1, ant2, func_show, Qi,
+    fs=np.arange(125e6, 175e6 + 0.001, 1e6)):
     """
     The latter two arguments are admittedly
     disappointing, but I could not figure out
@@ -9,7 +15,16 @@ def slicer(ant1, ant2, func_show, Qi):
     special = func_show("E0-387w", 0, Qi=Qi,
         special_request=(ant1, ant2))
     
-    print(special.shape)    
+    b = ant.baselength(ant1, ant2)
+    #print(special.shape)
+    print("Requsted baseline length:", b)
+    
+    center_f = np.average(fs)
+    z = pol.fq2z(center_f / 1e9)
+    lambda_ = pol.C / center_f
+    k_orth = pol.k_perp(z) * b / lambda_
+    
+    print("Requested baseline has k_perpendicular:", k_orth) 
         
     plt.plot(special[0, :, 0], special[0, :, 1], label="I")
     plt.plot(special[1, :, 0], special[1, :, 1], label="Q")
@@ -20,6 +35,15 @@ def slicer(ant1, ant2, func_show, Qi):
     plt.ylabel("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
     plt.title(str(ant1) + "-" + str(ant2) + " baseline")
     plt.legend(loc='upper right')
+    
+    # you should automatically print out
+        # corresponding k_perpendicular
+        # baseline length
+    
+    # Furthermore, you should plot the horizon lines here
+    
+    # Furthermore, you should investigate the horizons for
+    # any lingering amplitude.
     
     plt.show()
     return special
