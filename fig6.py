@@ -17,19 +17,42 @@ def slicer(ant1, ant2, func_show, Qi,
     
     b = ant.baselength(ant1, ant2)
     #print(special.shape)
-    print("Requsted baseline length:", b)
+    print("Baseline length [m]:", np.around(b, 4))
     
     center_f = np.average(fs)
     z = pol.fq2z(center_f / 1e9)
     lambda_ = pol.C / center_f
     k_orth = pol.k_perp(z) * b / lambda_
     
-    print("Requested baseline has k_perpendicular:", k_orth) 
+    print("Baseline has perpendicular k mode:",
+        np.around(k_orth, 4), "[h / Mpc]")
+        
+    horizonp = pol.horizon_limit(k_orth, z)
+    horizonn = -pol.horizon_limit(k_orth, z)
         
     plt.plot(special[0, :, 0], special[0, :, 1], label="I")
     plt.plot(special[1, :, 0], special[1, :, 1], label="Q")
     plt.plot(special[2, :, 0], special[2, :, 1], label="U")
     plt.plot(special[3, :, 0], special[3, :, 1], label="V")
+    
+    ### this is pretty bad
+    
+    ymin = special[0, :, 1].min()
+    ymin = min(ymin, special[1, :, 1].min())
+    ymin = min(ymin, special[2, :, 1].min())
+    ymin = min(ymin, special[3, :, 1].min())
+    
+    ymax = special[0, :, 1].max()
+    ymax = max(ymin, special[1, :, 1].max())
+    ymax = max(ymin, special[2, :, 1].max())
+    ymax = max(ymin, special[3, :, 1].max())
+    
+    ###
+    
+    plt.vlines(horizonp, ymin, ymax,
+        linestyles="dashed", colors='k')
+    plt.vlines(horizonn, ymin, ymax,
+        linestyles="dashed", colors='k')
     
     plt.xlabel("$k_\parallel$ [$h$ Mpc$^{-1}$]")
     plt.ylabel("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
