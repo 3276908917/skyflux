@@ -73,6 +73,9 @@ def load_wedge_sim(fname):
     ptitle = meta['title']
 
     fs = meta['frequencies']
+    MACRO_EPSILON = 0.001
+    #print(fs)
+    
     num_f = len(fs)
     
     ts = meta['times']
@@ -107,77 +110,7 @@ def load_wedge_sim(fname):
             fcd[ant1][ant2] = np.array(fourierc)
 
     return fcd, fs, ts, ptitle    
-    
-def static_wedge_vis(sim_dict, fs):
-    raise NotImplementedError("I have only updated" + \
-    " the dynamic wedge routine at this moment.")
-    
-    """
-    Read from the wedge data structure @sim_dict
-        (specifically, one using the format
-        established in load_wedge_sim)
-    and generate 3D points appropriate for a wedge plot.
-    i.e., return a list of triples:
-        (k_perpendicular, k_parallel, power*)
-    
-    * currently, the implementation uses values that
-    should be proportional to power. The final constants
-    have not yet been considered.
-    
-    This function is distinct from
-        dynamic_wedge_vis
-    in assuming that the simulation corresponding to
-        @sim_dict
-    runs over only one value of LST.
-    """
-    wedge_data = []
-    
-    etas = f2etas(fs)    
-
-    center_f = np.average(fs)
-    z = fq2z(center_f)
-    lambda_ = C / center_f
-
-    k_par = k_parallel(etas, z)
-    k_starter = k_perp(z) / lambda_ # this will need to be
-    # multiplied on a per-baseline basis
-    
-    ### aliasing ###
-    nu_idxs = sim_dict['fs']
-
-    sim = sim_dict['sim']
-
-    for ant1 in sim.keys():
-        for ant2 in sim[ant1].keys():
-            """
-            Since we only used one LST,
-            we do not need to do any averaging
-                (averaging is supposed to happen over LSTs,
-                    not frequency)
-            """
-            k_orth = k_starter * sf.ant.baselength(ant1, ant2)
-            for nu_idx in nu_idxs:
-                # this is a proportionality.
-                # The real deal uses the power equation 6
-                    # from Nunhokee et al.
-                    
-                brightness = sim[ant1][ant2][nu_idx]
-                    
-                power_prop = np.log10(np.vdot(
-                    brightness,
-                    brightness
-                ))
-                
-                wedge_datum = np.array([
-                    k_orth,
-                    k_par[nu_idx],
-                    float(power_prop)
-                ])
-
-                wedge_data.append(wedge_datum)
-                
-    return np.array(wedge_data)
-   
+       
 def transform_wedge(original, fs, ts):
     num_f = len(fs)
     num_t = len(ts)
@@ -240,6 +173,8 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
     
     visual = []
     
+    #print(fs)
+    
     etas = pol.f2etas(fs)    
 
     center_f = np.average(fs)
@@ -248,15 +183,16 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
     lambda_ = pol.C / center_f
 
     k_par = pol.k_parallel(etas, z)
+    #print(k_par)
     
     k_starter = pol.k_perp(z) / lambda_ # this will need to be
     # multiplied on a per-baseline basis
     
     # Power constants
-    B = 200e6 # 200 MHz, hard-coding the simulation parameter
+    B = 50e6 # 50 MHz, hard-coding the simulation parameter
     D = sf.deprecated.polSims.transverse_comoving_distance(z)
     DeltaD = sf.deprecated.polSims.comoving_depth(B, z)
-    kB = 1.380649e-23 #milliKelvin -> ADD 3 orders of magnitude
+    kB = 1.380649e-26 #milliKelvin -> ADD 3 orders of magnitude
     
     # 1 Jy = 1e-20 J / km^2 / s^2
     square_Jy = (1e-20) ** 2
@@ -318,16 +254,24 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
 
                 avg = p_coeff * np.average(np.array(powers_prop))
                 
+                #print("Using k_parallel", k_par[nu_idx])
+                
                 wedge_datum = np.array([
                     k_orth,
                     k_par[nu_idx],
+                    #float(avg)
                     float(np.log10(avg))
                 ])
                 
-                
                 if special_request is not None:
-                    special_powers = np.array(special_powers)
+                    for si in range(len(special_powers)):
+                        special_powers[si] = np.array(
+                            special_powers[si])
                     
+                    special_powers = np.array(special_powers)
+                
+                    #print("Using k_parallel", k_par[nu_idx])
+                
                     # si: Stokes index
                     for si in range(len(special_powers)):
                         stokes_param = special_powers[si]
@@ -336,6 +280,7 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                         #!!! duplicate reference
                         special[si].append(np.array([
                             k_par[nu_idx],
+                            #float(avg)
                             float(np.log10(avg))
                         ]))
                     
@@ -394,7 +339,7 @@ def plot_3D(visual, title, scaled=False):
     image = visual_to_image(visual)
 
     ### begin temporary horizon-code
-    fs = np.arange(50e6, 250e6 + 0.001, 4e6)
+    fs = np.arange(125e6, 175e6 + 0.001, 4e6)
     center_f = np.average(fs)
     z = pol.fq2z(center_f / 1e9)
     lambda_ = pol.C / center_f
@@ -451,7 +396,7 @@ def finalize_plot(title):
     plt.title(title)
     plt.xlabel("$k_\perp$ [$h$ Mpc$^{-1}$]")
     plt.ylabel("$k_\parallel$ [$h$ Mpc$^{-1}$]")
-    cbar.set_label("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
+    cbar.set_label("log$_{10}$ [mK$^2$ ($h^{-1}$ Mpc)^3] ?")
     
     plt.show()
 

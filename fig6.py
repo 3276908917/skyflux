@@ -1,3 +1,10 @@
+"""
+TODO 4/19
+* Build a more robust way to grab a subset of a simulation
+
+"""
+
+
 import matplotlib.pyplot as plt
 
 import skyflux.deprecated.polSims as pol
@@ -6,13 +13,13 @@ import skyflux.ant as ant
 import numpy as np
 
 def slicer(ant1, ant2, func_show, Qi,
-    fs=np.arange(125e6, 175e6 + 0.001, 1e6)):
+    fs=np.arange(157e6, 167e6 + 0.001, 1e6)):
     """
     The latter two arguments are admittedly
     disappointing, but I could not figure out
     how else to write a script like this.
     """
-    special = func_show("E0-387w", 0, Qi=Qi,
+    special = func_show("1E300-387w", 0, Qi=Qi,
         special_request=(ant1, ant2))
     
     b = ant.baselength(ant1, ant2)
@@ -29,23 +36,28 @@ def slicer(ant1, ant2, func_show, Qi,
         
     horizonp = pol.horizon_limit(k_orth, z)
     horizonn = -pol.horizon_limit(k_orth, z)
-        
-    plt.plot(special[0, :, 0], special[0, :, 1], label="I")
-    plt.plot(special[1, :, 0], special[1, :, 1], label="Q")
-    plt.plot(special[2, :, 0], special[2, :, 1], label="U")
-    plt.plot(special[3, :, 0], special[3, :, 1], label="V")
+    
+    special = np.fft.fftshift(special)
+    
+    yi = 0
+    xi = 1
+    
+    plt.plot(special[0, :, xi], special[0, :, yi], label="I")
+    plt.plot(special[1, :, xi], special[1, :, yi], label="Q")
+    plt.plot(special[2, :, xi], special[2, :, yi], label="U")
+    plt.plot(special[3, :, xi], special[3, :, yi], label="V")
     
     ### this is pretty bad
     
-    ymin = special[0, :, 1].min()
-    ymin = min(ymin, special[1, :, 1].min())
-    ymin = min(ymin, special[2, :, 1].min())
-    ymin = min(ymin, special[3, :, 1].min())
+    ymin = special[0, :, yi].min()
+    ymin = min(ymin, special[1, :, yi].min())
+    ymin = min(ymin, special[2, :, yi].min())
+    ymin = min(ymin, special[3, :, yi].min())
     
-    ymax = special[0, :, 1].max()
-    ymax = max(ymin, special[1, :, 1].max())
-    ymax = max(ymin, special[2, :, 1].max())
-    ymax = max(ymin, special[3, :, 1].max())
+    ymax = special[0, :, yi].max()
+    ymax = max(ymin, special[1, :, yi].max())
+    ymax = max(ymin, special[2, :, yi].max())
+    ymax = max(ymin, special[3, :, yi].max())
     
     ###
     
