@@ -15,56 +15,7 @@ from skyflux import catalog
 cop = lambda source, nu : source.flux_by_frq[nu / 1e6] / nu ** source.alpha
 
 def get_I(source, nu=151e6):
-    # make a copy to ensure write safety
-    #ef = catalog.expected_frequencies.copy()
-
-    #index_nu = nu / 1e6
-    
-    # keep in mind that ef is in ascending order
-    #if index_nu in ef: # we have an observed value for this frequency
-    #    return source.flux_by_frq[index_nu]
-
-    #if index_nu < ef[0] or index_nu > ef[len(ef)-1]:
-        #"beware the danger of extrapolation" --Aaron Simon
-    #    raise NotImplementedError("That frequency would have to be extrapolated.")
-
-    #if index_nu < ef[0] or index_nu > ef[len(ef)-1]:
-    #    w.warn("Using an extrapolated frequency: " + str(nu))
-
-    # we use the power law spectral index formulation here
-        # conceptually, I may have made an error.
-        # I think I want flux, but I am here calculating flux per unit frequency
-        # See "single_source_over_nu.ipynb" for an example plot of how alpha varies...
-
-    # You should double-down on interpolation;
-    # give up on trying to use any real values for flux
-    # we want a smooth spectrum, and these real references
-    # create discontinuities.
-
-    """
-    i = 0
-
-    # Use power law formula here; use the spectral index
-    # s1/s2 = nu1/nu2 * s2
-    while ef[i] > index_nu:
-        i += 1
-
-    nu_a = ef[i - 1] * 1e6
-    nu_b = ef[i] * 1e6
-    span = nu_b - nu_a
-
-    cop_a = cop(source, nu_a)
-    cop_b = cop(source, nu_b)
-
-    interp_a = (nu_b - nu) * cop_a
-    interp_b = (nu - nu_a) * cop_b
-    this_cop = (interp_a + interp_b) / span
-    """
-
-    # S1 / S2 = (nu1 / nu2) ** alpha
-    # S1 = S2 * (nu1 / nu2) ** alpha
-
-    # magic
+    #! magic
     S151 = source.flux_by_frq[151]
     return S151 * (nu / 151e6) ** source.alpha
 

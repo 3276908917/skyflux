@@ -175,31 +175,19 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
     
     #print(fs)
     
-    etas = pol.f2etas(fs)    
+    etas = pol.f2etas(fs)
+    k_para = np.array([
+        k_parallel(etas[i], fq2z(fs[i] / 1e9)) for i in num_f
+    ])
 
-    center_f = np.average(fs)
-    
-    z = pol.fq2z(center_f / 1e9)
-    lambda_ = pol.C / center_f
-
-    k_par = pol.k_parallel(etas, z)
     #print(k_par)
-    
-    k_starter = pol.k_perp(z) / lambda_ # this will need to be
-    # multiplied on a per-baseline basis
-    
-    # Power constants
+
+    """ Power constants, section 1"""
     B = 50e6 # 50 MHz, hard-coding the simulation parameter
-    D = sf.deprecated.polSims.transverse_comoving_distance(z)
-    DeltaD = sf.deprecated.polSims.comoving_depth(B, z)
     kB = 1.380649e-26 # this is in mK. To use K, add 3 orders of magnitude.
-    
     # 1 Jy = 1e-20 J / km^2 / s^2
     square_Jy = (1e-20) ** 2
-    
-    # put everything together to get a single power coefficient
-    p_coeff = (lambda_ ** 2 / 2 / kB) ** 2 * \
-         D ** 2 * DeltaD / B * square_Jy
+    universal_p_coeff = square_Jy / (2 kB) ** 2 / B
 
     for ant1 in fcd.keys():
         for ant2 in fcd[ant1].keys():
@@ -208,11 +196,22 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                     ant2 != special_request[1]:
                     continue
         
-            k_orth = k_starter * sf.ant.baselength(ant1, ant2)
+            baselength = sf.ant.baselength(ant1, ant2)
             
             special = [[], [], [], []]
                 
             for nu_idx in range(num_f):
+                nu = fs[nu_idx]
+
+                """ Power constants, section 2"""
+                z = pol.fq2z(nu / 1e9)
+                lambda_ = pol.C / nu
+                k_perp = baselength * pol.k_perp(z) / lambda_
+                D = sf.deprecated.polSims.transverse_comoving_distance(z)
+                DeltaD = sf.deprecated.polSims.comoving_depth(B, z)
+                # Finally, condense everything into a power coefficient
+                p_coeff = universal_p_coeff * lambda_ ** 4 * D ** 2 * DeltaD
+                
                 powers_prop = []
                 special_powers = [[], [], [], []]
                 special_times = []
@@ -257,8 +256,8 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                 #print("Using k_parallel", k_par[nu_idx])
                 
                 wedge_datum = np.array([
-                    k_orth,
-                    k_par[nu_idx],
+                    k_perp,
+                    k_para[nu_idx],
                     #float(avg)
                     float(np.log10(avg))
                 ])
@@ -279,7 +278,7 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                         
                         #!!! duplicate reference
                         special[si].append(np.array([
-                            k_par[nu_idx],
+                            k_para[nu_idx],
                             #float(avg)
                             float(np.log10(avg))
                         ]))
