@@ -192,7 +192,7 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
     B = 50e6 # 50 MHz, hard-coding the simulation parameter
     D = sf.deprecated.polSims.transverse_comoving_distance(z)
     DeltaD = sf.deprecated.polSims.comoving_depth(B, z)
-    kB = 1.380649e-26 #milliKelvin -> ADD 3 orders of magnitude
+    kB = 1.380649e-26 # this is in mK. To use K, add 3 orders of magnitude.
     
     # 1 Jy = 1e-20 J / km^2 / s^2
     square_Jy = (1e-20) ** 2
