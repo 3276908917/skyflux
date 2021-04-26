@@ -187,7 +187,7 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
     kB = 1.380649e-26 # this is in mK. To use K, add 3 orders of magnitude.
     # 1 Jy = 1e-20 J / km^2 / s^2
     square_Jy = (1e-20) ** 2
-    universal_p_coeff = square_Jy / (2 kB) ** 2 / B
+    universal_p_coeff = square_Jy / (2 * kB) ** 2 / B
 
     for ant1 in fcd.keys():
         for ant2 in fcd[ant1].keys():
@@ -207,10 +207,12 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                 z = pol.fq2z(nu / 1e9)
                 lambda_ = pol.C / nu
                 k_perp = baselength * pol.k_perp(z) / lambda_
-                D = sf.deprecated.polSims.transverse_comoving_distance(z)
-                DeltaD = sf.deprecated.polSims.comoving_depth(B, z)
-                # Finally, condense everything into a power coefficient
-                p_coeff = universal_p_coeff * lambda_ ** 4 * D ** 2 * DeltaD
+                D = pol.transverse_comoving_distance(z)
+                DeltaD = pol.comoving_depth(B, z)
+                # Finally, condense everything into a
+                # power coefficient
+                p_coeff = universal_p_coeff * \
+                    lambda_ ** 4 * D ** 2 * DeltaD
                 
                 powers_prop = []
                 special_powers = [[], [], [], []]

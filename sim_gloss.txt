@@ -6,6 +6,7 @@ simulation glossary
 Bandwidth is indicated by number at the start
     [blank]: default is 50 MHz to 250 MHz
     0: 125 MHz-175 MHz
+    1: a slice like 167-176MHz, from 0
 
 Baselines indicated by lower case letter
 a: (136, 143) ~ 102.3 m
