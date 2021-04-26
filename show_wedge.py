@@ -177,7 +177,8 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
     
     etas = pol.f2etas(fs)
     k_para = np.array([
-        k_parallel(etas[i], fq2z(fs[i] / 1e9)) for i in num_f
+        pol.k_parallel(etas[i], pol.fq2z(fs[i] / 1e9)) \
+        for i in range(num_f)
     ])
 
     #print(k_par)
