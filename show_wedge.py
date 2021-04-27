@@ -5,6 +5,97 @@ import pickle
 import skyflux as sf
 import skyflux.deprecated.polSims as pol
 
+def ppp(pp, key, power=1):
+    plt.plot(pp['fs'] / 1e6, pp[key] ** power)
+    plt.title(key + " vs Frequency, 125-175 MHz band")
+    plt.xlabel("Frequency [MHz]")
+    
+    xu = None
+    
+    if key == 'lambda':
+        xu = "m"
+    elif key == 'D':
+        xu = "m?"
+    elif key == 'DeltaD':
+        xu = "m?"
+    elif key == 'kperp':
+        xu = "h / Mpc"
+        
+    plt.ylabel(key + " [" + xu + "]^" + str(power))
+    
+    print("Vertical range is:",
+        (pp[key] ** power).max() - (pp[key] ** power).min(),
+        xu + "^" + str(power))
+        
+    print("Vertical ratio is:",
+        (pp[key] ** power).max() / (pp[key] ** power).min())
+    
+    plt.show()
+
+def power_parameters(fname, ant1, ant2):
+    fcd, fs, ts, ptitle = load_wedge_sim(fname + ".pickle")
+    
+    print("Simulation file loaded.\n")
+
+    num_f = len(fs)
+    
+    etas = pol.f2etas(fs)
+    #z_avg = pol.fq2z(np.average(fs) / 1e9)
+    #k_para = pol.k_parallel(etas, z_avg)
+    
+    k_para = np.array([
+        pol.k_parallel(etas[i], pol.fq2z(fs[i] / 1e9)) \
+        for i in range(num_f)
+    ])
+
+    #print(k_par)
+
+    """ Power constants, section 1"""
+    B = 50e6 # 50 MHz, hard-coding the simulation parameter
+    kB = 1.380649e-26 # this is in mK.
+    # To use K, add 3 orders of magnitude.
+    # 1 Jy = 1e-20 J / km^2 / s^2
+    square_Jy = (1e-20) ** 2
+    universal_p_coeff = square_Jy / (2 * kB) ** 2 / B
+    """ """
+
+    baselength = sf.ant.baselength(ant1, ant2)
+        
+    power_pieces = {
+        'z': [], # dimensionless
+        'lambda': [], # m
+        'D': [], # m?
+        'DeltaD': [], 
+        'kperp': []
+    }    
+        
+    for nu in fs:
+        #nu = np.average(fs)
+
+        """ Power constants, section 2 """
+        z = pol.fq2z(nu / 1e9)
+        power_pieces['z'].append(z)
+        
+        lambda_ = pol.C / nu
+        power_pieces['lambda'].append(lambda_)
+        
+        D = pol.transverse_comoving_distance(z)
+        power_pieces['D'].append(D)
+        
+        DeltaD = pol.comoving_depth(B, z)
+        power_pieces['DeltaD'].append(DeltaD)
+        
+        k_perp = baselength * pol.k_perp(z) / lambda_
+        power_pieces['kperp'].append(k_perp)
+        
+    for key in power_pieces.keys():
+        power_pieces[key] = np.array(power_pieces[key])
+        
+        
+    power_pieces['fs'] = fs
+        
+    return power_pieces
+        
 def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None, special_request=None):
     """
     Load simulated visibilities from the file named
@@ -187,7 +278,7 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
     #print(k_par)
 
     """ Power constants, section 1"""
-    B = 50e6 # 50 MHz, hard-coding the simulation parameter
+    B = 200e6 # 50 MHz, hard-coding the simulation parameter
     kB = 1.380649e-26 # this is in mK.
     # To use K, add 3 orders of magnitude.
     # 1 Jy = 1e-20 J / km^2 / s^2
@@ -207,8 +298,8 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
             special = [[], [], [], []]
                 
             for nu_idx in range(num_f):
-                #nu = np.average(fs)
-                nu = fs[nu_idx]
+                nu = np.average(fs)
+                #nu = fs[nu_idx]
 
                 """ Power constants, section 2 """
                 z = pol.fq2z(nu / 1e9)
@@ -348,7 +439,7 @@ def plot_3D(visual, title, scaled=False):
     image = visual_to_image(visual)
 
     ### begin temporary horizon-code
-    fs = np.arange(125e6, 175e6 + 0.001, 4e6)
+    fs = np.arange(50e6, 250e6 + 0.001, 4e6)
     center_f = np.average(fs)
     z = pol.fq2z(center_f / 1e9)
     lambda_ = pol.C / center_f

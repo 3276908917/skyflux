@@ -13,13 +13,13 @@ import skyflux.ant as ant
 import numpy as np
 
 def slicer(ant1, ant2, func_show, Qi,
-    fs=np.arange(157e6, 167e6 + 0.001, 1e6)):
+    fs=np.arange(50e6, 250e6 + 0.001, 1e6)):
     """
     The latter two arguments are admittedly
     disappointing, but I could not figure out
     how else to write a script like this.
     """
-    special = func_show("1E300-387w", 0, Qi=Qi,
+    special = func_show("0E300-387w", 0, Qi=Qi,
         special_request=(ant1, ant2))
     
     b = ant.baselength(ant1, ant2)
