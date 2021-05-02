@@ -117,6 +117,10 @@ def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None, special_
     """
     fcd, fs, ts, ptitle = load_wedge_sim(fname + ".pickle")
     
+    if Qi is None:
+        # hard coding for four Stokes param.s
+        Qi = np.identity(4, np.complex128)
+    
     if pt_override is not None:
         ptitle = pt_override
     
@@ -129,7 +133,7 @@ def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None, special_
         wedge = static_visual(sim_dict)
     else:
         wedge = collect_wedge_points(
-            transformed, fs, ts, sp, Qi, special_request
+            transformed, fs, ts, Qi, sp, special_request
         )
         if special_request is not None:
             return wedge
@@ -221,7 +225,7 @@ def transform_wedge(original, fs, ts):
                 
     return fourier_dict
 
-def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
+def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
     special_request=None):
     """
     Read from the wedge data structure @sim_dict
@@ -325,26 +329,20 @@ def collect_wedge_points(fcd, fs, ts, sp=None, Qi=None,
                     
                     # [I1, Q1, U1, V1] * [I2*, Q2*, U2*, V2*]
                     
-                    if sp is None:
-                        sqBr = np.vdot(this_instant, next_instant)
-                    else:
-                        ### trial code for implementation of Q
-                        if Qi is not None:
-                            hadamard = np.multiply(
-                                this_instant, next_instant
-                            )
-                            p = np.dot(Qi, hadamard)
-                            # stop trying to code in two
-                            # areas at once!!!
-                            sqBr = p[sp]
-                            special_times.append(p)
-                        ### end trial code
-                        else:    
-                            sqBr = this_instant[sp] * next_instant[sp]
+                    hadamard = np.multiply(
+                        this_instant, next_instant
+                    )
+                    p = np.dot(Qi, hadamard)
                     
-                    powers_prop.append(np.abs(sqBr))
-                    # this branch unfortunately
-                    # breaks all roads that do not use Q
+                    if sp is None:
+                        sqBr = np.abs(p)
+                    else:
+                        sqBr = np.abs(p[sp])
+                    
+                    special_times.append(p)
+                    
+                    powers_prop.append(sqBr)
+
                     if special_request is not None:
                         for vector in np.array(special_times):
                             # si: Stokes index
@@ -502,7 +500,7 @@ def finalize_plot(title):
 
 # hard-coding for now
 def calculate_Q(
-    B=np.arange(125e6, 175e6 + 0.001, 4e6),
+    B=np.arange(50e6, 250e6 + 0.001, 4e6),
     angular_resolution = 250
 ):
     
@@ -516,7 +514,6 @@ def calculate_Q(
     list_theta = np.linspace(0, np.pi / 2, angular_resolution)
     dtheta = list_theta[1] - list_theta[0]
     
-    #!!! I can't remember what would be a neutral LST value...
     dummy_A = sf.stokes.create_A(
         az = 0, alt = 0, nu=151e6, radians=True
     )
@@ -538,7 +535,8 @@ def calculate_Q(
     
     print("Integration complete.")
     
-    return Q
+    #! Disgusting hack
+    return Q[:, 0, :]
     
 """
 Just some prototyping

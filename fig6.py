@@ -82,20 +82,4 @@ def slicer(ant1, ant2, func_show, Qi,
     
     plt.show()
     return special
-    
-"""
-    for i in range(len(horizonx)):
-        k_orthogonal = horizonx[i]
-        zi = int(i * len(fs) / len(horizonx)) # terrible
-        zloc = pol.fq2z(fs[zi] / 1e9)
-        # after fixing this: pick a bin of k_perpendicular and do a cut
-        # it's a 1D plot, include all four Stokes parameters
-        # as different lines
-        baselength = k_orthogonal / k_starter
-        print(baselength, "baselength [m]")
-        tau = baselength / 2.9979e8 # geometric delay, Parsons eq. 3
-        print(tau * 1e9, "delay [ns]")
-        horizonyp.append(pol.k_parallel(tau, zloc))
-        horizonym.append(pol.k_parallel(-tau, zloc))
-    """
 
