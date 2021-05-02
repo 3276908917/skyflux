@@ -13,13 +13,15 @@ import skyflux.ant as ant
 import numpy as np
 
 def slicer(ant1, ant2, func_show, Qi,
-    fs=np.arange(50e6, 250e6 + 0.001, 1e6)):
+    fs=np.arange(50e6, 250e6 + 0.001, 4e6)):
     """
     The latter two arguments are admittedly
     disappointing, but I could not figure out
     how else to write a script like this.
     """
-    special = func_show("0E300-387w", 0, Qi=Qi,
+    #!!! Isn't it kind of weird that we're using
+    # sp=0 here?
+    special = func_show("E0-387w", sp=0, Qi=Qi,
         special_request=(ant1, ant2))
     
     b = ant.baselength(ant1, ant2)
@@ -71,13 +73,7 @@ def slicer(ant1, ant2, func_show, Qi,
     plt.title(str(ant1) + "-" + str(ant2) + " baseline")
     plt.legend(loc='upper right')
     
-    # you should automatically print out
-        # corresponding k_perpendicular
-        # baseline length
-    
-    # Furthermore, you should plot the horizon lines here
-    
-    # Furthermore, you should investigate the horizons for
+    # You should investigate the horizons for
     # any lingering amplitude.
     
     plt.show()

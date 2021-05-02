@@ -34,7 +34,7 @@ def ppp(pp, key, power=1):
 
 def power_parameters(fname, ant1, ant2):
     fcd, fs, ts, ptitle = load_wedge_sim(fname + ".pickle")
-    
+
     print("Simulation file loaded.\n")
 
     num_f = len(fs)
@@ -51,7 +51,7 @@ def power_parameters(fname, ant1, ant2):
     #print(k_par)
 
     """ Power constants, section 1"""
-    B = 50e6 # 50 MHz, hard-coding the simulation parameter
+    B = 200e6 # 50 MHz, hard-coding the simulation parameter
     kB = 1.380649e-26 # this is in mK.
     # To use K, add 3 orders of magnitude.
     # 1 Jy = 1e-20 J / km^2 / s^2
@@ -168,7 +168,6 @@ def load_wedge_sim(fname):
     ptitle = meta['title']
 
     fs = meta['frequencies']
-    MACRO_EPSILON = 0.001
     #print(fs)
     
     num_f = len(fs)
@@ -452,19 +451,9 @@ def plot_3D(visual, title, scaled=False):
     
     for i in range(len(horizonx)):
         k_orthogonal = horizonx[i]
-        #zi = int(i * len(fs) / len(horizonx)) # terrible
-        #zloc = pol.fq2z(fs[zi] / 1e9)
-        # after fixing this: pick a bin of k_perpendicular and do a cut
-        # it's a 1D plot, include all four Stokes parameters
-        # as different lines
-        #baselength = k_orthogonal / k_starter
         
         horizonyp.append(pol.horizon_limit(k_orthogonal, z))
         horizonym.append(-pol.horizon_limit(k_orthogonal, z))
-        
-        #horizonyp.append(pol.k_parallel(tau, zloc))
-        #horizonym.append(pol.k_parallel(-tau, zloc))
-    
         
     plt.scatter(horizonx, horizonyp, marker='.', c='w')
     plt.scatter(horizonx, horizonym, marker='.', c='w')
