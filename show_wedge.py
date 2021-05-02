@@ -301,12 +301,13 @@ def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
             special = [[], [], [], []]
                 
             for nu_idx in range(num_f):
-                nu = np.average(fs)
-                #nu = fs[nu_idx]
+                nua = np.average(fs)
+                nu = fs[nu_idx]
 
                 """ Power constants, section 2 """
                 z = pol.fq2z(nu / 1e9)
                 lambda_ = pol.C / nu
+                lambda_a = pol.C / nua
                 D = pol.transverse_comoving_distance(z)
                 DeltaD = pol.comoving_depth(B, z)
                 # Finally, condense everything into a
@@ -456,9 +457,10 @@ def plot_3D(visual, fs, title, scaled=False):
         
     plt.scatter(horizonx, horizonyp, marker='.', c='w')
     plt.scatter(horizonx, horizonym, marker='.', c='w')
-    ### end temporary horizon-code
+    ### end horizon-code
     
-    # Gaussian looks smooth
+    # Interpolation choice doesn't really matter;
+    # gaussian looks smooth
     plt.imshow(image.T, extent=[
         x.min(), x.max(), y.min(), y.max()
     ], interpolation='gaussian', aspect='auto')
@@ -525,10 +527,6 @@ def calculate_Q(
     
     #! Disgusting hack
     return Q[:, 0, :]
-    
-"""
-Just some prototyping
-""" 
 
 def diag(matrix):
     # Be careful! We are assuming that a shallow copy is fine
