@@ -5,11 +5,4 @@ Looking at a cross section (fig6.py):
 Wedge plotter (show_wedge.py):
     * calculate_Q
         * frequency range and spacing in the method header
-    * plot_3D
-        * frequency range and spacing in the horizon code
-    * collect_wedge_points
-        * B = 50 MHz
-        
-    * power_parameters
-        * B = 50 MHz
-
+    

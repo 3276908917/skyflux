@@ -15,7 +15,7 @@ import numpy as np
 def slicer(ant1, ant2, func_show, Qi,
     fs=np.arange(50e6, 250e6 + 0.001, 4e6)):
     """
-    The latter two arguments are admittedly
+    The second pair of arguments is admittedly
     disappointing, but I could not figure out
     how else to write a script like this.
     """

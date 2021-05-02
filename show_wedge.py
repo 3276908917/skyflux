@@ -38,6 +38,7 @@ def power_parameters(fname, ant1, ant2):
     print("Simulation file loaded.\n")
 
     num_f = len(fs)
+    B = fs.max() - fs.min()
     
     etas = pol.f2etas(fs)
     #z_avg = pol.fq2z(np.average(fs) / 1e9)
@@ -51,7 +52,6 @@ def power_parameters(fname, ant1, ant2):
     #print(k_par)
 
     """ Power constants, section 1"""
-    B = 200e6 # 50 MHz, hard-coding the simulation parameter
     kB = 1.380649e-26 # this is in mK.
     # To use K, add 3 orders of magnitude.
     # 1 Jy = 1e-20 J / km^2 / s^2
@@ -140,7 +140,7 @@ def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None, special_
         #return wedge # just for individual baseline testing
     print("Wedge points collected.\n")
     
-    return plot_3D(wedge, ptitle)
+    return plot_3D(wedge, fs, ptitle)
     
 def load_wedge_sim(fname):
     """
@@ -264,6 +264,7 @@ def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
     """
     num_t = len(ts)
     num_f = len(fs)
+    B = fs.max() - fs.min()
     
     visual = []
     
@@ -281,7 +282,6 @@ def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
     #print(k_par)
 
     """ Power constants, section 1"""
-    B = 200e6 # 50 MHz, hard-coding the simulation parameter
     kB = 1.380649e-26 # this is in mK.
     # To use K, add 3 orders of magnitude.
     # 1 Jy = 1e-20 J / km^2 / s^2
@@ -408,7 +408,7 @@ def visual_to_image(visual):
     
     return image 
    
-def plot_3D(visual, title, scaled=False):
+def plot_3D(visual, fs, title, scaled=False):
     """
     Primitive 3D plotter.
     
@@ -435,8 +435,7 @@ def plot_3D(visual, title, scaled=False):
 
     image = visual_to_image(visual)
 
-    ### begin temporary horizon-code
-    fs = np.arange(50e6, 250e6 + 0.001, 4e6)
+    ### horizon-code
     center_f = np.average(fs)
     z = pol.fq2z(center_f / 1e9)
     lambda_ = pol.C / center_f
