@@ -53,20 +53,20 @@ def slicer(ant1, ant2, func_show, Qi,
     
     max_counts = [0, 0, 0, 0]
     
-    for i in range(len(special[0, :, yi])):
+    for vi in range(len(special[0, :, yi])):
         vis = [0, 0, 0, 0]
-        vis[0] = special[0, :, yi]
-        vis[1] = special[1, :, yi]
-        vis[2] = special[2, :, yi]
-        vis[3] = special[3, :, yi]
+        vis[0] = special[0, vi, yi]
+        vis[1] = special[1, vi, yi]
+        vis[2] = special[2, vi, yi]
+        vis[3] = special[3, vi, yi]
     
         vis_test = np.array([
-            np.abs(S) for S in this_instant
+            np.abs(S) for S in vis
         ])
                     
-        for i in range(len(vis_test)):
-            if vis_test[i] == vis_test.max():
-               max_counts[i] += 1 
+        for si in range(len(vis_test)):
+            if vis_test[si] == vis_test.max():
+               max_counts[si] += 1 
     
     print(max_counts)
     ###
