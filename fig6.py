@@ -48,6 +48,29 @@ def slicer(ant1, ant2, func_show, Qi,
     plt.plot(special[2, :, xi], special[2, :, yi], label="U")
     plt.plot(special[3, :, xi], special[3, :, yi], label="V")
     
+    ### try to find the maximum value associated with
+    ### each index
+    
+    max_counts = [0, 0, 0, 0]
+    
+    for i in range(len(special[0, :, yi])):
+        vis = [0, 0, 0, 0]
+        vis[0] = special[0, :, yi]
+        vis[1] = special[1, :, yi]
+        vis[2] = special[2, :, yi]
+        vis[3] = special[3, :, yi]
+    
+        vis_test = np.array([
+            np.abs(S) for S in this_instant
+        ])
+                    
+        for i in range(len(vis_test)):
+            if vis_test[i] == vis_test.max():
+               max_counts[i] += 1 
+    
+    print(max_counts)
+    ###
+    
     ### this is pretty bad
     
     ymin = special[0, :, yi].min()
