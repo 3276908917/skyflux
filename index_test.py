@@ -35,6 +35,8 @@ def load_wedge_sim(fname):
     
     fcd = {} # fourier candidate dictionary
     
+    max_counts = [0, 0, 0, 0]
+    
     for ant1 in sim.keys():
         fcd[ant1] = {}
         for ant2 in sim[ant1].keys():
@@ -47,6 +49,14 @@ def load_wedge_sim(fname):
                 
                 for ni in range(num_f):
                     v = sim[ant1][ant2][ni][ti]
+
+                    v = np.array([
+                        np.abs(S) for S in v
+                    ])
+                    
+                    for i in range(len(v)):
+                        if v[i] == v.max():
+                           max_counts[i] += 1 
 
                     for p_idx in range(len(fourierc)):
                         fourierc[p_idx][ti].append(v[p_idx])
@@ -76,12 +86,13 @@ def transform_wedge(original, fs, ts):
             fourier = fourier_dict[ant1][ant2]
             for ti in range(num_t):
                 for parameter in fourier:
-                    parameter[ti] = np.fft.fft(parameter[ti] * window)
+                    parameter[ti] = np.fft.fft(
+                        parameter[ti] * window
+                    )
                 
     return fourier_dict
 
-def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
-    special_request=None):
+def collect_wedge_points(fcd, fs, ts, sp=None):
     """
     out of context
     """
@@ -105,17 +116,11 @@ def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
         
             baselength = sf.ant.baselength(ant1, ant2)
             
-            special = [[], [], [], []]
-                
             for nu_idx in range(num_f):
                 nua = np.average(fs)
                 nu = fs[nu_idx]
                 lambda_ = pol.C / nu
                 k_perp = baselength * pol.k_perp(z) / lambda_
-                
-                powers_prop = []
-                special_powers = [[], [], [], []]
-                special_times = []
                 
                 for t_idx in range(num_t - 1):
                     this_instant = \
