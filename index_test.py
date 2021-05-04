@@ -1,4 +1,11 @@
-def wauto_show(fname, sp=None):
+import numpy as np
+import matplotlib.pyplot as plt
+import pickle
+
+import skyflux as sf
+import skyflux.deprecated.polSims as pol
+
+def probe_stokes_params(fname, sp=None):
     """
     out of context
     """
@@ -69,6 +76,8 @@ def load_wedge_sim(fname):
 
             fcd[ant1][ant2] = np.array(fourierc)
 
+    print(max_counts)
+
     return fcd, fs, ts, ptitle    
        
 def transform_wedge(original, fs, ts):
@@ -85,6 +94,7 @@ def transform_wedge(original, fs, ts):
         for ant2 in fourier_dict[ant1].keys():
             fourier = fourier_dict[ant1][ant2]
             for ti in range(num_t):
+                print(len(fourier))
                 for parameter in fourier:
                     parameter[ti] = np.fft.fft(
                         parameter[ti] * window
@@ -117,9 +127,14 @@ def collect_wedge_points(fcd, fs, ts, sp=None):
             baselength = sf.ant.baselength(ant1, ant2)
             
             for nu_idx in range(num_f):
+                
                 nua = np.average(fs)
                 nu = fs[nu_idx]
+                
+                z = pol.fq2z(nu / 1e9)
+                
                 lambda_ = pol.C / nu
+                
                 k_perp = baselength * pol.k_perp(z) / lambda_
                 
                 for t_idx in range(num_t - 1):

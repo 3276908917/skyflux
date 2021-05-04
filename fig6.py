@@ -4,7 +4,6 @@ TODO 4/19
 
 """
 
-
 import matplotlib.pyplot as plt
 
 import skyflux.deprecated.polSims as pol
@@ -21,7 +20,7 @@ def slicer(ant1, ant2, func_show, Qi,
     """
     #!!! Isn't it kind of weird that we're using
     # sp=0 here?
-    special = func_show("E0-387w", sp=0, Qi=Qi,
+    special = func_show("0E300-387w", sp=0, Qi=Qi,
         special_request=(ant1, ant2))
     
     b = ant.baselength(ant1, ant2)
