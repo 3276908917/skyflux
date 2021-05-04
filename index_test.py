@@ -57,12 +57,12 @@ def load_wedge_sim(fname):
                 for ni in range(num_f):
                     v = sim[ant1][ant2][ni][ti]
 
-                    v = np.array([
+                    v_test = np.array([
                         np.abs(S) for S in v
                     ])
                     
-                    for i in range(len(v)):
-                        if v[i] == v.max():
+                    for i in range(len(v_test)):
+                        if v_test[i] == v_test.max():
                            max_counts[i] += 1 
 
                     for p_idx in range(len(fourierc)):
@@ -94,7 +94,6 @@ def transform_wedge(original, fs, ts):
         for ant2 in fourier_dict[ant1].keys():
             fourier = fourier_dict[ant1][ant2]
             for ti in range(num_t):
-                print(len(fourier))
                 for parameter in fourier:
                     parameter[ti] = np.fft.fft(
                         parameter[ti] * window
@@ -143,12 +142,12 @@ def collect_wedge_points(fcd, fs, ts, sp=None):
                     
                     # [I1, Q1, U1, V1] * [I2*, Q2*, U2*, V2*]
                     
-                    this_instant = np.array([
+                    this_test = np.array([
                         np.abs(S) for S in this_instant
                     ])
                     
-                    for i in range(len(this_instant)):
-                        if this_instant[i] == this_instant.max():
+                    for i in range(len(this_test)):
+                        if this_test[i] == this_test.max():
                            max_counts[i] += 1 
                     
     print(max_counts)
