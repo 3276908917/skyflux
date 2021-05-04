@@ -5,11 +5,13 @@ import pickle
 import skyflux as sf
 import skyflux.deprecated.polSims as pol
 
-def probe_stokes_params(fname, sp=None):
+def probe_stokes_params(fname, sp=None, rAnt1=None, rAnt2=None):
     """
     out of context
     """
-    fcd, fs, ts, ptitle = load_wedge_sim(fname + ".pickle")
+    fcd, fs, ts, ptitle = load_wedge_sim(
+        fname + ".pickle", rAnt1, rAnt2
+    )
     
     print("Simulation file loaded.\n")
     
@@ -17,10 +19,10 @@ def probe_stokes_params(fname, sp=None):
     print("Fourier transforms applied to simulation.\n")
     
     wedge = collect_wedge_points(
-        transformed, fs, ts, sp
+        transformed, fs, ts, sp, rAnt1, rAnt2
     )
     
-def load_wedge_sim(fname):
+def load_wedge_sim(fname, rAnt1, rAnt2):
     """
     out of context
     """
@@ -48,6 +50,11 @@ def load_wedge_sim(fname):
         fcd[ant1] = {}
         for ant2 in sim[ant1].keys():
             # 0: I    1: Q    2: U    3: V
+            if rAnt1 is not None and rAnt1 != ant1:
+                continue
+            if rAnt2 is not None and rAnt2 != ant2:
+                continue
+            
             fourierc = [[], [], [], []]
             
             for ti in range(num_t):
@@ -101,7 +108,7 @@ def transform_wedge(original, fs, ts):
                 
     return fourier_dict
 
-def collect_wedge_points(fcd, fs, ts, sp=None):
+def collect_wedge_points(fcd, fs, ts, sp, rAnt1, rAnt2):
     """
     out of context
     """
@@ -119,9 +126,15 @@ def collect_wedge_points(fcd, fs, ts, sp=None):
     ])
 
     max_counts = [0, 0, 0, 0]
+    hmax_counts = [0, 0, 0, 0]
 
     for ant1 in fcd.keys():
         for ant2 in fcd[ant1].keys():
+        
+            if rAnt1 is not None and rAnt1 != ant1:
+                continue
+            if rAnt2 is not None and rAnt2 != ant2:
+                continue
         
             baselength = sf.ant.baselength(ant1, ant2)
             
@@ -149,5 +162,32 @@ def collect_wedge_points(fcd, fs, ts, sp=None):
                     for i in range(len(this_test)):
                         if this_test[i] == this_test.max():
                            max_counts[i] += 1 
+                           
+                    next_instant = \
+                        fcd[ant1][ant2][:, t_idx + 1, nu_idx]
+                    
+                    # [I1, Q1, U1, V1] * [I2*, Q2*, U2*, V2*]
+                    
+                    hadamard = np.multiply(
+                        this_instant, next_instant
+                    )
+                    
+                    htest = np.array([
+                        np.abs(S) for S in hadamard
+                    ])
+                    
+                    for i in range(len(htest)):
+                        if htest[i] == htest.max():
+                           hmax_counts[i] += 1
                     
     print(max_counts)
+    print(hmax_counts)
+    
+"""
+Create a cross-sectional plot
+    1. Just the visibilities, with frequency as axis
+    2. Hadamard product of visibilities
+    3. Multiply by the cosmological constant
+    4. Divide by the normalization
+"""
+

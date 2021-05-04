@@ -11,7 +11,7 @@ import skyflux.ant as ant
 
 import numpy as np
 
-def slicer(ant1, ant2, func_show, Qi,
+def slicer(ant1, ant2, func_show, Qi=None,
     fs=np.arange(50e6, 250e6 + 0.001, 4e6)):
     """
     The second pair of arguments is admittedly
@@ -63,7 +63,7 @@ def slicer(ant1, ant2, func_show, Qi,
         vis_test = np.array([
             np.abs(S) for S in vis
         ])
-                    
+        
         for si in range(len(vis_test)):
             if vis_test[si] == vis_test.max():
                max_counts[si] += 1 

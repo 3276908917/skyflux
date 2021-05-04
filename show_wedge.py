@@ -220,7 +220,9 @@ def transform_wedge(original, fs, ts):
             fourier = fourier_dict[ant1][ant2]
             for ti in range(num_t):
                 for parameter in fourier:
-                    parameter[ti] = np.fft.fft(parameter[ti] * window)
+                    parameter[ti] = np.fft.fft(
+                        parameter[ti] * window
+                    )
                 
     return fourier_dict
 
@@ -318,7 +320,9 @@ def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
                 k_perp = baselength * pol.k_perp(z) / lambda_
                 
                 powers_prop = []
+                # store power results by Stokes index:
                 special_powers = [[], [], [], []]
+                # store normalized Hadamard vectors:
                 special_times = []
                 
                 for t_idx in range(num_t - 1):
@@ -334,21 +338,30 @@ def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
                     )
                     p = np.dot(Qi, hadamard)
                     
+                    # if no Stokes parameter is specified,
+                    # we take the absolute value of the
+                    # entire Stokes visibility vector
                     if sp is None:
                         sqBr = np.abs(p)
                     else:
                         sqBr = np.abs(p[sp])
                     
+                    powers_prop.append(sqBr)
+                    
+                    # we leave the normalized Hadamard
+                    # products for the cross-section
+                    # code to handle
                     special_times.append(p)
                     
-                    powers_prop.append(sqBr)
-
-                    if special_request is not None:
-                        for vector in np.array(special_times):
-                            # si: Stokes index
-                            for si in range(len(vector)):
-                                param = np.abs(vector[si])
-                                special_powers[si].append(param)
+                if special_request is not None:
+                    for vector in np.array(special_times):
+                        # si: Stokes index
+                        for si in range(len(vector)):
+                            # take the magnitude of each
+                            # normalized Hadamard index
+                            param = np.abs(vector[si])
+                            # and count it as a power
+                            special_powers[si].append(param)
 
                 avg = p_coeff * np.average(np.array(powers_prop))
                 
