@@ -75,8 +75,26 @@ def load_wedge_sim(fname, rAnt1, rAnt2):
                     for p_idx in range(len(fourierc)):
                         fourierc[p_idx][ti].append(v[p_idx])
                 
-                for parameter in fourierc:
+                # si: Stokes index
+                for si in range(len(fourierc)):
+                    parameter = fourierc[si]
                     parameter[ti] = np.array(parameter[ti])
+                    
+                    # cut the next three statements
+                    # in case you no longer want to plot this
+                    plt.plot(fs,
+                        np.abs(parameter[len(parameter) - 1]),
+                        label=str(si))
+        
+                plt.legend(loc='upper right')
+                plt.title(
+                    "Antennae: " + \
+                    str(ant1) + " to " + \
+                    str(ant2)
+                )
+                plt.xlabel("Frequencies [MHz]")
+                plt.ylabel("Brightness Magnitude [Jy]")
+                plt.show()
         
             for parameter in fourierc:
                 parameter = np.array(parameter)

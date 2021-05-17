@@ -49,7 +49,8 @@ def A_tensor(ra, dec):
         azs.append(az)
 
     for nu in nu_axis:
-        J_source = stokes.create_J(az=azs, alt=alts, nu=nu, radians=True)
+        J_source = stokes.create_J(
+            az=azs, alt=alts, nu=nu, radians=True)
         A_source = np.array([stokes.create_A(J=J) for J in J_source])
 
         A_tensor.append(np.array(A_source))
@@ -74,7 +75,8 @@ def f_only():
     az, alt = rot.eq_to_topo(ra, dec, lst=lst0, radians=True)
 
     for nu in nu_axis:
-        J_source = stokes.create_J(az=az, alt=alt, nu=nu, radians=True)
+        J_source = stokes.create_J(
+            az=az, alt=alt, nu=nu, radians=True)
         A_source = stokes.create_A(J=J_source)
 
         A_tensor.append(np.array(A_source))
@@ -148,9 +150,6 @@ def full_wedge(sources=catalog.srcs):
         
         next_wedge = single_wedge(next_obj)
         wedge = merge_wedges(wedge, next_wedge)
-        
-        # Have we successfully moved beyond this bug?
-        #print(wedge[136][140])
 
         percent += percent_interval
         tick(percent)
@@ -198,7 +197,25 @@ def single_wedge(source):
                     next_vista = np.dot(np.dot(A_t, s), phi)
                     t_layer.append(next_vista)
           
-                f_layer.append(np.array(t_layer))
+                t_layer = np.array(t_layer)
+          
+                for i in range(4):
+                    plt.plot(
+                        t_axis,
+                        np.abs(t_layer[:, i]), label=str(i)
+                    )
+        
+                plt.legend(loc='upper right')
+                plt.title(
+                    "Antennae: " + \
+                    str(outer_ant) + " to " + \
+                    str(inner_ant)
+                )
+                plt.xlabel("LST [rad]")
+                plt.ylabel("Brightness Magnitude [Jy]")
+                plt.show()
+                
+                f_layer.append(t_layer)
 
             inner_ants[inner_ant] = np.array(f_layer)
 
@@ -227,25 +244,6 @@ def merge_wedges(wedge1, wedge2):
                         np.add(vis1, vis2)
                         
     return sum_
-                
-    """
-    # I think we are past the zeroes issue, at
-    # least in a conceptual sense
-    for ant1 in wedge1.keys():
-        for ant2 in wedge1[ant1].keys():
-            for nu_idx in nu_rl:
-                system = wedge1[ant1][ant2][nu_idx]
-                for t_idx in t_rl:
-                    visibility2 = wedge2[ant1][ant2][nu_idx][t_idx]
-                    #print("\n" + str(type(visibility2)) + "\n")
-                    wedge1[ant1][ant2][nu_idx][t_idx] = np.add(
-                        visibility2, system[t_idx])
-                    if np.array_equal(system[t_idx], np.zeros(4)):
-                        print("\nZero encountered!")
-                        print(system[t_idx] - visibility2)
-                        print(visibility2)
-                        print()
-    """
     
 def merge_files(fname1, fname2, new_fname, new_ptitle):
     """ This function only really makes sense if f1 and f2 
