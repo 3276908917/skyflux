@@ -502,6 +502,9 @@ def finalize_plot(title):
     plt.show()
 
 # hard-coding for now
+# automatically assumes a full sky
+    # ie phi \in [0, 2 * np.pi]
+    # and theta \in [0, np.pi]
 def calculate_Q(
     B=np.arange(50e6, 250e6 + 0.001, 4e6),
     angular_resolution = 250

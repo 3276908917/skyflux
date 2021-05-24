@@ -1,0 +1,35 @@
+Original tasks:
+
+1. Just the visibilities, with frequency as axis
+2. Hadamard product of visibilities
+3. Multiply by the cosmological constant
+4. Multiplied by the normalization
+
+We should also do a plot immediately after Fourier-transform, no?
+
+What do we have:
+
+I. LST plot for visibility simulation generation
+II. Freq plot for visibility file loader
+
+Issues:
+
+A. Q parameter seems to jump between generation
+    and loading of simulation. Or potentially
+    we are merely seeing the bigger picture
+    with the loader plot because that runs
+    along freq whereas the generator plot runs along LST.
+    
+    In either case, the Q parameter seems to be
+    unreasonably high in the readout plot...
+    
+B. Somehow the U parameter achieves dominance by the end
+    of the pipeline. When does this transpire?
+    
+C. We are using a region
+    (3 to 5 hours in intervals of 4 minutes)
+    of the cold patch, even though we are nominally
+    observing the full sky during that period.
+    Should I still use the full range of phi and theta
+    over a sphere, even if the time window is thin?
+

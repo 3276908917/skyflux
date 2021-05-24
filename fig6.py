@@ -18,9 +18,9 @@ def slicer(ant1, ant2, func_show, Qi=None,
     disappointing, but I could not figure out
     how else to write a script like this.
     """
-    #!!! Isn't it kind of weird that we're using
-    # sp=0 here?
-    special = func_show("0E300-387w", sp=0, Qi=Qi,
+    # sp doesn't matter since the use of the
+    # special_request parameter branches differently
+    special = func_show("E0-387w", Qi=Qi,
         special_request=(ant1, ant2))
     
     b = ant.baselength(ant1, ant2)
@@ -38,7 +38,8 @@ def slicer(ant1, ant2, func_show, Qi=None,
     horizonp = pol.horizon_limit(k_orth, z)
     horizonn = -pol.horizon_limit(k_orth, z)
     
-    special = np.fft.fftshift(special)
+    # Is this line correct?
+    # special = np.fft.fftshift(special)
     
     yi = 0
     xi = 1
