@@ -39,7 +39,7 @@ def slicer(ant1, ant2, func_show, Qi=None,
     horizonn = -pol.horizon_limit(k_orth, z)
     
     # Is this line correct?
-    # special = np.fft.fftshift(special)
+    special = np.fft.fftshift(special)
     
     yi = 0
     xi = 1

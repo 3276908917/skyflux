@@ -8,6 +8,7 @@ from skyflux import vis
 from skyflux import stokes
 from skyflux import rot
 from skyflux import demo
+from skyflux import utils
 
 # disgustingly hacky
 MACRO_EPSILON = 0.001
@@ -284,16 +285,6 @@ def package(block, ptitle):
             'times' : t_axis,
             'picture' : block,
             'title' : ptitle}
-
-def pickle_dict(dict_, label):
-    """
-    Pickles @dict_ with a file name based on @label.
-    While this is a generic routine and will pickle any dictionary,
-        the intent is solely for use in conjunction with the
-        package_wedge routine.
-    """
-    with open(label + '.pickle', 'wb') as handle:
-        pickle.dump(dict_, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
 def auto_wedge(list_sources, label, ptitle):
     """
@@ -302,7 +293,7 @@ def auto_wedge(list_sources, label, ptitle):
         package_wedge()
         pickle_dict
     """
-    pickle_dict(package(
+    utils.pickle_dict(package(
         full_wedge(list_sources), ptitle
     ), label)
     
