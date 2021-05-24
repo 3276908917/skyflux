@@ -82,13 +82,13 @@ def load_wedge_sim(fname, rAnt1, rAnt2):
                     
                     # cut the next three statements
                     # in case you no longer want to plot this
-                    plt.plot(fs,
+                    plt.plot(fs / 1e6,
                         np.abs(parameter[len(parameter) - 1]),
                         label=str(si))
         
                 plt.legend(loc='upper right')
                 plt.title(
-                    "Antennae: " + \
+                    "Raw Visibilities. Antennae: " + \
                     str(ant1) + " to " + \
                     str(ant2)
                 )

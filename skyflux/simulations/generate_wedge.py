@@ -207,7 +207,7 @@ def single_wedge(source):
         
                 plt.legend(loc='upper right')
                 plt.title(
-                    "Antennae: " + \
+                    "Wedge generator. Antennae: " + \
                     str(outer_ant) + " to " + \
                     str(inner_ant)
                 )
