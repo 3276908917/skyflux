@@ -11,9 +11,6 @@ from skyflux import ant
 from skyflux import stokes
 from skyflux import catalog
 
-# Spectral index, coefficient of proportionality, empirically tuned
-cop = lambda source, nu : source.flux_by_frq[nu / 1e6] / nu ** source.alpha
-
 def get_I(source, nu=151e6):
     #! magic
     S151 = source.flux_by_frq[151]
@@ -47,13 +44,18 @@ def visibility(ant1, ant2, source, nu=151e6, time=None):
     return malformed_result[:, 0]
 
 # Incoming function, intended to replace sources_over_time
-def new_sources_over_time(ant1, ant2, list_sources=None,
-                        start=0, end=2/3*np.pi, interval=np.pi/72, nu=151e6, interpolator=None):
+def new_sources_over_time(ant1, ant2,
+    list_sources=None,
+    start=0, end=2/3*np.pi, interval=np.pi/72,
+    nu=151e6, interpolator=None):
     """
-    Return an array containing the visibilities at different points of time.
+    Return an array containing the visibilities at
+        different points of time.
     @ant1 and @ant2 are indices of antennae, to specify a baseline.
-    @list_sources is an array of GLEAM catalog objects (see catalog.py for specifications)
-        default value translates to the entire downloaded segment of the catalog.
+    @list_sources is an array of GLEAM catalog objects
+        (see catalog.py for specifications)
+        default value translates to the entire
+            downloaded segment of the catalog.
     @start: starting LST of integration [float, radians]
         default: 0 hours (cold patch)
     @end: terminal LST of integration [float, radians]
@@ -63,7 +65,8 @@ def new_sources_over_time(ant1, ant2, list_sources=None,
     @nu frequency in Hertz
     """
     if interpolator is None:
-        raise NotImplementedError("We are currently hard-coding interpolators.")
+        raise NotImplementedError("We are" + \
+            " currently hard-coding interpolators.")
     
     if list_sources is None:
         # make a copy to ensure write safety
@@ -82,7 +85,9 @@ def new_sources_over_time(ant1, ant2, list_sources=None,
         lst += interval
     list_lst = np.array(list_lst)
 
-    list_visibilities = np.zeros((len(list_lst), 4), dtype=np.complex128)
+    list_visibilities = np.zeros(
+        (len(list_lst), 4),
+        dtype=np.complex128)
 
     for source in list_sources:
         # establish values common to all visibility calculations
@@ -97,7 +102,8 @@ def new_sources_over_time(ant1, ant2, list_sources=None,
             # no input for latitude. Code is no longer general :(
             # no input for radians either. We have to rely on the user
                 # to provide a radian-based interpolator.
-            az, alt = rot.eq_to_topo(ra, dec, lst=curr_lst, radians=True)
+            az, alt = rot.eq_to_topo(
+                ra, dec, lst=curr_lst, radians=True)
             A = interpolator(az, alt)
 
             r = rot.radec2lm(ra, dec, ra0=curr_lst)

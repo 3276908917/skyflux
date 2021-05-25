@@ -10,8 +10,8 @@ from skyflux import rot
 
 """!
 This file is 840 MB. There's no way that's going to fly.
-At the same time, there is no denying that we have shaved a couple of
-seconds off of the import time...
+At the same time, there is no denying that we have
+shaved a couple of seconds off of the import time...
 !"""
 sbfps_origin = os.path.dirname(os.path.abspath(__file__)) + \
               "/sbf_params.npy"
