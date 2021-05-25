@@ -12,7 +12,7 @@ import skyflux.ant as ant
 import numpy as np
 
 def slicer(ant1, ant2, func_show, Qi=None,
-    fs=np.arange(50e6, 250e6 + 0.001, 4e6)):
+    fs=np.arange(125e6, 175e6 + 0.001, 4e6)):
     """
     The second pair of arguments is admittedly
     disappointing, but I could not figure out
@@ -20,7 +20,7 @@ def slicer(ant1, ant2, func_show, Qi=None,
     """
     # sp doesn't matter since the use of the
     # special_request parameter branches differently
-    special = func_show("E0-387w", Qi=Qi,
+    special = func_show("0E300-387w", Qi=Qi,
         special_request=(ant1, ant2))
     
     b = ant.baselength(ant1, ant2)
@@ -38,17 +38,27 @@ def slicer(ant1, ant2, func_show, Qi=None,
     horizonp = pol.horizon_limit(k_orth, z)
     horizonn = -pol.horizon_limit(k_orth, z)
     
-    # Is this line correct?
-    special = np.fft.fftshift(special)
+    magnitudes = []
     
-    yi = 0
-    xi = 1
+    # this loop only serves to re-organize the results
+    for stokes_param in special:
+        magnitudes.append([])
+        
+        i = len(magnitudes) - 1
+        magnitudes[i].append(
+            np.fft.fftshift(stokes_param[:, 0]))
+        magnitudes[i].append(
+            np.fft.fftshift(stokes_param[:, 1]))
+        magnitudes[i] = np.array(magnitudes[i])
     
-    plt.plot(special[0, :, xi], special[0, :, yi], label="I")
-    plt.plot(special[1, :, xi], special[1, :, yi], label="Q")
-    plt.plot(special[2, :, xi], special[2, :, yi], label="U")
-    plt.plot(special[3, :, xi], special[3, :, yi], label="V")
+    magnitudes = np.array(magnitudes)
     
+    plt.plot(magnitudes[0, 0], magnitudes[0, 1], label="I")
+    plt.plot(magnitudes[1, 0], magnitudes[1, 1], label="Q")
+    plt.plot(magnitudes[2, 0], magnitudes[2, 1], label="U")
+    plt.plot(magnitudes[3, 0], magnitudes[3, 1], label="V")
+    
+    """ outdated, but maybe you want to res it to keep debugging
     ### try to find the maximum value associated with
     ### each index
     
@@ -71,18 +81,19 @@ def slicer(ant1, ant2, func_show, Qi=None,
     
     print(max_counts)
     ###
+    """
     
     ### this is pretty bad
     
-    ymin = special[0, :, yi].min()
-    ymin = min(ymin, special[1, :, yi].min())
-    ymin = min(ymin, special[2, :, yi].min())
-    ymin = min(ymin, special[3, :, yi].min())
+    ymin = magnitudes[0, 1].min()
+    ymin = min(ymin, magnitudes[1, 1].min())
+    ymin = min(ymin, magnitudes[2, 1].min())
+    ymin = min(ymin, magnitudes[3, 1].min())
     
-    ymax = special[0, :, yi].max()
-    ymax = max(ymin, special[1, :, yi].max())
-    ymax = max(ymin, special[2, :, yi].max())
-    ymax = max(ymin, special[3, :, yi].max())
+    ymax = magnitudes[0, 1].max()
+    ymax = max(ymin, magnitudes[1, 1].max())
+    ymax = max(ymin, magnitudes[2, 1].max())
+    ymax = max(ymin, magnitudes[3, 1].max())
     
     ###
     
