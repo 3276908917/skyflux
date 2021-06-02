@@ -171,6 +171,8 @@ def single_wedge(source):
         nu = nu_axis[ni]
         I = vis.get_I(source, nu)
         s_axis.append(np.array([complex(I), 0, 0, 0]))
+
+    kill_timer = 0
    
     for outer_ant in outer_ants.keys():
         inner_ants = outer_ants.copy()
@@ -200,12 +202,22 @@ def single_wedge(source):
           
                 t_layer = np.array(t_layer)
           
+                """
+          
                 for i in range(4):
                     plt.plot(
                         t_axis,
                         np.abs(t_layer[:, i]), label=str(i)
                     )
-        
+                    
+                plt.plot(
+                    t_axis,
+                    np.repeat(
+                        np.array([np.abs(s[0])]),
+                        len(t_layer[:, i])
+                    )
+                )
+                
                 plt.legend(loc='upper right')
                 plt.title(
                     "Wedge generator. Antennae: " + \
@@ -216,9 +228,61 @@ def single_wedge(source):
                 plt.ylabel("Brightness Magnitude [Jy]")
                 plt.show()
                 
+                kill_timer += 1
+                
+                if kill_timer > 3:
+                    return
+                    
+                """
+                
                 f_layer.append(t_layer)
 
             inner_ants[inner_ant] = np.array(f_layer)
+
+            y = [[], [], [], []]
+            
+            #6/1/21 we're in this vicinity. y is not getting
+            # extracted appropriately
+            
+            for i in range(4):
+                y[i] = f_layer[:, 0, i]
+                y[i] = np.array(y[i])
+                
+            """
+            
+            * Check the s input vector
+            * Multiply s by the Jones matrix
+            * Output visibilities
+            
+            """
+
+            y = np.array(y)
+
+            for i in range(4):
+                plt.plot(
+                    nu_axis / 1e6,
+                    np.abs(y[i]), label=str(i)
+                )
+                    
+            plt.plot(
+                nu_axis / 1e6,
+                np.abs(s[nu_axis])
+            )
+            
+            plt.legend(loc='upper right')
+            plt.title(
+                "Wedge generator. Antennae: " + \
+                str(outer_ant) + " to " + \
+                str(inner_ant)
+            )
+            plt.xlabel("Frequency [MHz]")
+            plt.ylabel("Brightness Magnitude [Jy]")
+            plt.show()
+            
+            kill_timer += 1
+            
+            if kill_timer > 3:
+                return
 
         outer_ants[outer_ant] = inner_ants
 
