@@ -281,7 +281,7 @@ def single_wedge_spot(source, ti):
             * Output visibilities
             """
             
-            log_enabled = False
+            log_enabled = True
             
             x = nu_axis / 1e6
             
@@ -317,7 +317,7 @@ def single_wedge_spot(source, ti):
             
             plt.legend(loc='upper right')
             plt.title(
-                "Wedge generator, after Jones. Antennae: " + \
+                "Wedge generator, no phase factor. Antennae: " + \
                 str(outer_ant) + " to " + \
                 str(inner_ant)
             )
@@ -350,7 +350,7 @@ def single_wedge_spot(source, ti):
             
             plt.legend(loc='upper right')
             plt.title(
-                "Wedge generator, visibility. Antennae: " + \
+                "Wedge generator, with phase factor. Antennae: " + \
                 str(outer_ant) + " to " + \
                 str(inner_ant)
             )
