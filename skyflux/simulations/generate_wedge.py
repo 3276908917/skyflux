@@ -166,14 +166,14 @@ def single_wedge(source):
     A_full = A_tensor(ra, dec)
 
     s_axis = []
+
+    kill_timer = 0
     
     for ni in nu_rl:
         nu = nu_axis[ni]
         I = vis.get_I(source, nu)
         s_axis.append(np.array([complex(I), 0, 0, 0]))
 
-    kill_timer = 0
-   
     for outer_ant in outer_ants.keys():
         inner_ants = outer_ants.copy()
         del inner_ants[outer_ant]
@@ -201,77 +201,156 @@ def single_wedge(source):
                     t_layer.append(next_vista)
           
                 t_layer = np.array(t_layer)
-          
-                """
-          
-                for i in range(4):
-                    plt.plot(
-                        t_axis,
-                        np.abs(t_layer[:, i]), label=str(i)
-                    )
-                    
-                plt.plot(
-                    t_axis,
-                    np.repeat(
-                        np.array([np.abs(s[0])]),
-                        len(t_layer[:, i])
-                    )
-                )
-                
-                plt.legend(loc='upper right')
-                plt.title(
-                    "Wedge generator. Antennae: " + \
-                    str(outer_ant) + " to " + \
-                    str(inner_ant)
-                )
-                plt.xlabel("LST [rad]")
-                plt.ylabel("Brightness Magnitude [Jy]")
-                plt.show()
-                
-                kill_timer += 1
-                
-                if kill_timer > 3:
-                    return
-                    
-                """
                 
                 f_layer.append(t_layer)
 
             inner_ants[inner_ant] = np.array(f_layer)
 
-            y = [[], [], [], []]
+            f_layer = np.array(f_layer)
             
-            #6/1/21 we're in this vicinity. y is not getting
-            # extracted appropriately
+            max_ti = 0
+            max_V = float('-inf')
             
-            for i in range(4):
-                y[i] = f_layer[:, 0, i]
-                y[i] = np.array(y[i])
+            for ti in range(len(f_layer[0])):
+                if f_layer[0, ti, 0] > max_V:
+                    max_ti = ti
+                    max_V = f_layer[0, ti, 0]
+        
+            print(max_ti)                    
+            
+            kill_timer += 1
+            
+            if kill_timer > 3:
+                return
+            
+        outer_ants[outer_ant] = inner_ants
+
+    return outer_ants
+
+def single_wedge_spot(source, ti):
+    ra = np.radians(source.ra_angle)
+    dec = np.radians(source.dec_angle)
+    
+    A_full = A_tensor(ra, dec)
+
+    s_axis = []
+    
+    for ni in nu_rl:
+        nu = nu_axis[ni]
+        I = vis.get_I(source, nu)
+        s_axis.append(np.array([complex(I), 0, 0, 0]))
+
+    kill_timer = 0
+   
+    for outer_ant in outer_ants.keys():
+        inner_ants = outer_ants.copy()
+        del inner_ants[outer_ant]
+
+        for inner_ant in inner_ants.keys():
+        
+            f_layer = []
+            for ni in nu_rl:
+                nu = nu_axis[ni]
+            
+                s = s_axis[ni]
+                A_n = A_full[ni]
+
+                t_layer = []
+                
+                t = t_axis[ti[kill_timer]]
+
+                r = rot.radec2lm(ra, dec, ra0=t)
+                phi = ant.phase_factor(
+                    outer_ant, inner_ant, r, nu)
+                
+                A_t = A_n[ti[kill_timer]]
+                
+                Jonesed = np.dot(A_t, s)
+                
+                next_vista = np.dot(Jonesed, phi)
+                
+                f_layer.append(np.array([Jonesed, next_vista]))
+
+            f_layer = np.array(f_layer)
+
+            inner_ants[inner_ant] = f_layer
                 
             """
-            
             * Check the s input vector
             * Multiply s by the Jones matrix
             * Output visibilities
-            
             """
-
-            y = np.array(y)
-
+            
+            log_enabled = False
+            
+            x = nu_axis / 1e6
+            
+            s_axis = np.array(s_axis)
+            
+            if log_enabled:
+                s_plot = np.log10(s_axis[:, 0])
+            else:
+                s_plot = s_axis[:, 0]
+            
+            # Jonesed
             for i in range(4):
-                plt.plot(
-                    nu_axis / 1e6,
-                    np.abs(y[i]), label=str(i)
-                )
-                    
+                y = f_layer[:, 0, i]
+                
+                if log_enabled:
+                    plt.plot(
+                        x,
+                        np.log10(np.abs(y)),
+                        label=str(i)
+                    )
+                else:
+                    plt.plot(
+                        x,
+                        np.abs(y),
+                        label=str(i)
+                    )
+            
             plt.plot(
-                nu_axis / 1e6,
-                np.abs(s[nu_axis])
+                x,
+                s_plot,
+                label="s vector, I"
             )
             
             plt.legend(loc='upper right')
             plt.title(
-                "Wedge generator. Antennae: " + \
+                "Wedge generator, after Jones. Antennae: " + \
+                str(outer_ant) + " to " + \
+                str(inner_ant)
+            )
+            plt.xlabel("Frequency [MHz]")
+            plt.ylabel("Brightness Magnitude [Jy]")
+            plt.show()
+            
+            # Jonesed
+            for i in range(4):
+                y = f_layer[:, 1, i]
+                
+                if log_enabled:
+                    plt.plot(
+                        x,
+                        np.log10(np.abs(y)),
+                        label=str(i)
+                    )
+                else:
+                    plt.plot(
+                        x,
+                        np.abs(y),
+                        label=str(i)
+                    )
+               
+            plt.plot(
+                x,
+                s_plot,
+                label="s vector, I"
+            )
+            
+            plt.legend(loc='upper right')
+            plt.title(
+                "Wedge generator, visibility. Antennae: " + \
                 str(outer_ant) + " to " + \
                 str(inner_ant)
             )
@@ -287,6 +366,7 @@ def single_wedge(source):
         outer_ants[outer_ant] = inner_ants
 
     return outer_ants
+
     
 def merge_wedges(wedge1, wedge2):
     """ We assume that both wedges have the same format:
