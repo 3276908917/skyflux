@@ -58,13 +58,70 @@ def slicer(ant1, ant2, func_show, Qi=None,
     plt.plot(magnitudes[1, 0], magnitudes[1, 1], label="Q")
     plt.plot(magnitudes[2, 0], magnitudes[2, 1], label="U")
     plt.plot(magnitudes[3, 0], magnitudes[3, 1], label="V")
+    
+    ### this is pretty bad
+    
+    ymin = magnitudes[0, 1].min()
+    ymin = min(ymin, magnitudes[1, 1].min())
+    ymin = min(ymin, magnitudes[2, 1].min())
+    ymin = min(ymin, magnitudes[3, 1].min())
+    
+    ymax = magnitudes[0, 1].max()
+    ymax = max(ymin, magnitudes[1, 1].max())
+    ymax = max(ymin, magnitudes[2, 1].max())
+    ymax = max(ymin, magnitudes[3, 1].max())
+    
+    ###
     """
     
     #plt.plot(magnitudes[0, 0], 10 ** (magnitudes[0, 1] - magnitudes[0, 1]), label="I / I")
-    plt.plot(magnitudes[1, 0], 10 ** (magnitudes[1, 1] - magnitudes[0, 1]), label="Q / I")
-    plt.plot(magnitudes[2, 0], 10 ** (magnitudes[2, 1] - magnitudes[0, 1]), label="U / I")
-    plt.plot(magnitudes[3, 0], 10 ** (magnitudes[3, 1] - magnitudes[0, 1]), label="V / I")
+    plt.plot(
+        magnitudes[1, 0],
+        10 ** (magnitudes[1, 1] - magnitudes[0, 1]),
+        label="Q / I"
+    )
+    plt.plot(
+        magnitudes[2, 0],
+        10 ** (magnitudes[2, 1] - magnitudes[0, 1]),
+        label="U / I"
+    )
+    plt.plot(
+        magnitudes[3, 0],
+        10 ** (magnitudes[3, 1] - magnitudes[0, 1]),
+        label="V / I"
+    )
     
+    ### this is pretty bad
+    
+    ymin = 10 ** (magnitudes[1, 1] - magnitudes[0, 1]).min()
+    ymin = min(
+        ymin,
+        10 ** (magnitudes[2, 1] - magnitudes[0, 1]).min()
+    )
+    ymin = min(
+        ymin,
+        10 ** (magnitudes[2, 1] - magnitudes[0, 1]).min()
+    )
+    ymin = min(
+        ymin,
+        10 ** (magnitudes[3, 1] - magnitudes[0, 1]).min()
+    )
+    
+    ymax = magnitudes[0, 1].max()
+    ymax = max(
+        ymin,
+        10 ** (magnitudes[2, 1] - magnitudes[0, 1]).max()
+    )
+    ymax = max(
+        ymin,
+        10 ** (magnitudes[2, 1] - magnitudes[0, 1]).max()
+    )
+    ymax = max(
+        ymin,
+        10 ** (magnitudes[3, 1] - magnitudes[0, 1]).max()
+    )
+    
+    ###
     
     """ outdated, but maybe you want to res it to keep debugging
     ### try to find the maximum value associated with
@@ -90,27 +147,11 @@ def slicer(ant1, ant2, func_show, Qi=None,
     print(max_counts)
     ###
     """
-    
-    ### this is pretty bad
-    
-    ymin = magnitudes[0, 1].min()
-    ymin = min(ymin, magnitudes[1, 1].min())
-    ymin = min(ymin, magnitudes[2, 1].min())
-    ymin = min(ymin, magnitudes[3, 1].min())
-    
-    ymax = magnitudes[0, 1].max()
-    ymax = max(ymin, magnitudes[1, 1].max())
-    ymax = max(ymin, magnitudes[2, 1].max())
-    ymax = max(ymin, magnitudes[3, 1].max())
-    
-    ###
-    
-    """
+
     plt.vlines(horizonp, ymin, ymax,
         linestyles="dashed", colors='k')
     plt.vlines(horizonn, ymin, ymax,
         linestyles="dashed", colors='k')
-    """
     
     plt.xlabel("$k_\parallel$ [$h$ Mpc$^{-1}$]")
     plt.ylabel("log$_{10}$ [K$^2$ ($h^{-1}$ Mpc)^3] ?")
