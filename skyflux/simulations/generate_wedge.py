@@ -23,7 +23,7 @@ SECOND = MINUTE / 60
 
 # For wedges
 # 8 MHz from 145 to 155, split them into one MHz resolution
-nu_axis = np.arange(50e6, 250e6 + MACRO_EPSILON, 4e6)
+nu_axis = np.arange(125e6, 175e6 + MACRO_EPSILON, 1e6)
 t_axis = np.arange(3 * HOUR, 5 * HOUR, 4 * MINUTE)
     # it's an arbitrary region of the cold patch
 
@@ -158,8 +158,59 @@ def full_wedge(sources=catalog.srcs):
     return wedge
 
 outer_ants = ant.ant_pos.copy()
-    
+
 def single_wedge(source):
+    ra = np.radians(source.ra_angle)
+    dec = np.radians(source.dec_angle)
+    
+    A_full = A_tensor(ra, dec)
+
+    s_axis = []
+
+    for ni in nu_rl:
+        nu = nu_axis[ni]
+        I = vis.get_I(source, nu)
+        s_axis.append(np.array([complex(I), 0, 0, 0]))
+
+    for outer_ant in outer_ants.keys():
+        inner_ants = outer_ants.copy()
+        del inner_ants[outer_ant]
+
+        for inner_ant in inner_ants.keys():
+        
+            f_layer = []
+            for ni in nu_rl:
+                nu = nu_axis[ni]
+            
+                s = s_axis[ni]
+                A_n = A_full[ni]
+
+                t_layer = []
+                for ti in t_rl:
+                    t = t_axis[ti]
+
+                    r = rot.radec2lm(ra, dec, ra0=t)
+                    phi = ant.phase_factor(
+                        outer_ant, inner_ant, r, nu)
+                    
+                    A_t = A_n[ti]
+                    
+                    next_vista = np.dot(np.dot(A_t, s), phi)
+                    t_layer.append(next_vista)
+          
+                t_layer = np.array(t_layer)
+                
+                f_layer.append(t_layer)
+
+            inner_ants[inner_ant] = np.array(f_layer)
+
+            f_layer = np.array(f_layer)
+            
+        outer_ants[outer_ant] = inner_ants
+
+    return outer_ants
+    
+def single_wedge_readout(source):
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
     
@@ -366,7 +417,6 @@ def single_wedge_spot(source, ti):
         outer_ants[outer_ant] = inner_ants
 
     return outer_ants
-
     
 def merge_wedges(wedge1, wedge2):
     """ We assume that both wedges have the same format:

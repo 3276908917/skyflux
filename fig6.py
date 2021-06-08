@@ -20,7 +20,7 @@ def slicer(ant1, ant2, func_show, Qi=None,
     """
     # sp doesn't matter since the use of the
     # special_request parameter branches differently
-    special = func_show("0E300-387w", Qi=Qi,
+    special = func_show("max_one", Qi=Qi,
         special_request=(ant1, ant2))
     
     b = ant.baselength(ant1, ant2)

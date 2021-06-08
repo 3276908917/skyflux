@@ -4,6 +4,7 @@ the contents of demo.py
 """
 
 import numpy as np
+import pickle
 
 def load_saves(filepath):
     """
