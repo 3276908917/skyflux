@@ -332,7 +332,9 @@ def single_wedge_spot(source, ti):
             * Output visibilities
             """
             
-            log_enabled = True
+            ad_hoc_labels = ["I", "Q", "U", "V"]
+            
+            log_enabled = False
             
             x = nu_axis / 1e6
             
@@ -351,20 +353,22 @@ def single_wedge_spot(source, ti):
                     plt.plot(
                         x,
                         np.log10(np.abs(y)),
-                        label=str(i)
+                        label=ad_hoc_labels[i]
                     )
                 else:
                     plt.plot(
                         x,
                         np.abs(y),
-                        label=str(i)
+                        label=ad_hoc_labels[i]
                     )
             
+            """
             plt.plot(
                 x,
                 s_plot,
                 label="s vector, I"
             )
+            """
             
             plt.legend(loc='upper right')
             plt.title(
@@ -384,20 +388,29 @@ def single_wedge_spot(source, ti):
                     plt.plot(
                         x,
                         np.log10(np.abs(y)),
-                        label=str(i)
+                        label=ad_hoc_labels[i]
                     )
                 else:
                     plt.plot(
                         x,
                         np.abs(y),
-                        label=str(i)
+                        label=ad_hoc_labels[i]
                     )
-               
+            
+            """
+            * plot A at the point of interest
+                * do Q/I, U/I ratios 
+            * plot A multiplied by s
+            
+            """
+            
+            """
             plt.plot(
                 x,
                 s_plot,
                 label="s vector, I"
             )
+            """
             
             plt.legend(loc='upper right')
             plt.title(
