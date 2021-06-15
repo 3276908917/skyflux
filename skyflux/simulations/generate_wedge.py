@@ -211,6 +211,14 @@ def single_wedge(source):
     return outer_ants
     
 def single_wedge_readout(source):
+    """
+    Return the time indices at which
+    the source is most visible
+    over the first three hypothetical plots.
+    
+    Chiefly for use with the function
+    single_wedge_spot 
+    """
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
     
