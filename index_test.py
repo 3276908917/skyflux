@@ -5,6 +5,9 @@ import pickle
 import skyflux as sf
 import skyflux.deprecated.polSims as pol
 
+ad_hoc_labels = ["I", "Q", "U", "V"]
+ad_hoc_colors = ['k', 'b', 'orange', 'g']
+
 def probe_stokes_params(fname, sp=None, rAnt1=None, rAnt2=None):
     """
     out of context
@@ -84,15 +87,18 @@ def load_wedge_sim(fname, rAnt1, rAnt2):
                     # in case you no longer want to plot this
                     plt.plot(fs / 1e6,
                         np.abs(parameter[len(parameter) - 1]),
-                        label=str(si))
+                        label=str(ad_hoc_labels[si]),
+                        color=ad_hoc_colors[si])
         
                 plt.legend(loc='upper right')
                 plt.title(
-                    "Raw Visibilities. Antennae: " + \
+                    "Raw Visibilities (LST = " + \
+                    str(np.around(ts[ti], 4)) + \
+                    "). Antennae: " + \
                     str(ant1) + " to " + \
                     str(ant2)
                 )
-                plt.xlabel("Frequencies [MHz]")
+                plt.xlabel("Frequency [MHz]")
                 plt.ylabel("Brightness Magnitude [Jy]")
                 plt.show()
         

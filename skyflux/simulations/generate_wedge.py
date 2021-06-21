@@ -443,7 +443,6 @@ def merge_wedges(wedge1, wedge2):
     """ We assume that both wedges have the same format:
         ant1, ant2, nu, t hierarchies are exactly the same.
     """
-
     sum_ = {}
     for ant1 in wedge1.keys():
         sum_[ant1] = {}

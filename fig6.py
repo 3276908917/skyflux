@@ -53,74 +53,76 @@ def slicer(ant1, ant2, func_show, Qi=None,
     
     magnitudes = np.array(magnitudes)
     
-    """ OG Bild
-    plt.plot(magnitudes[0, 0], magnitudes[0, 1], label="I")
-    plt.plot(magnitudes[1, 0], magnitudes[1, 1], label="Q")
-    plt.plot(magnitudes[2, 0], magnitudes[2, 1], label="U")
-    plt.plot(magnitudes[3, 0], magnitudes[3, 1], label="V")
+    undivided = False
     
-    ### this is pretty bad
-    
-    ymin = magnitudes[0, 1].min()
-    ymin = min(ymin, magnitudes[1, 1].min())
-    ymin = min(ymin, magnitudes[2, 1].min())
-    ymin = min(ymin, magnitudes[3, 1].min())
-    
-    ymax = magnitudes[0, 1].max()
-    ymax = max(ymin, magnitudes[1, 1].max())
-    ymax = max(ymin, magnitudes[2, 1].max())
-    ymax = max(ymin, magnitudes[3, 1].max())
-    
-    ###
-    """
-    
-    #plt.plot(magnitudes[0, 0], 10 ** (magnitudes[0, 1] - magnitudes[0, 1]), label="I / I")
-    plt.plot(
-        magnitudes[1, 0],
-        10 ** (magnitudes[1, 1] - magnitudes[0, 1]),
-        label="Q / I"
-    )
-    plt.plot(
-        magnitudes[2, 0],
-        10 ** (magnitudes[2, 1] - magnitudes[0, 1]),
-        label="U / I"
-    )
-    plt.plot(
-        magnitudes[3, 0],
-        10 ** (magnitudes[3, 1] - magnitudes[0, 1]),
-        label="V / I"
-    )
-    
-    ### this is pretty bad
-    
-    ymin = 10 ** (magnitudes[1, 1] - magnitudes[0, 1]).min()
-    ymin = min(
-        ymin,
-        10 ** (magnitudes[2, 1] - magnitudes[0, 1]).min()
-    )
-    ymin = min(
-        ymin,
-        10 ** (magnitudes[2, 1] - magnitudes[0, 1]).min()
-    )
-    ymin = min(
-        ymin,
-        10 ** (magnitudes[3, 1] - magnitudes[0, 1]).min()
-    )
-    
-    ymax = magnitudes[0, 1].max()
-    ymax = max(
-        ymin,
-        10 ** (magnitudes[2, 1] - magnitudes[0, 1]).max()
-    )
-    ymax = max(
-        ymin,
-        10 ** (magnitudes[2, 1] - magnitudes[0, 1]).max()
-    )
-    ymax = max(
-        ymin,
-        10 ** (magnitudes[3, 1] - magnitudes[0, 1]).max()
-    )
-    
+    if undivided:
+        plt.plot(magnitudes[0, 0], magnitudes[0, 1],
+            label="I", color='k')
+        plt.plot(magnitudes[1, 0], magnitudes[1, 1],
+            label="Q", color='b')
+        plt.plot(magnitudes[2, 0], magnitudes[2, 1],
+            label="U", color='orange')
+        plt.plot(magnitudes[3, 0], magnitudes[3, 1],
+            label="V", color='g')
+        
+        ### this is pretty bad
+        
+        ymin = magnitudes[0, 1].min()
+        ymin = min(ymin, magnitudes[1, 1].min())
+        ymin = min(ymin, magnitudes[2, 1].min())
+        ymin = min(ymin, magnitudes[3, 1].min())
+        
+        ymax = magnitudes[0, 1].max()
+        ymax = max(ymin, magnitudes[1, 1].max())
+        ymax = max(ymin, magnitudes[2, 1].max())
+        ymax = max(ymin, magnitudes[3, 1].max())
+    else:
+        plt.plot(
+            magnitudes[1, 0],
+            10 ** (magnitudes[1, 1] - magnitudes[0, 1]),
+            label="Q / I"
+        )
+        plt.plot(
+            magnitudes[2, 0],
+            10 ** (magnitudes[2, 1] - magnitudes[0, 1]),
+            label="U / I"
+        )
+        plt.plot(
+            magnitudes[3, 0],
+            10 ** (magnitudes[3, 1] - magnitudes[0, 1]),
+            label="V / I"
+        )
+        
+        ### this is pretty bad
+        
+        ymin = 10 ** (magnitudes[1, 1] - magnitudes[0, 1]).min()
+        ymin = min(
+            ymin,
+            10 ** (magnitudes[2, 1] - magnitudes[0, 1]).min()
+        )
+        ymin = min(
+            ymin,
+            10 ** (magnitudes[2, 1] - magnitudes[0, 1]).min()
+        )
+        ymin = min(
+            ymin,
+            10 ** (magnitudes[3, 1] - magnitudes[0, 1]).min()
+        )
+        
+        ymax = magnitudes[0, 1].max()
+        ymax = max(
+            ymin,
+            10 ** (magnitudes[2, 1] - magnitudes[0, 1]).max()
+        )
+        ymax = max(
+            ymin,
+            10 ** (magnitudes[2, 1] - magnitudes[0, 1]).max()
+        )
+        ymax = max(
+            ymin,
+            10 ** (magnitudes[3, 1] - magnitudes[0, 1]).max()
+        )
+        
     ###
     
     """ outdated, but maybe you want to res it to keep debugging
