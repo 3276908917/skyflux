@@ -8,7 +8,7 @@ import skyflux.deprecated.polSims as pol
 ad_hoc_labels = ["I", "Q", "U", "V"]
 ad_hoc_colors = ['k', 'b', 'orange', 'g']
 
-def probe_stokes_params(fname, sp=None, rAnt1=None, rAnt2=None):
+def probe_stokes_params(fname, rAnt1=None, rAnt2=None):
     """
     out of context
     """
@@ -22,7 +22,7 @@ def probe_stokes_params(fname, sp=None, rAnt1=None, rAnt2=None):
     print("Fourier transforms applied to simulation.\n")
     
     wedge = collect_wedge_points(
-        transformed, fs, ts, sp, rAnt1, rAnt2
+        transformed, fs, ts, rAnt1, rAnt2
     )
     
 def load_wedge_sim(fname, rAnt1, rAnt2):
@@ -132,7 +132,7 @@ def transform_wedge(original, fs, ts):
                 
     return fourier_dict
 
-def collect_wedge_points(fcd, fs, ts, sp, rAnt1, rAnt2):
+def collect_wedge_points(fcd, fs, ts, rAnt1, rAnt2):
     """
     out of context
     """

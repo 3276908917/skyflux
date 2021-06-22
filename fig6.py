@@ -12,7 +12,7 @@ import skyflux.ant as ant
 import numpy as np
 
 def slicer(ant1, ant2, func_show, Qi=None,
-    fs=np.arange(125e6, 175e6 + 0.001, 4e6)):
+    fs=np.arange(125e6, 175e6 + 0.001, 1e6)):
     """
     The second pair of arguments is admittedly
     disappointing, but I could not figure out
@@ -20,7 +20,7 @@ def slicer(ant1, ant2, func_show, Qi=None,
     """
     # sp doesn't matter since the use of the
     # special_request parameter branches differently
-    special = func_show("max_one", Qi=Qi,
+    special = func_show("0Fw", Qi=Qi,
         special_request=(ant1, ant2))
     
     b = ant.baselength(ant1, ant2)
