@@ -1,0 +1,22 @@
+What is the problem?
+Sometimes the leakage terms seem to dominate the discussion.
+Why is Q out of control? Why not U and V?
+
+How do we make sense of the request for plots of the Mueller matrix?
+
+What we want to say
+I. I am using RIMEz or whatever
+II. I am using the GLEAMEGCAT catalog
+III. In case you want to double check my work, I am using 
+
+Overleaf is a terrible idea.
+While I certainly would like to have professional content (i.e. LaTeX)
+	to use in resumes and whatnot,
+the truth of the matter is that this is completely infeasible given current work circumstances.
+
+Let's see how far we can get just by using Google Docs.
+
+---
+
+If I wake up at 7:15, then I can get to the office by 8:15, but I have to leave at 9:20.
+Bible study at 9:45, service at 11, lunch at noon, I might resume work at 13
