@@ -25,7 +25,7 @@ def probe_stokes_params(fname, rAnt1=None, rAnt2=None):
         transformed, fs, ts, rAnt1, rAnt2
     )
     
-def load_wedge_sim(fname, rAnt1, rAnt2):
+def load_wedge_sim(fname, rAnt1, rAnt2, tGoal=None):
     """
     out of context
     """
@@ -56,6 +56,8 @@ def load_wedge_sim(fname, rAnt1, rAnt2):
             if rAnt1 is not None and rAnt1 != ant1:
                 continue
             if rAnt2 is not None and rAnt2 != ant2:
+                continue
+            if tGoal is None or tGoal != np.around(ts[ti], 4):
                 continue
             
             fourierc = [[], [], [], []]

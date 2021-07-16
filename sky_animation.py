@@ -1,6 +1,8 @@
 ### hard coding section
 ant1 = 136
 ant2 = 140
+tGoal = 0.7854 # almost exactly 3 hours
+
 ###
 
 import os
@@ -36,22 +38,13 @@ print("Full-alpha catalog assembled. Length is " + str(len(srcs)))
         
 import numpy as np
 
-print("Numpy imported.")
-
 srcs = np.array(srcs)
-
-print("Catalog reformatted.")
 
 index = len(srcs) - 1
 
-print("Setup terminated.")
-
 while index >= 0:
-
     ### todo
     # just show one plot at each plotting step
-    # automatically pick a good LST?
-    # or perhaps we should default to LST = 4 hours?
 
     label = "computer_" + str(len(srcs) - 1 - index)
     
@@ -59,7 +52,7 @@ while index >= 0:
     auto_wedge(srcs[np.array([index])], label=label, ptitle=label)
     
     print("Printing said source.")
-    load_wedge_sim(label + ".pickle", ant1, ant2)
+    load_wedge_sim(label + ".pickle", ant1, ant2, tGoal)
     
     if index == len(srcs) - 1:
         continue
@@ -67,7 +60,7 @@ while index >= 0:
     previous_label = "computer" + str(len(srcs) - index)
     merge_files(previous_label, label, label, label)
     print("Printing the entire story so far.")
-    load_wedge_sim(label + ".pickle", ant1, ant2)
+    load_wedge_sim(label + ".pickle", ant1, ant2, tGoal)
     
     index -= 1
 
