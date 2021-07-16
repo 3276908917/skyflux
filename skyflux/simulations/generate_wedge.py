@@ -202,9 +202,9 @@ def single_wedge(source):
                 
                 f_layer.append(t_layer)
 
-            inner_ants[inner_ant] = np.array(f_layer)
-
             f_layer = np.array(f_layer)
+
+            inner_ants[inner_ant] = f_layer
             
         outer_ants[outer_ant] = inner_ants
 
