@@ -27,6 +27,7 @@ lists give sf.catalog.srcs indices
         -35 < dec_angle < -25
     G: 50 brightest sources with
         -33 < dec_angle < -27
+    H: [3671:3872]
         
 The lower-case letter that appears at the end
 tells you the type of simulation

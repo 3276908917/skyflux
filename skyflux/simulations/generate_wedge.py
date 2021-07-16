@@ -452,9 +452,17 @@ def merge_wedges(wedge1, wedge2):
             )
             for nu_idx in nu_rl:
                 for t_idx in t_rl:
+                    
                     vis1 = wedge1[ant1][ant2][nu_idx][t_idx]
                     vis2 = wedge2[ant1][ant2][nu_idx][t_idx]
-                    
+
+                    # We don't care about parameter phases
+                    # and we take abs so that phases do not
+                    # produce spurious interference patterns
+                    for i in range(len(vis1)):
+                        vis1[i] = np.abs(vis1[i])
+                        vis2[i] = np.abs(vis2[i])
+
                     sum_[ant1][ant2][nu_idx][t_idx] = \
                         np.add(vis1, vis2)
                         
