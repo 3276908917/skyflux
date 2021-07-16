@@ -45,6 +45,7 @@ index = len(srcs) - 1
 while index >= 0:
     ### todo
     # just show one plot at each plotting step
+    # the one-source plotter still seems to be showing the wrong LST
 
     label = "computer_" + str(len(srcs) - 1 - index)
     
@@ -58,7 +59,7 @@ while index >= 0:
         index -= 1
         continue
         
-    previous_label = "computer" + str(len(srcs) - index)
+    previous_label = "computer_" + str(len(srcs) - 2 - index)
     merge_files(previous_label, label, label, label)
     print("Printing the entire story so far.")
     load_wedge_sim(label + ".pickle", ant1, ant2, tGoal)

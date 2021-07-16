@@ -486,7 +486,7 @@ def merge_files(fname1, fname2, new_fname, new_ptitle):
         'picture' : wmerged,
         'title' : new_ptitle
     }
-    pickle_dict(packed, new_fname)
+    utils.pickle_dict(packed, new_fname)
     
 def package(block, ptitle):
     """
