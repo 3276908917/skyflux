@@ -55,6 +55,7 @@ while index >= 0:
     load_wedge_sim(label + ".pickle", ant1, ant2, tGoal)
     
     if index == len(srcs) - 1:
+        index -= 1
         continue
         
     previous_label = "computer" + str(len(srcs) - index)
@@ -63,4 +64,6 @@ while index >= 0:
     load_wedge_sim(label + ".pickle", ant1, ant2, tGoal)
     
     index -= 1
+    
+    
 

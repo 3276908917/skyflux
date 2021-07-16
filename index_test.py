@@ -57,12 +57,13 @@ def load_wedge_sim(fname, rAnt1, rAnt2, tGoal=None):
                 continue
             if rAnt2 is not None and rAnt2 != ant2:
                 continue
-            if tGoal is None or tGoal != np.around(ts[ti], 4):
-                continue
             
             fourierc = [[], [], [], []]
             
             for ti in range(num_t):
+                if tGoal is None or tGoal != np.around(ts[ti], 4):
+                    continue
+                
                 for parameter in fourierc:
                     parameter.append([])
                 
