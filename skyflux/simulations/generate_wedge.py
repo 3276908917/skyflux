@@ -543,4 +543,7 @@ def auto_wedge(
     utils.pickle_dict(package(
         full_wedge(list_sources, ignor_I, gamma_func), ptitle
     ), label)
+
+# I use the following line for the first batch of polarized sims:
+# gamma_func = lambda: np.random.uniform(low=0.0, high=0.0032)
     

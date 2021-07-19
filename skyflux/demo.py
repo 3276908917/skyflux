@@ -265,15 +265,19 @@ def lookup(name):
 
 def cleaned_list():
     """
-    Returns a copy of the GLEAMEGCAT list, for which we have eliminated all entries with
-    unspecified spectral indices. By construction, objects without spectral indices were
+    Returns a copy of the GLEAMEGCAT list,
+    for which we have eliminated all entries with
+    unspecified spectral indices. By construction,
+    objects without spectral indices were
     automatically assigned 'NaN' for the field.
     """
-    ws_oc = catalog.obj_catalog.copy() # write-safe read copy for the GLEAM object catalog
-    cat = catalog.obj_catalog.copy()
-    # we loop in reverse, to avoid concurrent modification exceptions
+    ws_oc = catalog.srcs.copy() # write-safe read copy for
+        # the GLEAM object catalog
+    cat = catalog.srcs.copy()
+    # we loop in reverse, to avoid concurrent mod. exceptions
     for i in range(len(ws_oc) - 1, 0, -1):
-        # classic. The easiest way to check if a value is NaN: it does not equal itself
+        # classic. The easiest way to check if a value is NaN:
+        # it won't equal itself
         if ws_oc[i].alpha != ws_oc[i].alpha:
             del cat[i]
     return cat

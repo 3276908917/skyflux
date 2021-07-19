@@ -90,7 +90,8 @@ class GLEAM_entry:
     def _format_dec(self):
         """
         self.dec is a string which describes the declination
-            of the source in the format '(arc)degree-arcminute-arcsecond'.
+            of the source in the format
+            '(arc)degree-arcminute-arcsecond'.
         This internal function breaks that string up into
             three explicitly floating-point instance variables:
                 dec_degree, dec_arcminute, and dec_arcsecond
@@ -112,7 +113,8 @@ class GLEAM_entry:
             self.dec_degree, self.dec_arcminute, self.dec_arcsecond)
 
     def __str__(self):
-        return "Name: " + self.name + "\nRight ascension: " + str(self.ra_angle) + \
+        return "Name: " + self.name + \
+            "\nRight ascension: " + str(self.ra_angle) + \
             "\nDeclination: " + str(self.dec_angle) + \
             "\n151 MHz flux: " + str(self.flux_by_frq[151]) + "\n"
     
@@ -131,5 +133,4 @@ def idxs_to_objs(indices):
     for i in indices:
         objs.append(srcs[i])
     return np.array(objs)
-    
 
