@@ -12,7 +12,8 @@ import skyflux.ant as ant
 import numpy as np
 
 def slicer(ant1, ant2, func_show, Qi=None,
-    fs=np.arange(125e6, 175e6 + 0.001, 1e6)):
+    fs=np.arange(125e6, 175e6 + 0.001, 1e6),
+    wedge_name="0Fw", ratio_mode=False):
     """
     The second pair of arguments is admittedly
     disappointing, but I could not figure out
@@ -20,7 +21,7 @@ def slicer(ant1, ant2, func_show, Qi=None,
     """
     # sp doesn't matter since the use of the
     # special_request parameter branches differently
-    special = func_show("0Fw", Qi=Qi,
+    special = func_show(wedge_name, Qi=Qi,
         special_request=(ant1, ant2))
     
     b = ant.baselength(ant1, ant2)
@@ -53,30 +54,7 @@ def slicer(ant1, ant2, func_show, Qi=None,
     
     magnitudes = np.array(magnitudes)
     
-    undivided = False
-    
-    if undivided:
-        plt.plot(magnitudes[0, 0], magnitudes[0, 1],
-            label="I", color='k')
-        plt.plot(magnitudes[1, 0], magnitudes[1, 1],
-            label="Q", color='b')
-        plt.plot(magnitudes[2, 0], magnitudes[2, 1],
-            label="U", color='orange')
-        plt.plot(magnitudes[3, 0], magnitudes[3, 1],
-            label="V", color='g')
-        
-        ### this is pretty bad
-        
-        ymin = magnitudes[0, 1].min()
-        ymin = min(ymin, magnitudes[1, 1].min())
-        ymin = min(ymin, magnitudes[2, 1].min())
-        ymin = min(ymin, magnitudes[3, 1].min())
-        
-        ymax = magnitudes[0, 1].max()
-        ymax = max(ymin, magnitudes[1, 1].max())
-        ymax = max(ymin, magnitudes[2, 1].max())
-        ymax = max(ymin, magnitudes[3, 1].max())
-    else:
+    if ratio_mode:
         plt.plot(
             magnitudes[1, 0],
             10 ** (magnitudes[1, 1] - magnitudes[0, 1]),
@@ -122,6 +100,28 @@ def slicer(ant1, ant2, func_show, Qi=None,
             ymin,
             10 ** (magnitudes[3, 1] - magnitudes[0, 1]).max()
         )
+    else:
+        plt.plot(magnitudes[0, 0], magnitudes[0, 1],
+            label="I", color='k')
+        plt.plot(magnitudes[1, 0], magnitudes[1, 1],
+            label="Q", color='b')
+        plt.plot(magnitudes[2, 0], magnitudes[2, 1],
+            label="U", color='orange')
+        plt.plot(magnitudes[3, 0], magnitudes[3, 1],
+            label="V", color='g')
+        
+        ### this is pretty bad
+        
+        ymin = magnitudes[0, 1].min()
+        ymin = min(ymin, magnitudes[1, 1].min())
+        ymin = min(ymin, magnitudes[2, 1].min())
+        ymin = min(ymin, magnitudes[3, 1].min())
+        
+        ymax = magnitudes[0, 1].max()
+        ymax = max(ymin, magnitudes[1, 1].max())
+        ymax = max(ymin, magnitudes[2, 1].max())
+        ymax = max(ymin, magnitudes[3, 1].max())
+    
         
     ###
     

@@ -94,7 +94,8 @@ def f_only():
         
     return np.array(A_tensor)
 
-# Scan over all frequencies, for a single source, over all possible baselines
+# Scan over all frequencies, for a single source,
+    # over all possible baselines
 #! Is this method still relevant?
 def picture_tensor():
     raise NotImplementedError("Still processes just one source.")
@@ -541,7 +542,7 @@ def auto_wedge(
         pickle_dict
     """
     utils.pickle_dict(package(
-        full_wedge(list_sources, ignor_I, gamma_func), ptitle
+        full_wedge(list_sources, ignore_I, gamma_func), ptitle
     ), label)
 
 # I use the following line for the first batch of polarized sims:

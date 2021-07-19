@@ -279,7 +279,7 @@ def cleaned_list():
         # classic. The easiest way to check if a value is NaN:
         # it won't equal itself
         if ws_oc[i].alpha != ws_oc[i].alpha:
-            del cat[i]
+            cat = np.delete(cat, i)
     return cat
 
 def sources_range(start=3, end=5, frq=151):

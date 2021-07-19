@@ -308,8 +308,14 @@ def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
 
                 """ Power constants, section 2 """
                 z = pol.fq2z(nu / 1e9)
+                
+                # using this causes problems
                 lambda_ = pol.C / nu
+                
+                # less accurate, but doesn't kill the graph
+                # what gives?
                 lambda_a = pol.C / nua
+                
                 D = pol.transverse_comoving_distance(z)
                 DeltaD = pol.comoving_depth(B, z)
                 # Finally, condense everything into a
@@ -317,7 +323,7 @@ def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
                 p_coeff = universal_p_coeff * \
                     lambda_ ** 4 * D ** 2 * DeltaD
                 """ """
-                k_perp = baselength * pol.k_perp(z) / lambda_
+                k_perp = baselength * pol.k_perp(z) / lambda_a
                 
                 powers_prop = []
                 # store power results by Stokes index:
