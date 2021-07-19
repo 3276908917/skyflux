@@ -17,6 +17,8 @@ MACRO_EPSILON = 0.001
 HOUR = 2 * np.pi / 24
 MINUTE = HOUR / 60
 SECOND = MINUTE / 60
+c = 299792458 # m / s
+polar_unit = 2 * c ** 2 # see single_wedge for demonstration
 
 # we keep these as global parameters to avoid the potential overhead
 # of passing by value
@@ -29,6 +31,14 @@ t_axis = np.arange(3 * HOUR, 5 * HOUR, 4 * MINUTE)
 
 nu_rl = range(len(nu_axis))
 t_rl = range(len(t_axis))
+
+def sample_RM():
+    """
+    Hard-coded based on figure 4 of Nunhokee et al 2018
+    
+    Units are radians per square meter
+    """
+    return np.random.normal(loc=5.6, scale=20)
 
 def A_tensor(ra, dec):
     """
@@ -136,11 +146,13 @@ def tick(percent):
 def null_source(obj):
     return obj.alpha != obj.alpha
 
-def full_wedge(sources=catalog.srcs):
+def full_wedge(
+    sources=catalog.srcs, ignore_I=False, gamma_func=lambda: None
+):
     percent_interval = 100 / len(sources)
     percent = 0
     
-    wedge = single_wedge(sources[0])
+    wedge = single_wedge(sources[0], ignore_I, gamma_func())
     
     percent += percent_interval
     tick(percent)
@@ -149,7 +161,7 @@ def full_wedge(sources=catalog.srcs):
         if null_source(next_obj):
             continue
         
-        next_wedge = single_wedge(next_obj)
+        next_wedge = single_wedge(next_obj, ignore_I, gamma_func())
         wedge = merge_wedges(wedge, next_wedge)
 
         percent += percent_interval
@@ -159,7 +171,7 @@ def full_wedge(sources=catalog.srcs):
 
 outer_ants = ant.ant_pos.copy()
 
-def single_wedge(source):
+def single_wedge(source, ignore_I=False, gamma=None):
     ra = np.radians(source.ra_angle)
     dec = np.radians(source.dec_angle)
     
@@ -170,7 +182,17 @@ def single_wedge(source):
     for ni in nu_rl:
         nu = nu_axis[ni]
         I = vis.get_I(source, nu)
-        s_axis.append(np.array([complex(I), 0, 0, 0]))
+        Q = U = V = 0
+        if gamma is not None:
+            RM = sample_RM()
+            polarization = polar_unit * RM / nu ** 2
+            Q = gamma * I * np.cos(polarization)
+            U = gamma * I * np.sin(polarization)
+        if ignore_I:
+            I = 0 # important to do this here rather than earlier
+        s_axis.append(np.array([
+            complex(I), complex(Q), complex(U), complex(V)
+        ]))
 
     for outer_ant in outer_ants.keys():
         inner_ants = outer_ants.copy()
@@ -508,7 +530,10 @@ def package(block, ptitle):
             'picture' : block,
             'title' : ptitle}
         
-def auto_wedge(list_sources, label, ptitle):
+def auto_wedge(
+    list_sources, label, ptitle,
+    ignore_I=False, gamma_func=lambda: None
+):
     """
     Automatically runs
         full_wedge(list_sources)
@@ -516,6 +541,6 @@ def auto_wedge(list_sources, label, ptitle):
         pickle_dict
     """
     utils.pickle_dict(package(
-        full_wedge(list_sources), ptitle
+        full_wedge(list_sources, ignor_I, gamma_func), ptitle
     ), label)
     

@@ -28,6 +28,10 @@ lists give sf.catalog.srcs indices
     G: 50 brightest sources with
         -33 < dec_angle < -27
     H: [3671:3872]
+    I: [3470:3671]
+    J: [3269:3470]
+    K: [3068:3269]
+    L: [2667:3068]  yes, four hundred rather than the usual two
         
 The lower-case letter that appears at the end
 tells you the type of simulation
