@@ -96,7 +96,9 @@ def power_parameters(fname, ant1, ant2):
         
     return power_pieces
         
-def wauto_show(fname, sp=None, pt_override=None, static=False, Qi=None, special_request=None):
+def wauto_show(fname, sp=None,
+    pt_override=None, static=False,
+    Qi=None, special_request=None):
     """
     Load simulated visibilities from the file named
         @fname
@@ -307,23 +309,23 @@ def collect_wedge_points(fcd, fs, ts, Qi, sp=None,
                 nu = fs[nu_idx]
 
                 """ Power constants, section 2 """
+                # using these causes problems
                 z = pol.fq2z(nu / 1e9)
-                
-                # using this causes problems
                 lambda_ = pol.C / nu
                 
                 # less accurate, but doesn't kill the graph
-                # what gives?
+                # what gives? 
+                z_a = pol.fq2z(nua / 1e9)
                 lambda_a = pol.C / nua
                 
-                D = pol.transverse_comoving_distance(z)
-                DeltaD = pol.comoving_depth(B, z)
+                D = pol.transverse_comoving_distance(z_a)
+                DeltaD = pol.comoving_depth(B, z_a)
                 # Finally, condense everything into a
                 # power coefficient
                 p_coeff = universal_p_coeff * \
-                    lambda_ ** 4 * D ** 2 * DeltaD
+                    lambda_a ** 4 * D ** 2 * DeltaD
                 """ """
-                k_perp = baselength * pol.k_perp(z) / lambda_a
+                k_perp = baselength * pol.k_perp(z_a) / lambda_a
                 
                 powers_prop = []
                 # store power results by Stokes index:

@@ -13,7 +13,7 @@ import numpy as np
 
 def slicer(ant1, ant2, func_show, Qi=None,
     fs=np.arange(125e6, 175e6 + 0.001, 1e6),
-    wedge_name="0Fw", ratio_mode=False):
+    wedge_name="0Fw", ratio_mode=False, deltas=False):
     """
     The second pair of arguments is admittedly
     disappointing, but I could not figure out
@@ -101,14 +101,27 @@ def slicer(ant1, ant2, func_show, Qi=None,
             10 ** (magnitudes[3, 1] - magnitudes[0, 1]).max()
         )
     else:
-        plt.plot(magnitudes[0, 0], magnitudes[0, 1],
-            label="I", color='k')
-        plt.plot(magnitudes[1, 0], magnitudes[1, 1],
-            label="Q", color='b')
-        plt.plot(magnitudes[2, 0], magnitudes[2, 1],
-            label="U", color='orange')
-        plt.plot(magnitudes[3, 0], magnitudes[3, 1],
-            label="V", color='g')
+        if deltas=False:
+            plt.plot(magnitudes[0, 0], magnitudes[0, 1],
+                label="I", color='k')
+            plt.plot(magnitudes[1, 0], magnitudes[1, 1],
+                label="Q", color='b')
+            plt.plot(magnitudes[2, 0], magnitudes[2, 1],
+                label="U", color='orange')
+            plt.plot(magnitudes[3, 0], magnitudes[3, 1],
+                label="V", color='g')
+        else: # k^3 / 2 pi^2, but the problem is that
+            # these powers are logs, right?
+            
+            # k^2 = k_par^2 + k_perp^2
+            plt.plot(magnitudes[0, 0], magnitudes[0, 1],
+                label="I", color='k')
+            plt.plot(magnitudes[1, 0], magnitudes[1, 1],
+                label="Q", color='b')
+            plt.plot(magnitudes[2, 0], magnitudes[2, 1],
+                label="U", color='orange')
+            plt.plot(magnitudes[3, 0], magnitudes[3, 1],
+                label="V", color='g')
         
         ### this is pretty bad
         
