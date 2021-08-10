@@ -98,7 +98,7 @@ def power_parameters(fname, ant1, ant2):
         
 def wauto_show(fname, sp=None,
     pt_override=None, static=False,
-    Qi=None, special_request=None):
+    Qi=None, special_request=None, quiet=False):
     """
     Load simulated visibilities from the file named
         @fname
@@ -126,10 +126,13 @@ def wauto_show(fname, sp=None,
     if pt_override is not None:
         ptitle = pt_override
     
-    print("Simulation file loaded.\n")
+    if not quiet:
+        print("Simulation file loaded.\n")
     
     transformed = transform_wedge(fcd, fs, ts)
-    print("Fourier transforms applied to simulation.\n")
+    
+    if not quiet:
+        print("Fourier transforms applied to simulation.\n")
     
     if static:
         wedge = static_visual(sim_dict)
@@ -140,7 +143,9 @@ def wauto_show(fname, sp=None,
         if special_request is not None:
             return wedge
         #return wedge # just for individual baseline testing
-    print("Wedge points collected.\n")
+    
+    if not quiet:
+        print("Wedge points collected.\n")
     
     return plot_3D(wedge, fs, ptitle)
     
@@ -515,10 +520,11 @@ def finalize_plot(title):
     # and theta \in [0, np.pi]
 def calculate_Q(
     B=np.arange(50e6, 250e6 + 0.001, 4e6),
-    angular_resolution = 250
+    angular_resolution = 250,
+    quiet=False
 ):
-    
-    print("Establishing integration parameters")
+    if not quiet:
+        print("Establishing integration parameters")
     dnu = B[1] - B[0]
     window = pol.genWindow(len(B))
     
@@ -535,10 +541,12 @@ def calculate_Q(
 
     d3 = dnu * dphi * dtheta
     
-    print("Integration paramaters established. Integrating...")
+    if not quiet:
+        print("Integration paramaters established. Integrating...")
 
     for phi in list_phi:
-        print("phi is", phi)
+        if not quiet:
+            print("phi is", phi)
         for theta in list_theta:
             for nu_idx in range(len(B)):
                 next_A = sf.stokes.create_A(
@@ -547,7 +555,8 @@ def calculate_Q(
                 Aw = next_A * window[nu_idx]
                 Q += np.multiply(Aw, np.conj(Aw)) * d3
     
-    print("Integration complete.")
+    if not quiet:
+        print("Integration complete.")
     
     #! Disgusting hack
     return Q[:, 0, :]
