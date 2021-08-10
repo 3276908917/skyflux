@@ -487,6 +487,7 @@ def plot_3D(visual, fs, title, scaled=False):
     
     # Interpolation choice doesn't really matter;
     # gaussian looks smooth
+    print(image.shape, "shape")
     plt.imshow(image.T, extent=[
         x.min(), x.max(), y.min(), y.max()
     ], interpolation='gaussian', aspect='auto')
